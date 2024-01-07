@@ -314,8 +314,6 @@ end
 function response.read(client)
   local payload = client.network.read(client)
   local prefix, data = payload:sub(1, -#payload), payload:sub(2)
-  Log(kLogInfo, "data : >" .. data .. "<")
-  Log(kLogInfo, "prefix : >" .. prefix .. "<")
   -- status reply
   if prefix == '+' then
       if data == 'OK' then
@@ -812,8 +810,7 @@ local function connect_tcp(socket, parameters)
 
   local ok, err = unix.connect(socket, ResolveIp(host), port)
   if not ok then
-     Log(kLogInfo, EncodeJson(err))
-      redis.error('could not connect to '..host..':'..port..' ['..EncodeJson(err)..']')
+    redis.error('could not connect to '..host..':'..port..' ['..EncodeJson(err)..']')
   end
   -- socket:setoption('tcp-nodelay', parameters.tcp_nodelay)
   return socket

@@ -136,9 +136,6 @@ function CustomRoute(method, url, options)
     url = url:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
 	end
 
-	params.controller = options.controller
-	params.action = options.action
-
 	if(#extractedPatterns > 0) then
 		parser = re.compile(url)
 		matcher = {parser:search(path)}
@@ -149,11 +146,14 @@ function CustomRoute(method, url, options)
 		end
 	end
 
-	if GetMethod() == method then
+	parser = re.compile("^" .. url .. "$")
+	matcher = parser:search(path)
+	if matcher and GetMethod() == method then
+		params.controller = options.controller
+		params.action = options.action
+
 		RoutePath("/controllers/" .. options.controller .. "_controller.lua")
 		return
-	else
-		Route()
 	end
 end
 

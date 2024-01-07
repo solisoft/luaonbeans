@@ -17,8 +17,8 @@
           <td><%= doc.title %></td>
           <td><%= doc.text %></td>
           <td>
-            <a href="/comments/<%= doc._key %>">Show</a> ||
-            <a href="/comments/<%= doc._key %>/edit">Edit</a> ||
+            <a href="/posts/<%= params.post_id %>/comments/<%= doc._key %>">Show</a> ||
+            <a href="/posts/<%= params.post_id %>/comments/<%= doc._key %>/edit">Edit</a> ||
             <a href="#" hx-target="body" hx-confirm="Are you sure ?"  hx-delete="/posts/<%= params.post_id %>/comments/<%= doc._key %>">Destroy</a>
           </td>
         </tr>

@@ -1,0 +1,18 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title><%= title or "lua_on_beans" %></title>
+
+	<meta name="description" content="" />
+	<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" href="/layouts/app/css.css" />
+</head>
+<body class="min-h-screen flex flex-col">
+	<%- Partial("header") %>
+	<div class="grow">@yield</div>
+	<%- Partial("footer") %>
+</body>
+</html>

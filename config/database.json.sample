@@ -1,0 +1,6 @@
+{
+	"db_name": "<db>",
+	"url": "http://localhost:8529",
+	"username": "root",
+	"password": "password"
+}

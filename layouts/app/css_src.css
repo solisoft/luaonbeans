@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input[type="text"], textarea {
+  @apply w-full py-1 px-2 border border-[#3A687E]
+}
+
+input[type="submit"] {
+  @apply bg-black rounded text-white py-2 px-5
+}
+
+h1 {
+  @apply text-xl font-bold pb-5
+}
+
+a {
+  @apply text-[#99C1D0] hover:text-[#3A687E] hover:underline hover:cursor-pointer cursor-pointer
+}

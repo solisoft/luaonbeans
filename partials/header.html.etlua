@@ -1,0 +1,15 @@
+<header class="bg-[#D1DBE1] text-white pb-5 border-b border-[#3A687E] border-b-8">
+	<div class="container mx-auto flex justify-center">
+		<%= title or "" %>
+		<% if results then %>
+			<% for i, doc in pairs(results) do %>
+				<%= doc %>
+			<% end %>
+		<% else %>
+			<div class="flex flex-col items-center pt-2">
+				<a href="/"><img src="/redbean.png" alt="Lua on Rails" class="w-10"></a>
+				<h2 class="text-xl font-bold text-shadow-xl ">Lua on Beans</h2>
+			</div>
+		<% end %>
+	</div>
+</header>

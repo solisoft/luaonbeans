@@ -27,7 +27,8 @@
     </tbody>
   </table>
 
-  <div class="pt-10">
+  <div class="pt-10 flex gap-10" >
     <a href="/posts/<%= params.post_id %>/comments/new">Create a new Comment</a>
+    <a href="/posts/<%= params.post_id %>">Back to post</a>
   </div>
 </div>

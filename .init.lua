@@ -12,13 +12,16 @@ function OnHttpRequest()
 
 	adb.RefreshToken(db_config) -- reconnect to arangoDB if needed
 
-	-- routes
+	-- Routes
+	---- Basic CRUD
 	Resource('posts')
-	NestedResource('comments', '/posts/:post_id', {
-		post_id = "([0-9]+)"
+	---- Nested CRUD
+	Resource('comments', { root = '/posts/:post_id', post_id = "([0-9]+)" })
+	---- Custom Ruute
+	CustomRoute('GET', '/posts/:post_id/offline', {
+		post_id = "([0-9]+)", controller = "posts", action = "offline"
 	})
-
-	-- define root route
+	---- define root route
 	if GetPath() == '/' then
 		params['action'] = 'index'
 		RoutePath("/controllers/welcome_controller.lua")

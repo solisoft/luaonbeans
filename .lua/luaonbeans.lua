@@ -25,25 +25,25 @@ function extractPatterns(inputStr)
 end
 
 function Resource(name, options)
-	options = options or { base_root = "" }
-	options.base_root = options.base_root or ""
-	options.base_root = options.base_root .. "/"
+	options = options or { root = "" }
+	options.root = options.root or ""
+	options.root = options.root .. "/"
 
 	local path = GetPath()
 	local id = null
 	local parser = null
 	local matcher = null
 
-	extractedPatterns = extractPatterns(options.base_root)
+	local extractedPatterns = extractPatterns(options.root)
 
 	for _, pattern in ipairs(extractedPatterns) do
-    options.base_root = options.base_root:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
+    options.root = options.root:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
 	end
 
 	params["controller"] = name
 
 	if(#extractedPatterns > 0) then
-		parser = re.compile(options.base_root)
+		parser = re.compile(options.root)
 		matcher = {parser:search(path)}
 		for i, match in ipairs(matcher) do
 			if i > 1 then
@@ -53,7 +53,7 @@ function Resource(name, options)
 	end
 
 	if GetMethod() == "GET" then
-		parser = re.compile("^" .. options.base_root .. name .. "$")
+		parser = re.compile("^" .. options.root .. name .. "$")
 		matcher = parser:search(path)
 
 		if matcher then
@@ -62,7 +62,7 @@ function Resource(name, options)
 			return
 		end
 
-    parser = re.compile("^" .. options.base_root .. name .. "/new$")
+    parser = re.compile("^" .. options.root .. name .. "/new$")
 		matcher = parser:search(path)
 		if matcher then
 			params["action"] = "new"
@@ -89,7 +89,7 @@ function Resource(name, options)
 	end
 
 	if GetMethod() == "POST" then
-		parser = re.compile("^" ..  options.base_root ..name .. "$")
+		parser = re.compile("^" ..  options.root ..name .. "$")
 		matcher = parser:search(path)
 		if matcher then
 			params["action"] = "create"
@@ -128,8 +128,33 @@ function Resource(name, options)
 	end
 end
 
-function NestedResource(name, path, options)
-	Resource(name, table.merge(options, { base_root = path }))
+function CustomRoute(method, url, options)
+	local extractedPatterns = extractPatterns(url)
+	local path = GetPath()
+
+	for _, pattern in ipairs(extractedPatterns) do
+    url = url:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
+	end
+
+	params.controller = options.controller
+	params.action = options.action
+
+	if(#extractedPatterns > 0) then
+		parser = re.compile(url)
+		matcher = {parser:search(path)}
+		for i, match in ipairs(matcher) do
+			if i > 1 then
+				params[extractedPatterns[i - 1]:gsub(":","")] = match
+			end
+		end
+	end
+
+	if GetMethod() == method then
+		RoutePath("/controllers/" .. options.controller .. "_controller.lua")
+		return
+	else
+		Route()
+	end
 end
 
 function GetBodyParams()

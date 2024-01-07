@@ -1,4 +1,5 @@
 package.path = package.path .. ";.lua/?.lua"
+package.path = package.path .. ";models/?.lua"
 require "utilities"
 
 -- ArangoDB connection

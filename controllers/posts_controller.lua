@@ -1,15 +1,14 @@
 post = {}
+Posts = require("posts")
 
 -- A kind of before_each only: %w(edit update show) :)
 if table.contains({ "edit", "update", "show" }, params.action) then
-  post = adb.GetDocument("posts/" .. params.id)
+  post = Posts.get(params.id)
 end
 
 -- Here a method to be more DRI
 local function load_index()
-  local posts = adb.Aql([[
-    FOR post IN posts SORT post._key ASC RETURN post
-  ]]).result
+  local posts = Posts.all()
   Page("posts/index", "app", { posts = posts })
 end
 
@@ -28,10 +27,11 @@ local app = {
 
   -- PUT posts#update => posts/:id
   update = function()
-    local record = adb.UpdateDocument("posts/" .. params.id, GetBodyParams())
+    local bodyParams = GetBodyParams()
+    local record = Posts.update(params.id, bodyParams)
 
     if record.error then
-      Page("posts/edit", "app", { post = table.merge(GetBodyParams(), { _key = params.id }), record = record })
+      Page("posts/edit", "app", { post = table.merge(bodyParams, { _key = params.id }), record = record })
       return
     end
 
@@ -40,11 +40,12 @@ local app = {
 
   -- POST posts#create => /posts
   create = function()
-    local created_post = adb.CreateDocument("posts", GetBodyParams())
+    local bodyParams = GetBodyParams()
+    local created_post = Posts.create(bodyParams)
 
     if created_post.error then
       SetStatus(400)
-      Page("posts/new", "app", { post = GetBodyParams() })
+      Page("posts/new", "app", { post = bodyParams })
       return
     end
 
@@ -53,7 +54,7 @@ local app = {
 
   -- DELETE posts#delete => /posts/:id
   delete = function()
-    adb.DeleteDocument("posts/" .. params.id)
+    Posts.destroy(params.id)
     load_index()
   end,
 

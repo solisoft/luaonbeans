@@ -1,22 +1,15 @@
 
 comment = {}
+Comments = require("comments")
 
 -- A kind of before_each only: %w(edit update show) :)
 if table.contains({ "edit", "update", "show" }, params.action) then
-  comment = adb.GetDocument("comments/" .. params.id)
+  comment = Comments.get(params.id)
 end
 
 -- Here a method to be more DRI
 local function load_index()
-  local data = adb.Aql([[
-    FOR post IN posts FILTER post._key == TO_STRING(@key)
-    LET comments = (
-      FOR comment IN comments FILTER comment.post_key == post._key
-      SORT comment._key ASC RETURN comment
-    )
-    RETURN { post, comments }
-  ]], { key = params.post_id }).result[1]
-
+  local data = Comments.all()
   if data then
     Page("comments/index", "app", { comments = data.comments })
   else
@@ -44,7 +37,7 @@ local app = {
     local bodyParams = GetBodyParams()
     bodyParams.post_key = params.post_id
 
-    local record = adb.UpdateDocument("comments/" .. params.id, bodyParams)
+    local record = Comments.update(params.id, bodyParams)
 
     if record.error then
       Page("comments/edit", "app", { comment = table.merge(bodyParams, { _key = params.id }), record = record })
@@ -59,7 +52,7 @@ local app = {
     local bodyParams = GetBodyParams()
     bodyParams.post_key = params.post_id
 
-    local created_comment = adb.CreateDocument("comments", bodyParams)
+    local created_comment = Comments.create(bodyParams)
 
     if created_comment.error then
       SetStatus(400)
@@ -72,7 +65,7 @@ local app = {
 
   -- DELETE comments#delete => /comments/:id
   delete = function()
-    adb.DeleteDocument("comments/" .. params.id)
+    Comments.destroy(params.id)
     load_index()
   end
 }

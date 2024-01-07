@@ -15,7 +15,7 @@ return {
   end,
 
   create = function(dataset)
-    return adb.CreateDocument("comments", datasets)
+    return adb.CreateDocument("comments", dataset)
   end,
 
   update = function(key, dataset)

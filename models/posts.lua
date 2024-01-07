@@ -10,7 +10,7 @@ return {
   end,
 
   create = function(dataset)
-    return adb.CreateDocument("posts", datasets)
+    return adb.CreateDocument("posts", dataset)
   end,
 
   update = function(key, dataset)

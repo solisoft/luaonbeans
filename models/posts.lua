@@ -10,14 +10,14 @@ return {
   end,
 
   create = function(dataset)
-    adb.CreateDocument("posts", datasets)
+    return adb.CreateDocument("posts", datasets)
   end,
 
   update = function(key, dataset)
-    adb.UpdateDocument("posts/" .. key, dataset)
+    return adb.UpdateDocument("posts/" .. key, dataset)
   end,
 
   destroy = function(key)
-    adb.DeleteDocument("posts/" .. key)
+    return adb.DeleteDocument("posts/" .. key)
   end
 }

@@ -15,14 +15,14 @@ return {
   end,
 
   create = function(dataset)
-    adb.CreateDocument("comments", datasets)
+    return adb.CreateDocument("comments", datasets)
   end,
 
   update = function(key, dataset)
-    adb.UpdateDocument("comments/" .. key, dataset)
+    return adb.UpdateDocument("comments/" .. key, dataset)
   end,
 
   destroy = function(key)
-    adb.DeleteDocument("comments/" .. key)
+    return adb.DeleteDocument("comments/" .. key)
   end
 }

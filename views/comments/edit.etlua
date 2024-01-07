@@ -2,18 +2,18 @@
   <h1>Editing Comment :</h1>
 
   <form
-    action="/posts/<%= params.post_id %>/comments/<%= post._key %>"
+    action="/posts/<%= params.post_id %>/comments/<%= comment._key %>"
     method="POST"
     class="flex flex-col gap-2"
     >
     <div class="flex gap-4 items-center">
       <label for="title">Title</label>
-      <input type="text" name="title" required value="<%= post.title %>" />
+      <input type="text" name="title" required value="<%= comment.title %>" />
     </div>
 
     <div class="flex gap-4 items-center">
       <label for="text">Text</label>
-      <textarea type="text" name="text" required><%= post.text %></textarea>
+      <textarea type="text" name="text" required><%= comment.text %></textarea>
     </div>
 
     <% if record then %>

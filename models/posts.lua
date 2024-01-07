@@ -18,6 +18,11 @@ return {
   end,
 
   destroy = function(key)
+    -- Remove associated comments
+    adb.Aql([[
+      FOR comment IN comments FILTER comment.post_id == TO_STRING(@key)
+        REMOVE comment IN comments
+    ]], { key = key })
     return adb.DeleteDocument("posts/" .. key)
   end
 }

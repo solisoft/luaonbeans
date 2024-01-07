@@ -3,6 +3,6 @@
   <%= EncodeJson(post) %>
 
 
-  <div><a href="/posts/<%= params.id %>/comments/new">Add a new comment</a></div>
+  <div><a href="/posts/<%= params.id %>/comments">Comments</a></div>
   <div><a href="/posts">Back</a></div>
 </div>

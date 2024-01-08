@@ -19,4 +19,11 @@ Then configure the `config/database.json` file
 
 Then run `./redbean.com -D .`
 
+## TODO
+
+- Specs
+- Migrations
+- File Upload
+- Oauth2
+
 !!! This project is under development !!!

@@ -1,21 +1,80 @@
 package.path = package.path .. ";.lua/?.lua"
 require("utilities")
 
+define_words = function(name)
+  return {
+    model = Camelize(name),
+    plural = Pluralize(name),
+    singular = name
+  }
+end
+
+process_template = function(template, words)
+  template = string.gsub(template, "##model_plural##", words.plural)
+  template = string.gsub(template, "##model_singular##", words.singular)
+  return string.gsub(template, "##model_singular_capitalized##", words.model)
+end
+
+create_views = function(controller_name)
+  local words = define_words(controller_name)
+  unix.mkdir("views/" .. words.plural)
+  local template = Slurp(".templates/views/index.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/index.etlua", template)
+
+  template = Slurp(".templates/views/new.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/new.etlua", template)
+
+  template = Slurp(".templates/views/edit.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/edit.etlua", template)
+
+  template = Slurp(".templates/views/show.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/show.etlua", template)
+end
+
+create_controller = function(controller_name)
+  local words = define_words(controller_name)
+  local template = Slurp(".templates/controller.lua")
+  template = process_template(template, words)
+  Barf("controllers/" .. words.plural .. "_controller.lua", template)
+end
+
+create_migration = function(name)
+  local template = Slurp(".templates/migration.lua")
+  template = process_template(template, words)
+  Barf("migrations/" .. os.date("%Y%m%d-%H%I_") .. string.to_slug(name) .. ".lua", template)
+end
+
+create_model = function(model_name)
+  local words = define_words(model_name)
+  local template = Slurp(".templates/model.lua")
+  template = process_template(template, words)
+  Barf("models/" .. words.singular .. ".lua", template)
+  create_migration("create " .. words.plural .. " table")
+end
+
 if arg[1] == "create" then
   if arg[2] == "migration" then
-    Barf("migrations/" .. os.date("%Y%m%d-%H%I_") .. string.to_slug(arg[3]) .. ".lua", "")
+    create_migration(Singularize(arg[3]))
   end
 
   if arg[2] == "controller" then
-    -- todo
+    create_controller(Singularize(arg[3]))
   end
 
   if arg[2] == "model" then
-    -- todo
+    create_model(Singularize(arg[3]))
   end
 
   if arg[2] == "scaffold" then
-    -- todo
+    singular = Singularize(arg[3])
+
+    create_controller(singular)
+    create_views(singular)
+    create_model(singular)
   end
 end
 

@@ -1,0 +1,32 @@
+<div class="container mx-auto py-10">
+  <h1>##model_plural_capitalized##</h1>
+
+  <table class="w-full">
+    <thead>
+      <tr>
+        <th class="text-left">Key</th>
+        <th class="text-left">Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for _, doc in pairs(##model_plural##) do %>
+        <% if doc then %>
+        <tr>
+          <td><%= doc._key %></td>
+          <td><%= doc.title %></td>
+          <td><%= doc.text %></td>
+          <td>
+            <a href="/##model_plural##/<%= doc._key %>">Show</a> ||
+            <a href="/##model_plural##/<%= doc._key %>/edit">Edit</a> ||
+            <a href="#" hx-target="body" hx-confirm="Are you sure ?"  hx-delete="/##model_plural##/<%= doc._key %>">Destroy</a>
+          </td>
+        </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="pt-10">
+    <a href="/##model_plural##/new">Create a new ##model_singular_capitalized##</a>
+  </div>
+</div>

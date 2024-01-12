@@ -1,0 +1,30 @@
+package.path = package.path .. ";.lua/?.lua"
+require("utilities")
+
+if arg[1] == "create" then
+  if arg[2] == "migration" then
+    Barf("migrations/" .. os.date("%Y%m%d-%H%I_") .. string.to_slug(arg[3]) .. ".lua", "")
+  end
+
+  if arg[2] == "controller" then
+    -- todo
+  end
+
+  if arg[2] == "model" then
+    -- todo
+  end
+
+  if arg[2] == "scaffold" then
+    -- todo
+  end
+end
+
+if arg[1] == "migrate" then
+  -- todo
+end
+
+if arg[1] == "migrate:rollback" then
+  -- todo
+end
+
+

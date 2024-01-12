@@ -23,11 +23,16 @@ end
 
 function string.split(inputStr, sep)
   if sep == nil then
-      sep = "%s" -- Default to whitespace
+    sep = "%s" -- Default to whitespace
   end
   local t = {}
   for str in string.gmatch(inputStr, "([^"..sep.."]+)") do
-      table.insert(t, str)
+    table.insert(t, str)
   end
   return t
+end
+
+function string.to_slug(str)
+  local slug = string.gsub(string.gsub(str,"[^ A-Za-z0-9]","-"),"[ ]+","-")
+  return string.gsub(slug, "[-]+","-")
 end

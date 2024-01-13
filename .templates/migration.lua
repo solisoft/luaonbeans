@@ -5,7 +5,9 @@ return {
       reads = { "some", "tables" }
     })
     if(pcall(function()
+
       -- do something
+
     end)) then
       adb.CommitTransaction(transaction.result.id)
       return true
@@ -21,7 +23,9 @@ return {
       reads = { "some", "tables" }
     })
     if(pcall(function()
+
       -- do something
+
     end)) then
       adb.CommitTransaction(transaction.result.id)
       return true

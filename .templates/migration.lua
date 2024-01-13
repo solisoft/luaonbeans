@@ -1,9 +1,9 @@
 return {
-  up: function()
+  up = function()
     -- do something
   end,
 
-  down: function()
+  down = function()
     -- do something
   end
 }

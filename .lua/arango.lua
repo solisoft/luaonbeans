@@ -81,14 +81,16 @@ end
 
 local function with_params(endpoint, method, handle, params)
 	params = params or {}
-  return Api_run(endpoint .. handle, method, params)
+	return Api_run(endpoint .. handle, method, params)
 end
 
 local function without_params(endpoint, method, handle)
 	params = params or {}
   return Api_run(endpoint .. handle, method)
 end
+
 -- Documents
+
 local function UpdateDocument(handle, params)
 	return with_params('/document/', 'PATCH', handle, params)
 end
@@ -104,39 +106,65 @@ end
 local function DeleteDocument(handle)
 	return without_params('/document/', 'DELETE', handle)
 end
+
 ---Collections
-local function UpdateCollection(handle, params)
-	return with_params('/collections/', 'PUT', handle, params)
+
+local function UpdateCollection(collection, params)
+	return with_params('/collection/', 'PUT', collection, params)
 end
 
-local function CreateCollection(handle, params)
-	return with_params('/collections/', 'POST', handle, params)
+local function CreateCollection(collection, options)
+	local params = { name = collection, options = (options or {}) }
+	return with_params('/collection/', 'POST', "", params)
 end
 
-local function GetCollection(handle)
-	return without_params('/collections/', 'GET', handle)
+local function GetCollection(collection)
+	return without_params('/collection/', 'GET', collection)
 end
 
-local function DeleteCollection(handle)
-	return without_params('/collections/', 'DELETE', handle)
+local function DeleteCollection(collection)
+	return without_params('/collection/', 'DELETE', collection)
 end
+
+-- Databases
+
+local function CreateDatabase(name, options)
+	local params = { name = name, options = (options or {}) }
+	return with_params('/database', 'POST', "", params)
+end
+
+local function DeleteDatabase(name)
+	return without_params('/database/', 'DELETE', name)
+end
+
 -- Indexes
+
+local function GetAllIndexes(collection)
+	return without_params('/index?collection=' .. collection, 'GET', "")
+end
+
 local function CreateIndex(handle, params)
-	return with_params('/index', 'POST', handle, params)
+	return with_params('/index?collection=' .. handle, 'POST', "", params)
 end
-local function DeleteIndex(handle)
-	return without_params('/index/', 'DELETE', handle)
+
+local function DeleteIndex(handle, index_id)
+	return without_params('/index/', 'DELETE', handle .. "/" .. index_id)
 end
+
 -- QueryCache
+
 local function GetQueryCacheEntries()
 	return without_params('/query-cache/entries', 'GET', "")
 end
+
 local function GetQueryCacheConfiguration()
 	return without_params('/query-cache/properties', 'GET', "")
 end
+
 local function UpdateCacheConfiguration(params)
 	return with_params('/query-cache/properties', 'PUT', "", params)
 end
+
 local function DeleteQueryCache()
 	return without_params('/query-cache', 'DELETE', "")
 end
@@ -162,10 +190,17 @@ return {
 	DeleteCollection = DeleteCollection,
 	PatchCollection = PutCollection,
 
+	GetAllIndexes = GetAllIndexes,
+	CreateIndex = CreateIndex,
+	DeleteIndex = DeleteIndex,
+
+	CreateDatabase = CreateDatabase,
+	DeleteDatabase = DeleteDatabase,
+
 	GetQueryCacheEntries = GetQueryCacheEntries,
 	GetQueryCacheConfiguration = GetQueryCacheConfiguration,
 	UpdateCacheConfiguration = UpdateCacheConfiguration,
 	DeleteQueryCache = DeleteQueryCache,
 
-	RefreshToken = RefreshToken
+	RefreshToken = RefreshToken,
 }

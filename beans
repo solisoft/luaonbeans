@@ -1,0 +1,163 @@
+package.path = package.path .. ";.lua/?.lua"
+package.path = package.path .. ";migrations/?.lua"
+require("utilities")
+
+beans_env = unix.environ()['BEANS_ENV'] or "development"
+
+local db_config = DecodeJson(Slurp("config/database.json"))
+adb = require "arango"
+
+json_print = function(value)
+  print(EncodeJson(value))
+end
+
+define_words = function(name)
+  return {
+    model = Camelize(name),
+    plural = Pluralize(name),
+    singular = name
+  }
+end
+
+process_template = function(template, words)
+  template = string.gsub(template, "##model_plural##", words.plural)
+  template = string.gsub(template, "##model_singular##", words.singular)
+  return string.gsub(template, "##model_singular_capitalized##", words.model)
+end
+
+create_views = function(controller_name)
+  local words = define_words(controller_name)
+  unix.mkdir("views/" .. words.plural)
+  local template = Slurp(".templates/views/index.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/index.etlua", template)
+
+  template = Slurp(".templates/views/new.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/new.etlua", template)
+
+  template = Slurp(".templates/views/edit.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/edit.etlua", template)
+
+  template = Slurp(".templates/views/show.etlua")
+  template = process_template(template, words)
+  Barf("views/".. words.plural .."/show.etlua", template)
+end
+
+create_controller = function(controller_name)
+  local words = define_words(controller_name)
+  local template = Slurp(".templates/controller.lua")
+  template = process_template(template, words)
+  Barf("controllers/" .. words.plural .. "_controller.lua", template)
+end
+
+create_migration = function(name)
+  local words = define_words(name)
+  local template = Slurp(".templates/migration.lua")
+  template = process_template(template, words)
+  Barf("migrations/" .. os.date("%Y%m%d-%H%I%S_") .. string.to_slug(name) .. ".lua", template)
+end
+
+create_model = function(model_name)
+  local words = define_words(model_name)
+  local template = Slurp(".templates/model.lua")
+  template = process_template(template, words)
+  Barf("models/" .. words.singular .. ".lua", template)
+  create_migration("create " .. words.plural .. " table")
+end
+
+if arg[1] == "create" then
+  if arg[2] == "migration" then
+    create_migration(arg[3])
+  end
+
+  if arg[2] == "controller" then
+    create_controller(Singularize(arg[3]))
+  end
+
+  if arg[2] == "model" then
+    create_model(Singularize(arg[3]))
+  end
+
+  if arg[2] == "scaffold" then
+    singular = Singularize(arg[3])
+
+    create_controller(singular)
+    create_views(singular)
+    create_model(singular)
+  end
+end
+
+if arg[1] == "db:setup" then
+  if db_config.production then
+    assert(adb.Auth(db_config.system) ~= null)
+    adb.CreateDatabase(db_config.production.db_name)
+    assert(adb.Auth(db_config.production) ~= null)
+    adb.CreateCollection("migrations")
+    adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
+    adb.CreateDocument("migrations", { filename = "0" })
+  end
+
+  if db_config.development then
+    assert(adb.Auth(db_config.system) ~= null)
+    adb.CreateDatabase(db_config.development.db_name)
+    assert(adb.Auth(db_config.development) ~= null)
+    adb.CreateCollection("migrations")
+    adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
+    adb.CreateIndex("migrations", {
+      type = "persistent",
+      unique = true,
+      fields = { "filename" }
+    })
+    adb.CreateDocument("migrations", { filename = "0" })
+  end
+
+  if db_config.test then
+    assert(adb.Auth(db_config.system) ~= null)
+    adb.CreateDatabase(db_config.test.db_name)
+    assert(adb.Auth(db_config.test) ~= null)
+    adb.CreateCollection("migrations")
+    adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
+    adb.CreateIndex("migrations", {
+      type = "persistent",
+      unique = true,
+      fields = { "filename" }
+    })
+    adb.CreateDocument("migrations", { filename = "0" })
+  end
+end
+
+if arg[1] == "db:migrate" then
+  assert(adb.Auth(db_config[beans_env]) ~= null)
+  latest_version = adb.Aql(
+    "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m.filename"
+  ).result[1]
+  for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. "/migrations")) do
+    if name ~= '.' and name ~= '..' then
+      if name > latest_version then
+        print("Processing " .. name)
+        local migration = require(string.gsub(name, ".lua", ""))
+        migration.up()
+        adb.CreateDocument("migrations", { filename = name })
+      end
+    end
+  end
+end
+
+if arg[1] == "db:rollback" then
+  assert(adb.Auth(db_config[beans_env]) ~= null)
+  latest_version = adb.Aql(
+    "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m"
+  ).result[1]
+  if latest_version.filename ~= "0" then
+    print("Processing " .. latest_version.filename)
+    local migration = require(string.gsub(latest_version.filename, ".lua", ""))
+    migration.down()
+    adb.DeleteDocument(latest_version._id)
+  else
+    print("Nothing to rollback!")
+  end
+end
+
+

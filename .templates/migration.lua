@@ -8,8 +8,10 @@ return {
       -- do something
     end)) then
       adb.CommitTransaction(transaction.result.id)
+      return true
     else
       adb.AbortTransaction(transaction.result.id)
+      return false
     end
   end,
 
@@ -22,8 +24,10 @@ return {
       -- do something
     end)) then
       adb.CommitTransaction(transaction.result.id)
+      return true
     else
       adb.AbortTransaction(transaction.result.id)
+      return false
     end
   end
 }

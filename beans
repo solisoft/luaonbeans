@@ -138,8 +138,9 @@ if arg[1] == "db:migrate" then
       if name > latest_version then
         print("Processing " .. name)
         local migration = require(string.gsub(name, ".lua", ""))
-        migration.up()
-        adb.CreateDocument("migrations", { filename = name })
+        if migration.up() then
+          adb.CreateDocument("migrations", { filename = name })
+        end
       end
     end
   end
@@ -153,8 +154,9 @@ if arg[1] == "db:rollback" then
   if latest_version.filename ~= "0" then
     print("Processing " .. latest_version.filename)
     local migration = require(string.gsub(latest_version.filename, ".lua", ""))
-    migration.down()
-    adb.DeleteDocument(latest_version._id)
+    if migration.down() then
+      adb.DeleteDocument(latest_version._id)
+    end
   else
     print("Nothing to rollback!")
   end

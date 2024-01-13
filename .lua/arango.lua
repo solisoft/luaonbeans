@@ -40,28 +40,28 @@ local function Auth(db_config)
 	api_url = db_config.url .. "/_db/" .. db_config.db_name .. "/_api"
 
 	if ok == 200 then
-		arango_jwt = DecodeJson(body)['jwt']
+		arango_jwt = DecodeJson(body)["jwt"]
 	end
 
 	return arango_jwt
 end
 
 local function Raw_aql(stm)
-	local body, status_code = Api_run('/cursor', 'POST', stm)
-	local result = body['result']
-	local has_more = body['hasMore']
-	local extra = body['extra']
+	local body, status_code = Api_run("/cursor", "POST", stm)
+	local result = body["result"]
+	local has_more = body["hasMore"]
+	local extra = body["extra"]
 
-	if body['error'] then
+	if body["error"] then
 		print(status_code)
 		print(EncodeJson(stm))
 		print(EncodeJson(body))
 	end
 
 	while has_more do
-		body = Api_run("/cursor/" .. body["id"], 'PUT')
-		result = Table_append(result, body['result'])
-		has_more = body['hasMore']
+		body = Api_run("/cursor/" .. body["id"], "PUT")
+		result = Table_append(result, body["result"])
+		has_more = body["hasMore"]
 	end
 
 	if result == nil then
@@ -92,81 +92,95 @@ end
 -- Documents
 
 local function UpdateDocument(handle, params)
-	return with_params('/document/', 'PATCH', handle, params)
+	return with_params("/document/", "PATCH", handle, params)
 end
 
 local function CreateDocument(handle, params)
-	return with_params('/document/', 'POST', handle, params)
+	return with_params("/document/", "POST", handle, params)
 end
 
 local function GetDocument(handle)
-	return without_params('/document/', 'GET', handle)
+	return without_params("/document/", "GET", handle)
 end
 
 local function DeleteDocument(handle)
-	return without_params('/document/', 'DELETE', handle)
+	return without_params("/document/", "DELETE", handle)
 end
 
 ---Collections
 
 local function UpdateCollection(collection, params)
-	return with_params('/collection/', 'PUT', collection, params)
+	return with_params("/collection/", "PUT", collection, params)
 end
 
 local function CreateCollection(collection, options)
 	local params = { name = collection, options = (options or {}) }
-	return with_params('/collection/', 'POST', "", params)
+	return with_params("/collection/", "POST", "", params)
 end
 
 local function GetCollection(collection)
-	return without_params('/collection/', 'GET', collection)
+	return without_params("/collection/", "GET", collection)
 end
 
 local function DeleteCollection(collection)
-	return without_params('/collection/', 'DELETE', collection)
+	return without_params("/collection/", "DELETE", collection)
 end
 
 -- Databases
 
 local function CreateDatabase(name, options)
 	local params = { name = name, options = (options or {}) }
-	return with_params('/database', 'POST', "", params)
+	return with_params("/database", "POST", "", params)
 end
 
 local function DeleteDatabase(name)
-	return without_params('/database/', 'DELETE', name)
+	return without_params("/database/", "DELETE", name)
 end
 
 -- Indexes
 
 local function GetAllIndexes(collection)
-	return without_params('/index?collection=' .. collection, 'GET', "")
+	return without_params("/index?collection=" .. collection, "GET", "")
 end
 
 local function CreateIndex(handle, params)
-	return with_params('/index?collection=' .. handle, 'POST', "", params)
+	return with_params("/index?collection=" .. handle, "POST", "", params)
 end
 
 local function DeleteIndex(handle, index_id)
-	return without_params('/index/', 'DELETE', handle .. "/" .. index_id)
+	return without_params("/index/", "DELETE", handle .. "/" .. index_id)
 end
 
 -- QueryCache
 
 local function GetQueryCacheEntries()
-	return without_params('/query-cache/entries', 'GET', "")
+	return without_params("/query-cache/entries", "GET", "")
 end
 
 local function GetQueryCacheConfiguration()
-	return without_params('/query-cache/properties', 'GET', "")
+	return without_params("/query-cache/properties", "GET", "")
 end
 
 local function UpdateCacheConfiguration(params)
-	return with_params('/query-cache/properties', 'PUT', "", params)
+	return with_params("/query-cache/properties", "PUT", "", params)
 end
 
 local function DeleteQueryCache()
-	return without_params('/query-cache', 'DELETE', "")
+	return without_params("/query-cache", "DELETE", "")
+end
+
+-- Stream transactions
+-- POST /_api/transaction/begin
+local function BeginTransaction(params)
+	return with_params("/transaction/begin", "POST", "", params)
+end
+
+local function CommitTransaction(transaction_id)
+	return without_params("/transaction/", "PUT", transaction_id)
+end
+
+local function AbortTransaction(transaction_id)
+	return without_params("/transaction/", "DELETE", transaction_id)
 end
 
 local function RefreshToken(db_config)
@@ -196,6 +210,10 @@ return {
 
 	CreateDatabase = CreateDatabase,
 	DeleteDatabase = DeleteDatabase,
+
+	BeginTransaction = BeginTransaction,
+	CommitTransaction = CommitTransaction,
+	AbortTransaction = AbortTransaction,
 
 	GetQueryCacheEntries = GetQueryCacheEntries,
 	GetQueryCacheConfiguration = GetQueryCacheConfiguration,

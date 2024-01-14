@@ -17,7 +17,6 @@ end
 local function Api_run(path, method, params, headers)
 	params = params or {}
 	headers = headers or {}
-
 	local ok, h, body = Fetch(
 		Api_url(path), {
 			method = method,
@@ -52,12 +51,6 @@ local function Raw_aql(stm)
 	local has_more = body["hasMore"]
 	local extra = body["extra"]
 
-	if body["error"] then
-		print(status_code)
-		print(EncodeJson(stm))
-		print(EncodeJson(body))
-	end
-
 	while has_more do
 		body = Api_run("/cursor/" .. body["id"], "PUT")
 		result = Table_append(result, body["result"])
@@ -68,7 +61,12 @@ local function Raw_aql(stm)
 		result = {}
 	end
 
-	return { result = result, extra = extra }
+	if body.error then
+		return body
+	else
+		return { result = result, extra = extra }
+	end
+
 end
 
 local function Aql(str, bindvars, options)
@@ -86,7 +84,7 @@ end
 
 local function without_params(endpoint, method, handle)
 	params = params or {}
-  return Api_run(endpoint .. handle, method)
+	return Api_run(endpoint .. handle, method)
 end
 
 -- Documents
@@ -147,8 +145,8 @@ local function CreateIndex(handle, params)
 	return with_params("/index?collection=" .. handle, "POST", "", params)
 end
 
-local function DeleteIndex(handle, index_id)
-	return without_params("/index/", "DELETE", handle .. "/" .. index_id)
+local function DeleteIndex(handle)
+	return without_params("/index/", "DELETE", handle)
 end
 
 -- QueryCache
@@ -197,12 +195,12 @@ return {
 	UpdateDocument = UpdateDocument,
 	CreateDocument = CreateDocument,
 	DeleteDocument = DeleteDocument,
-	PatchDocument = PutDocument,
+	PatchDocument = UpdateDocument,
 
 	UpdateCollection = UpdateCollection,
 	CreateCollection = CreateCollection,
 	DeleteCollection = DeleteCollection,
-	PatchCollection = PutCollection,
+	PatchCollection = UpdateCollection,
 
 	GetAllIndexes = GetAllIndexes,
 	CreateIndex = CreateIndex,

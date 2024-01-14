@@ -2,7 +2,13 @@ package.path = package.path .. ";.lua/?.lua"
 package.path = package.path .. ";models/?.lua"
 require "utilities"
 
-beans_env = unix.environ()['BEANS_ENV'] or "development"
+ENV = {}
+for _, var in pairs(unix.environ()) do
+	var = string.split(var, "=")
+	ENV[var[1]] = var[2]
+end
+
+beans_env = ENV['BEANS_ENV'] or "development"
 
 -- ArangoDB connection
 local db_config = DecodeJson(LoadAsset("config/database.json"))
@@ -13,7 +19,7 @@ adb.UpdateCacheConfiguration({ mode = "on" })
 function OnHttpRequest()
 	params = GetParams()
 
-	adb.RefreshToken(db_config) -- reconnect to arangoDB if needed
+	adb.RefreshToken(db_config[beans_env]) -- reconnect to arangoDB if needed
 
 	-- Routes
 	---- Basic CRUD

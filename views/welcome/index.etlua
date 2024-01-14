@@ -1,7 +1,9 @@
 <div class="container mx-auto py-10">
   <h1>Welcome aboard</h1>
 
-  <p>Find me in <code>/controller/welcome#indew</code></p>
+  <p>Find me in <code>/controllers/welcome_controller.lua #index</code> : running in <code><%= beans_env %></code></p>
+  <%= EncodeJson(adb.Aql("RETURN { uuid: UUID() }")) %>
+
   <%
     -- local original_hash = DecodeBase64("wUVS6tazE2N98_J4SH_djkEe1igXPu0qILAvVXCiO6O20gdf5vZ2sYFWX3c-Hy6L4TD47b3DSAAO9XjSqpJfag")
     -- local calculated_hash = GetCryptoHash(

@@ -3,6 +3,14 @@ etlua = require "etlua"
 
 -- Tables
 
+table.keys = function(t)
+  local keys = {}
+  for key, _ in pairs(t) do
+    table.insert(keys, key)
+  end
+  return keys
+end
+
 table.contains = function(table, element)
   for _, value in pairs(table) do
     if value == element then
@@ -17,6 +25,13 @@ table.merge = function(t1, t2)
     t1[k] = v
   end
   return t1
+end
+
+table.append = function(t1, t2)
+	for k, v in ipairs(t2) do
+    table.insert(t1, v)
+	end
+	return t1
 end
 
 -- Strings
@@ -34,7 +49,10 @@ end
 
 string.to_slug = function(str)
   local slug = string.gsub(string.gsub(str,"[^ A-Za-z0-9]","-"),"[ ]+","-")
-  return string.gsub(slug, "[-]+","-")
+  slug = string.gsub(slug, "[-]+","-")
+  slug = string.gsub(slug, "[-]+$","")
+
+  return string.lower(slug)
 end
 
 
@@ -100,13 +118,4 @@ end
 
 Camelize = function(str)
   return Capitalize(string.gsub(str, '%W+(%w+)', Capitalize))
-end
-
-string.split = function (inputstr, sep)
-  if sep == nil then sep = "%s" end
-  local t={}
-  for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-    table.insert(t, str)
-  end
-  return t
 end

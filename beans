@@ -1,11 +1,25 @@
-package.path = package.path .. ";.lua/?.lua"
-package.path = package.path .. ";migrations/?.lua"
+package.path = package.path .. ";.lua/?.lua;migrations/?.lua;specs/?.lua"
 require("utilities")
+lester = require("lester")
 
 beans_env = unix.environ()['BEANS_ENV'] or "development"
 
-local db_config = DecodeJson(Slurp("config/database.json"))
+db_config = DecodeJson(Slurp("config/database.json"))
 adb = require "arango"
+
+recursive_files = function(dir, files_found)
+  files_found = files_found or {}
+  for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. dir)) do
+    if name ~= '.' and name ~= '..' then
+      if path.isdir(name) then
+        files_found = recursive_files(dir .. "/" .. name, files_found)
+      else
+        files_found = table.append(files_found, { dir .. "/" .. name })
+      end
+    end
+  end
+  return files_found
+end
 
 json_print = function(value)
   print(EncodeJson(value))
@@ -89,46 +103,35 @@ if arg[1] == "create" then
   end
 end
 
+setup_db = function(env)
+  print("Setup " .. env .. " DB")
+  assert(adb.Auth(db_config.system) ~= null)
+  if env == "test" then
+    adb.DeleteDatabase(db_config[env].db_name)
+  end
+  adb.CreateDatabase(db_config[env].db_name)
+  assert(adb.Auth(db_config[env]) ~= null)
+  adb.CreateCollection("migrations")
+  adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
+  adb.CreateDocument("migrations", { filename = "0" })
+end
+
 if arg[1] == "db:setup" then
   if db_config.production then
-    assert(adb.Auth(db_config.system) ~= null)
-    adb.CreateDatabase(db_config.production.db_name)
-    assert(adb.Auth(db_config.production) ~= null)
-    adb.CreateCollection("migrations")
-    adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
-    adb.CreateDocument("migrations", { filename = "0" })
+    setup_db("production")
   end
 
   if db_config.development then
-    assert(adb.Auth(db_config.system) ~= null)
-    adb.CreateDatabase(db_config.development.db_name)
-    assert(adb.Auth(db_config.development) ~= null)
-    adb.CreateCollection("migrations")
-    adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
-    adb.CreateIndex("migrations", {
-      type = "persistent",
-      unique = true,
-      fields = { "filename" }
-    })
-    adb.CreateDocument("migrations", { filename = "0" })
+    setup_db("development")
   end
 
   if db_config.test then
-    assert(adb.Auth(db_config.system) ~= null)
-    adb.CreateDatabase(db_config.test.db_name)
-    assert(adb.Auth(db_config.test) ~= null)
-    adb.CreateCollection("migrations")
-    adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
-    adb.CreateIndex("migrations", {
-      type = "persistent",
-      unique = true,
-      fields = { "filename" }
-    })
-    adb.CreateDocument("migrations", { filename = "0" })
+    setup_db("test")
   end
 end
 
-if arg[1] == "db:migrate" then
+db_migrate = function()
+  print("Running migrations ...")
   assert(adb.Auth(db_config[beans_env]) ~= null)
   latest_version = adb.Aql(
     "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m.filename"
@@ -144,6 +147,10 @@ if arg[1] == "db:migrate" then
       end
     end
   end
+end
+
+if arg[1] == "db:migrate" then
+  db_migrate()
 end
 
 if arg[1] == "db:rollback" then
@@ -162,4 +169,18 @@ if arg[1] == "db:rollback" then
   end
 end
 
+if arg[1] == "specs" then
+  beans_env = "test"
+  setup_db("test")
+  db_migrate()
+  describe, it, expect = lester.describe, lester.it, lester.expect
+  for _, spec in pairs(recursive_files("/specs")) do
+    spec = spec:sub(8)
+    spec = require(string.gsub(spec, ".lua", ""))
+    spec.run()
+  end
+
+  lester.report()
+  lester.exit()
+end
 

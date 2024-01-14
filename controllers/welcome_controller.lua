@@ -3,5 +3,5 @@ local app = {
   index = function() Page('welcome/index', 'app') end
 }
 
-app[params.action]()
+return app[params.action]()
 

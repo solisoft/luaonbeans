@@ -19,7 +19,6 @@ jobs:
           command: apk add git
       - checkout
       - run: cp config/database.json.sample config/database.json
-
       - run:
           name: 'Start server'
           command: ./luaonbeans.org -D .

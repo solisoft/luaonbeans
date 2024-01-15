@@ -1,4 +1,5 @@
-"system": {
+{
+	"system": {
 		"db_name": "_system",
 		"url": "http://localhost:8529",
 		"username": "root",
@@ -22,3 +23,4 @@
 		"username": "root",
 		"password": "password"
 	}
+}

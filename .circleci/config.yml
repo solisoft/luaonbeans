@@ -1,17 +1,12 @@
 version: 2.1
 
-executors:
-  luaonbeans:
+jobs:
+  build:
     docker:
       - image: arangodb/arangodb:latest
         environment:
           ARANGO_ROOT_PASSWORD: password
         command: [--server.endpoint=http+tcp://0.0.0.0:8529 --server.password password]
-
-jobs:
-  test:
-    executor:
-      name: luaonbeans
     steps:
       - run:
           name: 'Install dependencies'
@@ -22,12 +17,6 @@ jobs:
           name: 'Start server'
           command: ./luaonbeans.org -D .
           background: true
-
       - run:
           name: 'Run tests'
           command: ./luaonbeans.org -i beans specs
-
-workflows:
-  build:
-    jobs:
-      - test

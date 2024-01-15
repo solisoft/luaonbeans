@@ -75,6 +75,7 @@ beans create model post
 beans create scaffold posts
 beans create migration add_indexes_to_posts
 
+beans db:setup
 beans db:migrate
 beans db:rollback
 

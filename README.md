@@ -82,6 +82,7 @@ beans specs
 
 ## TODO
 
+- Add specs for controllers & models from templates
 - File Upload
 - Oauth2
 

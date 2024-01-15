@@ -7,7 +7,7 @@ A tiny [redbean](https://redbean.dev/) MVC Lua framework
 First clone the repository
 
 ```sh
-git clone https://github.com/solisoft/luaonbeans.git
+git clone https://github.com/solisoft/luaonbeans.git --depth=1
 ```
 
 You need then to configure arangoDB (using brew or docker) and create a new database :

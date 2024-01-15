@@ -1,11 +1,13 @@
 return {
   up = function()
     local transaction = adb.BeginTransaction({
-      writes = { "some", "tables" },
-      reads = { "some", "tables" }
+      collections = {
+        writes = { "some", "tables" },
+        reads = { "some", "tables" }
+      }
     })
     if(pcall(function()
-
+      assert(transaction.code == 201, "Transaction is not created")
       -- do something
 
     end)) then
@@ -19,11 +21,13 @@ return {
 
   down = function()
     local transaction = adb.BeginTransaction({
-      writes = { "some", "tables" },
-      reads = { "some", "tables" }
+      collections = {
+        writes = { "some", "tables" },
+        reads = { "some", "tables" }
+      }
     })
     if(pcall(function()
-
+      assert(transaction.code == 201, "Transaction is not created")
       -- do something
 
     end)) then

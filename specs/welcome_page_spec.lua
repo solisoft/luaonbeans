@@ -12,7 +12,6 @@ return {
           local status, h, body = Fetch("http://localhost:8080")
           expect.equal(status, 200)
           expect.truthy(string.match(body, "welcome"))
-          expect.truthy(string.match(body, "uuid"))
         end)
       end)
     end)

@@ -86,16 +86,16 @@ end
 
 local function singularizeWord(word)
   if word:match("ives$") then
-      word = word:gsub("ives$", "ife")
+    word = word:gsub("ives$", "ife")
   elseif word:match("ves$") then
-      word = word:gsub("ves$", "f")
+    word = word:gsub("ves$", "f")
   elseif word:match("shes$") or word:match("ches$") or word:match("ses$") or word:match("xes$") or word:match("zes$") or
   (not table.contains(vowels, word:sub(-4, -4)) and word:match("oes$")) then
-      word = word:gsub("es$", "")
+    word = word:gsub("es$", "")
   elseif not table.contains(vowels, word:sub(-4, -4)) and word:match("ies$") then
-      word = word:gsub("ies$", "y")
-  else
-      word = word:sub(1, -2)
+    word = word:gsub("ies$", "y")
+  elseif word:match("s$") and word:match("ss$") == nil then
+    word = word:sub(1, -2)
   end
   return word
 end

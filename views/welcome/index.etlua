@@ -2,16 +2,4 @@
   <h1>Welcome aboard</h1>
 
   <p>Find me in <code>/controllers/welcome_controller.lua #index</code> : running in <code><%= beans_env %></code></p>
-  <%= EncodeJson(adb.Aql("RETURN { uuid: UUID() }")) %>
-
-  <%
-    -- local original_hash = DecodeBase64("wUVS6tazE2N98_J4SH_djkEe1igXPu0qILAvVXCiO6O20gdf5vZ2sYFWX3c-Hy6L4TD47b3DSAAO9XjSqpJfag")
-    -- local calculated_hash = GetCryptoHash(
-    --      "SHA512",
-    --      "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ",
-    --      "secret"
-    -- )
-  %>
-  <%= "" -- calculated_hash == original_hash
-  %>
 </div>

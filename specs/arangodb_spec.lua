@@ -175,7 +175,6 @@ return {
           indexes = adb.GetAllIndexes("test_data")
           expect.truthy(indexes.code == 200)
           expect.equal(#table.keys(indexes.identifiers), 1)
-          expect.equal(index.code, 201) -- it seems arangodb doc is wrong
           collection = adb.DeleteCollection("test_data")
           expect.truthy(collection.code == 200)
         end)

@@ -162,6 +162,7 @@ if arg[1] == "db:rollback" then
     print("Processing " .. latest_version.filename)
     local migration = require(string.gsub(latest_version.filename, ".lua", ""))
     if migration.down() then
+      print("Updating migration value.")
       adb.DeleteDocument(latest_version._id)
     end
   else

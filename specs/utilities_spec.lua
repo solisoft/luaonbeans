@@ -52,10 +52,17 @@ return {
       end)
 
       it('Singularize', function()
+        expect.equal(Singularize("Chess"), "Chess")
         expect.equal(Singularize("Beans"), "Bean")
+        expect.equal(Singularize("Bean"), "Bean")
         expect.equal(Singularize("Entries"), "Entry")
+        expect.equal(Singularize("Entry"), "Entry")
         expect.equal(Singularize("Potatoes"), "Potato")
+        expect.equal(Singularize("Potato"), "Potato")
         expect.equal(Singularize("Tables"), "Table")
+        expect.equal(Singularize("Table"), "Table")
+        expect.equal(Singularize("Comments"), "Comment")
+        expect.equal(Singularize("Comment"), "Comment")
       end)
 
       it('Capitalize', function()

@@ -11,7 +11,7 @@ end
 beans_env = ENV['BEANS_ENV'] or "development"
 
 -- ArangoDB connection
-db_config = DecodeJson(LoadAsset("config/database.json"))
+db_config = DecodeJson(Slurp("config/database.json"))
 adb = require "arango"
 assert(adb.Auth(db_config[beans_env]) ~= null)
 adb.UpdateCacheConfiguration({ mode = "on" })

@@ -19,8 +19,6 @@ Then configure the `config/database.json` file
 
 Then run `./redbean.com -D .`
 
-https://github.com/solisoft/luaonbeans/assets/6237/d304a1b8-4f55-4b3a-a7ac-513ec3c7ba1b
-
 Create a `beans` alias for your favorite shell
 
 ```

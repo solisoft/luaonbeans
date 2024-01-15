@@ -173,11 +173,15 @@ if arg[1] == "specs" then
   beans_env = "test"
   setup_db("test")
   db_migrate()
+
   describe, it, expect = lester.describe, lester.it, lester.expect
+
   for _, spec in pairs(recursive_files("/specs")) do
-    spec = spec:sub(8)
-    spec = require(string.gsub(spec, ".lua", ""))
-    spec.run()
+    if string.find(spec, "_spec.lua") then
+      spec = spec:sub(8)
+      spec = require(string.gsub(spec, ".lua", ""))
+      spec.run()
+    end
   end
 
   lester.report()

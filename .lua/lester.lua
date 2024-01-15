@@ -133,7 +133,7 @@ local lester = {
   --- A string with a lua pattern to filter tests. Nil by default.
   filter = os.getenv('LESTER_FILTER') or '',
   --- Function to retrieve time in seconds with milliseconds precision, `os.clock` by default.
-  seconds = os.clock,
+  seconds = GetTime,
 }
 
 -- Variables used internally for the lester state.

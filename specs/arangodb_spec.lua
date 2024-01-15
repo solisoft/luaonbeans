@@ -80,21 +80,54 @@ return {
       -- COLLECTIONS
 
       describe('UpdateCollection', function()
-        it('update collection', function()
+        local collection = adb.CreateCollection("test_data")
+        expect.truthy(collection.code == 200)
 
-        end, false)
+        collection = adb.UpdateCollection("test_data", {
+          schema = {
+            message = "The document does not contain an array of numbers in attribute 'nums', or one of the numbers is greater than 6.",
+            level = "moderate",
+            type = "json",
+            rule = {
+              properties = {
+                nums = {
+                  type = "array",
+                  items = {
+                      type = "number",
+                      maximum = 6
+                  }
+                }
+              },
+              additionalProperties = {
+                  type = "string"
+              },
+              required = { "nums" }
+            }
+          }
+        })
+        expect.truthy(#table.keys(collection.schema) > 0)
+        collection = adb.DeleteCollection("test_data")
+        expect.truthy(collection.code == 200)
       end)
 
-      describe('CreateCollection', function()
-        it('create collection', function()
+      describe('RenameCollection', function()
+        local collection = adb.CreateCollection("test_data")
+        expect.truthy(collection.code == 200)
 
-        end, false)
+        collection = adb.RenameCollection("test_data", { name = "test_data2" })
+        expect.truthy(collection.code == 200)
+
+        collection = adb.DeleteCollection("test_data2")
+        expect.truthy(collection.code == 200)
       end)
 
-      describe('DeleteCollection', function()
-        it('delete collection', function()
-
-        end, false)
+      describe('Create and delete Collection', function()
+        it('create and delete collection', function()
+          local collection = adb.CreateCollection("test_data")
+          expect.truthy(collection.code == 200)
+          collection = adb.DeleteCollection("test_data")
+          expect.truthy(collection.code == 200)
+        end)
       end)
 
       -- INDEXES
@@ -163,23 +196,9 @@ return {
 
       -- TRANSACTIONS
 
-      describe('BeginTransaction', function()
-        it('begin transaction', function()
+      describe('Transactions', function()
 
-        end, false)
-      end)
-
-      describe('CommitTransaction', function()
-        it('commit transaction', function()
-
-        end, false)
-      end)
-
-      describe('AbortTransaction', function()
-        it('abort transaction', function()
-
-        end, false)
-      end)
+      end, false)
 
       -- CACHE
 

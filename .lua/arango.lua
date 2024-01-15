@@ -108,7 +108,11 @@ end
 ---Collections
 
 local function UpdateCollection(collection, params)
-	return with_params("/collection/", "PUT", collection, params)
+	return with_params("/collection/", "PUT", collection .. "/properties", params)
+end
+
+local function RenameCollection(collection, params)
+	return with_params("/collection/", "PUT", collection .. "/rename", params)
 end
 
 local function CreateCollection(collection, options)
@@ -198,6 +202,7 @@ return {
 	PatchDocument = UpdateDocument,
 
 	UpdateCollection = UpdateCollection,
+	RenameCollection = RenameCollection,
 	CreateCollection = CreateCollection,
 	DeleteCollection = DeleteCollection,
 	PatchCollection = UpdateCollection,

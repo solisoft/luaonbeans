@@ -1,35 +1,22 @@
 version: 2.1
 
-executors:
-  luaonbeans:
+jobs:
+  build:
     docker:
-      - image: alpine:latest
+      - image: circleci/node:latest
       - image: arangodb/arangodb:latest
         environment:
           ARANGO_ROOT_PASSWORD: password
-        command: [--server.endpoint=http+tcp://0.0.0.0:8529 --server.password password]
-
-jobs:
-  test:
-    executor:
-      name: luaonbeans
     steps:
-      - run:
-          name: 'Install dependencies'
-          command: apk add git
       - checkout
       - run: cp config/database.json.sample config/database.json
-
       - run:
-          name: 'Start server'
+          name: 'Wait for ArangoDB to be up'
+          command: while ! nc -z localhost 8529; do sleep 1; done
+      - run:
+          name: 'Start Application'
           command: ./luaonbeans.org -D .
           background: true
-
       - run:
           name: 'Run tests'
           command: ./luaonbeans.org -i beans specs
-
-workflows:
-  build:
-    jobs:
-      - test

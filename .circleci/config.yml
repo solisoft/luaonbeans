@@ -3,6 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
+      - image: circleci/node:latest
       - image: arangodb/arangodb:latest
         environment:
           ARANGO_ROOT_PASSWORD: password

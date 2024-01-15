@@ -2,4 +2,5 @@
   <h1>Welcome aboard</h1>
 
   <p>Find me in <code>/controllers/welcome_controller.lua #index</code> : running in <code><%= beans_env %></code></p>
+  <p>Check README.md for more details</p>
 </div>

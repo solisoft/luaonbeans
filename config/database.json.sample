@@ -1,25 +1,25 @@
 {
 	"system": {
 		"db_name": "_system",
-		"url": "http://localhost:8529",
+		"url": "http://127.0.0.1:8529",
 		"username": "root",
 		"password": "password"
 	},
 	"development": {
 		"db_name": "luaonbeans_dev",
-		"url": "http://localhost:8529",
+		"url": "http://127.0.0.1:8529",
 		"username": "root",
 		"password": "password"
 	},
 	"production": {
 		"db_name": "luaonbeans",
-		"url": "http://localhost:8529",
+		"url": "http://127.0.0.1:8529",
 		"username": "root",
 		"password": "password"
 	},
 	"test": {
 		"db_name": "luaonbeans_tests",
-		"url": "http://localhost:8529",
+		"url": "http://127.0.0.1:8529",
 		"username": "root",
 		"password": "password"
 	}

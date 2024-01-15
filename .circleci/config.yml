@@ -3,7 +3,6 @@ version: 2.1
 executors:
   luaonbeans:
     docker:
-      - image: alpine:latest
       - image: arangodb/arangodb:latest
         environment:
           ARANGO_ROOT_PASSWORD: password

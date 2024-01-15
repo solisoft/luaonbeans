@@ -1,6 +1,6 @@
 # luaonbeans
 
-A tiny redbean Lua framework
+A tiny [redbean](https://redbean.dev/) MVC Lua framework
 
 ## Getting started
 
@@ -18,19 +18,19 @@ Then run `./redbean.com -D .`
 
 Create a `beans` alias for your favorite shell
 
-```
+```sh
 alias beans="./luaonbeans.org -i beans"
 ```
 
 then once your shell is reloaded simply run
 
-```
+```sh
 beans specs
 ```
 
 Shoud return somthing similar
 
-```sh
+```text
 Setup test DB
 Running migrations ...
 [PASS] arangodb driver | Aql | run request

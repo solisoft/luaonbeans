@@ -1,6 +1,8 @@
 # luaonbeans
 
-A tiny [redbean](https://redbean.dev/) MVC Lua framework [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/WNgXuxBoP6PPsRmbqkSY4Q/GzWFpN9LomjWyZqBGsVQMp/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/WNgXuxBoP6PPsRmbqkSY4Q/GzWFpN9LomjWyZqBGsVQMp/tree/main)
+A tiny [redbean](https://redbean.dev/) MVC Lua framework
+
+[![CircleCI](https://dl.circleci.com/status-badge/img/circleci/WNgXuxBoP6PPsRmbqkSY4Q/GzWFpN9LomjWyZqBGsVQMp/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/WNgXuxBoP6PPsRmbqkSY4Q/GzWFpN9LomjWyZqBGsVQMp/tree/main)
 
 ## Getting started
 

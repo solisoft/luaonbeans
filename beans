@@ -62,8 +62,10 @@ end
 create_controller = function(controller_name)
   local words = define_words(controller_name)
   local template = Slurp(".templates/controller.lua")
+  local spec = Slurp(".templates/empty_spec.lua")
   template = process_template(template, words)
   Barf("controllers/" .. words.plural .. "_controller.lua", template)
+  Barf("specs/controllers/" .. words.plural .. "_spec.lua", spec)
 end
 
 create_migration = function(name)
@@ -76,8 +78,10 @@ end
 create_model = function(model_name)
   local words = define_words(model_name)
   local template = Slurp(".templates/model.lua")
+  local spec = Slurp(".templates/empty_spec.lua")
   template = process_template(template, words)
   Barf("models/" .. words.singular .. ".lua", template)
+  Barf("specs/models/" .. words.singular .. "_spec.lua", spec)
   create_migration("create " .. words.plural .. " table")
 end
 

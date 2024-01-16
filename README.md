@@ -25,7 +25,16 @@ Create a `beans` alias for your favorite shell
 alias beans="./luaonbeans.org -i beans"
 ```
 
-then once your shell is reloaded simply run
+
+## Running tests
+
+First you need to launch the server in test mode
+
+```sh
+BEANS_ENV=test ./luaonbeans.org -D .
+```
+
+Then simply run
 
 ```sh
 beans specs

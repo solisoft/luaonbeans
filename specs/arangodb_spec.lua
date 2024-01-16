@@ -80,45 +80,49 @@ return {
       -- COLLECTIONS
 
       describe('UpdateCollection', function()
-        local collection = adb.CreateCollection("test_data")
-        expect.truthy(collection.code == 200)
+        it('update a collection', function()
+          local collection = adb.CreateCollection("test_data")
+          expect.truthy(collection.code == 200)
 
-        collection = adb.UpdateCollection("test_data", {
-          schema = {
-            message = "The document does not contain an array of numbers in attribute 'nums', or one of the numbers is greater than 6.",
-            level = "moderate",
-            type = "json",
-            rule = {
-              properties = {
-                nums = {
-                  type = "array",
-                  items = {
-                      type = "number",
-                      maximum = 6
+          collection = adb.UpdateCollection("test_data", {
+            schema = {
+              message = "The document does not contain an array of numbers in attribute 'nums', or one of the numbers is greater than 6.",
+              level = "moderate",
+              type = "json",
+              rule = {
+                properties = {
+                  nums = {
+                    type = "array",
+                    items = {
+                        type = "number",
+                        maximum = 6
+                    }
                   }
-                }
-              },
-              additionalProperties = {
-                  type = "string"
-              },
-              required = { "nums" }
+                },
+                additionalProperties = {
+                    type = "string"
+                },
+                required = { "nums" }
+              }
             }
-          }
-        })
-        expect.truthy(#table.keys(collection.schema) > 0)
-        collection = adb.DeleteCollection("test_data")
-        expect.truthy(collection.code == 200)
+          })
+          expect.truthy(#table.keys(collection.schema) > 0)
+          collection = adb.DeleteCollection("test_data")
+          expect.truthy(collection.code == 200)
+        end)
       end)
 
       describe('RenameCollection', function()
-        local collection = adb.CreateCollection("test_data")
-        expect.truthy(collection.code == 200)
+        it('rename a collection', function()
+          local collection = adb.CreateCollection("test_data")
+          expect.truthy(collection.code == 200)
 
-        collection = adb.RenameCollection("test_data", { name = "test_data2" })
-        expect.truthy(collection.code == 200)
+          collection = adb.RenameCollection("test_data", { name = "test_data2" })
+          expect.truthy(collection.code == 200)
 
-        collection = adb.DeleteCollection("test_data2")
-        expect.truthy(collection.code == 200)
+          collection = adb.DeleteCollection("test_data2")
+          expect.truthy(collection.code == 200)
+        end)
       end)
 
       describe('Create and delete Collection', function()
@@ -196,39 +200,54 @@ return {
       -- TRANSACTIONS
 
       describe('Transactions', function()
+        it('create and commit a transaction', function()
+          local transaction = adb.BeginTransaction({ collections = { } })
+          expect.equal(transaction.code, 201)
+          transaction = adb.CommitTransaction(transaction.result.id)
+          expect.equal(transaction.code, 200)
+        end)
 
-      end, false)
+        it('create and abort a transaction', function()
+          local transaction = adb.BeginTransaction({ collections = { } })
+          expect.equal(transaction.code, 201)
+          transaction = adb.AbortTransaction(transaction.result.id)
+          expect.equal(transaction.code, 200)
+        end)
+      end)
 
       -- CACHE
 
       describe('GetQueryCacheEntries', function()
-        it('get query cache', function()
-
-        end, false)
+        it('get empty query cache', function()
+          expect.equal(#adb.GetQueryCacheEntries(), 0)
+        end)
       end)
 
       describe('GetQueryCacheConfiguration', function()
         it('get query cache configuration', function()
-
-        end, false)
+          adb.UpdateCacheConfiguration({ mode = "off" })
+          expect.equal(adb.GetQueryCacheConfiguration().mode, "off")
+        end)
       end)
 
       describe('UpdateCacheConfiguration', function()
         it('update query cache configuration', function()
-
-        end, false)
+          adb.UpdateCacheConfiguration({ mode = "on" })
+          expect.equal(adb.GetQueryCacheConfiguration().mode, "on")
+        end)
       end)
 
       describe('DeleteQueryCache', function()
         it('delete query cache configuration', function()
-
-        end, false)
+          expect.equal(adb.DeleteQueryCache().code, 200)
+        end)
       end)
 
       describe('RefreshToken', function()
         it('refresh auth token', function()
-
-        end, false)
+          last_db_connect = 1000
+          assert(adb.RefreshToken(db_config["test"]) == null)
+        end)
       end)
     end)
   end

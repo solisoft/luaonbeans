@@ -2,6 +2,15 @@
 
 return {
   run = function()
+
+    describe('crypto', function()
+      it('check diffie helmann shared keys', function()
+        local k1 = GenerateKeys()
+        local k2 = GenerateKeys()
+        expect.equal(EncodeBase64(GenerateDH(k1.private, k2.public)),EncodeBase64(GenerateDH(k2.private, k1.public)))
+      end)
+    end)
+
     describe('utilities', function()
       lester.before(function()
         -- This function is run before every test.

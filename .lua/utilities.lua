@@ -1,4 +1,5 @@
 require "luaonbeans"
+unix = require 'unix'
 etlua = require "etlua"
 
 -- Tables
@@ -118,4 +119,72 @@ end
 
 Camelize = function(str)
   return Capitalize(string.gsub(str, '%W+(%w+)', Capitalize))
+end
+
+-- Crypto
+
+GenerateKeys = function()
+  private = RunCommand("openssl genpkey -paramfile dhparam.pem")
+  private_filename = GenerateTempFilename()
+  Barf(private_filename, private)
+  public = RunCommand("openssl pkey -in " .. private_filename .. " -pubout")
+  unix.unlink(private_filename)
+
+  return { private = private, public = public }
+end
+
+GenerateDH = function(private, public)
+  private_filename = GenerateTempFilename()
+  public_filename = GenerateTempFilename()
+  Barf(private_filename, private)
+  Barf(public_filename, public)
+
+  output = RunCommand("openssl pkeyutl -derive -inkey " .. private_filename .. " -peerkey " .. public_filename)
+  unix.unlink(private_filename)
+  unix.unlink(public_filename)
+
+  return output
+end
+
+-- utilities
+
+GenerateTempFilename = function()
+  filename = EncodeBase64(GetRandomBytes(32))
+  filename = string.gsub(filename, "[\\/]", "")
+  return "tmp/" .. filename
+end
+
+RunCommand = function(command)
+  command = string.split(command)
+  local prog = assert(unix.commandv(command[1]))
+
+  local output = ""
+  local reader, writer = assert(unix.pipe())
+  if assert(unix.fork()) == 0 then
+    unix.close(1)
+    unix.dup(writer)
+    unix.close(writer)
+    unix.close(reader)
+    unix.execve(prog, command, {'PATH=/bin'})
+    unix.exit(127)
+  else
+    unix.close(writer)
+    while true do
+      data, err = unix.read(reader)
+      if data then
+        if data ~= '' then
+          output = output .. data
+        else
+            break
+        end
+      elseif err:errno() ~= unix.EINTR then
+        Log(kLogWarn, tostring(err))
+        break
+      end
+    end
+    assert(unix.close(reader))
+    unix.wait()
+  end
+
+  return output
 end

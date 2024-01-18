@@ -56,7 +56,6 @@ string.to_slug = function(str)
   return string.lower(slug)
 end
 
-
 vowels = { "a", "e", "i", "o", "u" }
 
 local function pluralizeWord(word)
@@ -121,10 +120,11 @@ Camelize = function(str)
   return Capitalize(string.gsub(str, '%W+(%w+)', Capitalize))
 end
 
+
 -- Crypto
 
-GenerateKeys = function()
-  private = RunCommand("openssl genpkey -paramfile dhparam.pem")
+GenerateX25519Keys = function()
+  private = RunCommand("openssl genpkey -algorithm X25519")
   private_filename = GenerateTempFilename()
   Barf(private_filename, private)
   public = RunCommand("openssl pkey -in " .. private_filename .. " -pubout")
@@ -133,7 +133,7 @@ GenerateKeys = function()
   return { private = private, public = public }
 end
 
-GenerateDH = function(private, public)
+GenerateX25519SharedSecret = function(private, public)
   private_filename = GenerateTempFilename()
   public_filename = GenerateTempFilename()
   Barf(private_filename, private)

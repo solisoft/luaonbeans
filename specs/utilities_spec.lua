@@ -4,10 +4,10 @@ return {
   run = function()
 
     describe('crypto', function()
-      it('check diffie helmann shared keys', function()
-        local k1 = GenerateKeys()
-        local k2 = GenerateKeys()
-        expect.equal(EncodeBase64(GenerateDH(k1.private, k2.public)),EncodeBase64(GenerateDH(k2.private, k1.public)))
+      it('check diffie hellman shared keys', function()
+        local k1 = GenerateX25519Keys()
+        local k2 = GenerateX25519Keys()
+        expect.equal(EncodeBase64(GenerateX25519SharedSecret(k1.private, k2.public)),EncodeBase64(GenerateX25519SharedSecret(k2.private, k1.public)))
       end)
     end)
 

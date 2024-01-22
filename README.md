@@ -16,7 +16,7 @@ You need then to configure arangoDB (using brew or docker) and create a new data
 
 Then configure the `config/database.json` file
 
-Then run `./redbean.com -D .` ; You should be able to open : [http://localhost:8080](http://localhost:8080)
+Then run `./luaonbeans.org -D .` ; You should be able to open : [http://localhost:8080](http://localhost:8080)
 
 
 Create a `beans` alias for your favorite shell

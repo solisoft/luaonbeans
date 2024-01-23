@@ -56,6 +56,10 @@ string.to_slug = function(str)
   return string.lower(slug)
 end
 
+string.strip = function(str)
+  return (str:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 vowels = { "a", "e", "i", "o", "u" }
 
 local function pluralizeWord(word)
@@ -118,32 +122,6 @@ end
 
 Camelize = function(str)
   return Capitalize(string.gsub(str, '%W+(%w+)', Capitalize))
-end
-
-
--- Crypto
-
-GenerateX25519Keys = function()
-  private = RunCommand("openssl genpkey -algorithm X25519")
-  private_filename = GenerateTempFilename()
-  Barf(private_filename, private)
-  public = RunCommand("openssl pkey -in " .. private_filename .. " -pubout")
-  unix.unlink(private_filename)
-
-  return { private = private, public = public }
-end
-
-GenerateX25519SharedSecret = function(private, public)
-  private_filename = GenerateTempFilename()
-  public_filename = GenerateTempFilename()
-  Barf(private_filename, private)
-  Barf(public_filename, public)
-
-  output = RunCommand("openssl pkeyutl -derive -inkey " .. private_filename .. " -peerkey " .. public_filename)
-  unix.unlink(private_filename)
-  unix.unlink(public_filename)
-
-  return output
 end
 
 -- utilities

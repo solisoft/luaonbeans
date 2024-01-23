@@ -3,14 +3,6 @@
 return {
   run = function()
 
-    describe('crypto', function()
-      it('check diffie hellman shared keys', function()
-        local k1 = GenerateX25519Keys()
-        local k2 = GenerateX25519Keys()
-        expect.equal(EncodeBase64(GenerateX25519SharedSecret(k1.private, k2.public)),EncodeBase64(GenerateX25519SharedSecret(k2.private, k1.public)))
-      end)
-    end)
-
     describe('utilities', function()
       lester.before(function()
         -- This function is run before every test.
@@ -51,6 +43,13 @@ return {
       it('string.to_slug', function()
         expect.equal(string.to_slug("Hello World!!!"), "hello-world")
         expect.equal(string.to_slug("Hello  %  World"), "hello-world")
+      end)
+
+      it('string.strip', function()
+        expect.equal(string.strip("Hello World  "), "Hello World")
+        expect.equal(string.strip("Hello World\n"), "Hello World")
+        expect.equal(string.strip("Hello World \n"), "Hello World")
+        expect.equal(string.strip("Hello World \r\n"), "Hello World")
       end)
 
       it('Pluralize', function()

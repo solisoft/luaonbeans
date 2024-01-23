@@ -1,92 +1,390 @@
--- Fork from fullmoon code --
---[[-- multipart parsing --]]--
+local setmetatable = setmetatable
+local tostring     = tostring
+local insert       = table.insert
+local remove       = table.remove
+local concat       = table.concat
+local ipairs       = ipairs
+local pairs        = pairs
+local match        = string.match
+local find         = string.find
+local sub          = string.sub
 
-local patts = {}
-local function getParameter(header, name)
-  local function optignorecase(s)
-    if not patts[s] then
-      patts[s] = (";%s*"
-        ..s:gsub("%w", function(s) return ("[%s%s]"):format(s:upper(), s:lower()) end)
-        ..[[=["']?([^;"']*)["']?]])
-    end
-    return patts[s]
-  end
-  return header:match(optignorecase(name))
+
+local RANDOM_BOUNDARY = sub(tostring({}), 10)
+
+
+local MultipartData = { RANDOM_BOUNDARY = RANDOM_BOUNDARY}
+
+
+MultipartData.__index = MultipartData
+
+
+setmetatable(MultipartData, {
+  __call = function (cls, ...)
+    return cls.new(...)
+  end,
+})
+
+
+local function is_header(value)
+  return match(value, "%S:%s*%S")
 end
 
-local CRLF, TAIL = "\r\n", "--"
-local CRLFlen = #CRLF
-local MULTIVAL = "%[%]$"
 
-local function argerror(cond, narg, extramsg, name)
-  if cond then return cond end
-  name = name or debug.getinfo(2, "n").name or "?"
-  local msg = ("bad argument #%d to %s%s"):format(narg, name, extramsg and " "..extramsg or  "")
-  return error(msg, 3)
-end
-
-local function parseMultipart(body, ctype)
-  argerror(type(ctype) == "string", 2, "(string expected)")
-  local parts = {
-    boundary = getParameter(ctype, "boundary"),
-    start = getParameter(ctype, "start"),
+-- Create a table representation of multipart/data body
+--
+-- @param {string} body The multipart/data string body
+-- @param {string} boundary The multipart/data boundary
+-- @return {table} Lua representation of the body
+local function decode(body, boundary)
+  local result = {
+    data    = {},
+    indexes = {},
   }
-  local boundary = "--"..argerror(parts.boundary, 2, "(boundary expected in Content-Type)")
-  local bol, eol, eob = 1
-  while true do
-    repeat
-      eol, eob = string.find(body, boundary, bol, true)
-      if not eol then return nil, "missing expected boundary at position "..bol end
-    until eol == 1 or eol > CRLFlen and body:sub(eol-CRLFlen, eol-1) == CRLF
-    if eol > CRLFlen then eol = eol - CRLFlen end
-    local headers, name, filename = {}
-    if bol > 1 then
-      -- find the header (if any)
-      if string.sub(body, bol, bol+CRLFlen-1) == CRLF then -- no headers
-        bol = bol + CRLFlen
-      else -- headers
-        -- find the end of headers (CRLF+CRLF)
-        local boh, eoh = 1, string.find(body, CRLF..CRLF, bol, true)
-        if not eoh then return nil, "missing expected end of headers at position "..bol end
-        -- join multi-line header values back if present
-        local head = string.sub(body, bol, eoh+1):gsub(CRLF.."%s+", " ")
-        while (string.find(head, CRLF, boh, true) or 0) > boh do
-          local p, e, header, value = head:find("([^:]+)%s*:%s*(.-)%s*\r\n", boh)
-          if p ~= boh then return nil, "invalid header syntax at position "..bol+boh end
-          header = header:lower()
-          if header == "content-disposition" then
-            name = getParameter(value, "name")
-            filename = getParameter(value, "filename")
+
+  if not boundary then
+    return result
+  end
+
+  local part_name
+  local part_index    = 1
+  local part_headers  = {}
+  local part_value    = {}
+  local part_value_ct = 0
+
+  local end_boundary_length   = boundary and #boundary + 2
+  local processing_part_value = false
+
+  local position = 1
+  local done     = false
+
+  repeat
+    local s = find(body, "[\r\n]", position)
+
+    local line
+
+    if s then
+      line = sub(body, position, s - 1)
+      position = s + 1
+
+    else
+      if position == 1 then
+        line = body
+
+      else
+        line = sub(body, position)
+      end
+
+      done = true
+    end
+
+    if line == "" then
+      if s and processing_part_value then
+        part_value_ct             = part_value_ct + 1
+        part_value[part_value_ct] = sub(body, s, s)
+      end
+
+    else
+      if sub(line, 1, 2) == "--" and sub(line, 3, end_boundary_length) == boundary then
+        processing_part_value = false
+
+        if part_name ~= nil then
+          if part_value[part_value_ct] == "\n" then
+             part_value[part_value_ct] = nil
           end
-          headers[header] = value
-          boh = e + 1
+
+          if part_value[part_value_ct - 1] == "\r" then
+             part_value[part_value_ct - 1] = nil
+          end
+
+          result.data[part_index] = {
+            name    = part_name,
+            headers = part_headers,
+            value   = concat(part_value)
+          }
+
+          if result.indexes[part_name] == nil then
+            result.indexes[part_name] = {}
+          end
+
+          insert(result.indexes[part_name], part_index)
+
+          -- Reset fields for the next part
+          part_headers  = {}
+          part_value    = {}
+          part_value_ct = 0
+          part_name     = nil
+          part_index    = part_index + 1
         end
-        bol = eoh + CRLFlen*2
-      end
-      -- epilogue is processed, but not returned
-      local ct = headers["content-type"]
-      local b, err = string.sub(body, bol, eol-1)
-      if ct and ct:lower():find("^multipart/") then
-        b, err = parseMultipart(b, ct) -- handle multipart/* recursively
-        if not b then return b, err end
-      end
-      local first = parts.start and parts.start == headers["content-id"] and 1
-      local v = {name = name, headers = headers, filename = filename, data = b}
-      table.insert(parts, first or #parts+1, v)
-      if name then
-        if string.find(name, MULTIVAL) then
-          parts[name] = parts[name] or {}
-          table.insert(parts[name], first or #parts[name]+1, v)
+
+      else
+        --Beginning of part
+        if not processing_part_value and line:sub(1, 19):lower() == "content-disposition" then
+          -- Extract part_name
+          for v in line:gmatch("[^;]+") do
+            if not is_header(v) then -- If it's not content disposition part
+              local pos = v:match("^%s*[Nn][Aa][Mm][Ee]=()")
+              if pos then
+                local current_value = v:match("^%s*([^=]*)", pos):gsub("%s*$", "")
+                part_name = sub(current_value, 2, #current_value - 1)
+              end
+            end
+          end
+
+          insert(part_headers, line)
+
+          if s and sub(body, s, s + 3) == "\r\n\r\n" then
+            processing_part_value = true
+            position = s + 4
+          end
+
+        elseif not processing_part_value and is_header(line) then
+          insert(part_headers, line)
+
+          if s and sub(body, s, s + 3) == "\r\n\r\n" then
+            processing_part_value = true
+            position = s + 4
+          end
+
         else
-          parts[name] = parts[name] or v
+          processing_part_value = true
+
+          -- The value part begins
+          part_value_ct               = part_value_ct + 1
+          part_value[part_value_ct]   = line
+
+          if s then
+            part_value_ct             = part_value_ct + 1
+            part_value[part_value_ct] = sub(body, s, s)
+          end
         end
       end
     end
-    local tail = body:sub(eob+1, eob+#TAIL)
-    -- check if the encapsulation or regular boundary is present
-    if tail == TAIL then break end
-    if tail ~= CRLF then return nil, "missing closing boundary at position "..eol end
-    bol = eob + #tail + 1
+
+  until done
+
+  if part_name ~= nil then
+    result.data[part_index] = {
+      name    = part_name,
+      headers = part_headers,
+      value   = concat(part_value)
+    }
+    result.indexes[part_name] = { part_index }
   end
-  return parts
+
+  return result
 end
+
+-- Creates a multipart/data body from a table
+--
+-- @param {table} t The table that contains the multipart/data body properties
+-- @param {boundary} boundary The multipart/data boundary to use
+-- @return {string} The multipart/data string body
+local function encode(t, boundary)
+  if not boundary then
+    boundary = RANDOM_BOUNDARY
+  end
+
+  local result = {}
+  local i = 0
+
+  for _, v in ipairs(t.data) do
+    if v.value then
+      result[i + 1] = "--"
+      result[i + 2] = boundary
+      result[i + 3] = "\r\n"
+
+      i = i + 3
+
+      for _, header in ipairs(v.headers) do
+        result[i + 1] = header
+        result[i + 2] = "\r\n"
+
+        i = i + 2
+      end
+
+      result[i + 1] = "\r\n"
+      result[i + 2] = v.value
+      result[i + 3] = "\r\n"
+
+      i = i + 3
+    end
+  end
+
+  if i == 0 then
+    return ""
+  end
+
+  result[i + 1] = "--"
+  result[i + 2] = boundary
+  result[i + 3] = "--\r\n"
+
+  return concat(result)
+end
+
+
+function MultipartData.new(data, content_type)
+  local instance = setmetatable({}, MultipartData)
+
+  if content_type then
+    local boundary = match(content_type, ";%s*boundary=(%S+)")
+    if boundary then
+      if (sub(boundary, 1, 1) == '"' and sub(boundary, -1)  == '"') or
+         (sub(boundary, 1, 1) == "'" and sub(boundary, -1)  == "'") then
+        boundary = sub(boundary, 2, -2)
+      end
+
+      if boundary ~= "" then
+        instance._boundary = boundary
+      end
+    end
+  end
+
+  instance._data = decode(data or "", instance._boundary)
+
+  return instance
+end
+
+
+function MultipartData:get(name)
+  -- Get first index for part
+  local index = self._data.indexes[name]
+  if not index then
+    return nil
+  end
+
+  return self._data.data[index[1]]
+end
+
+
+function MultipartData:get_all()
+  local result = {}
+
+  for k, v in pairs(self._data.indexes) do
+    -- Get first index for part
+    result[k] = self._data.data[v[1]].value
+  end
+
+  return result
+end
+
+
+function MultipartData:get_as_array(name)
+  local vals = {}
+
+  local idx = self._data.indexes[name]
+  if not idx then
+    return vals
+  end
+
+  for _, index in ipairs(self._data.indexes[name]) do
+    insert(vals, self._data.data[index].value)
+  end
+
+  return vals
+end
+
+
+function MultipartData:get_all_as_arrays()
+  -- Get all fields as arrays
+  local result = {}
+
+  for k in pairs(self._data.indexes) do
+    result[k] = self:get_as_array(k)
+  end
+
+  return result
+end
+
+function MultipartData:get_all_with_arrays()
+  -- Get repeating fields as arrays, rest as strings
+  local result = {}
+
+  for k, v in pairs(self._data.indexes) do
+    if #v == 1 then
+      result[k] = self._data.data[v[1]].value
+    else
+      result[k] = self:get_as_array(k)
+    end
+  end
+
+  return result
+end
+
+
+function MultipartData:set_simple(name, value, filename, content_type)
+    local headers = {'Content-Disposition: form-data; name="' , name , '"'}
+    if filename then
+      headers[4] = '; filename="'
+      headers[5] = filename
+      headers[6] = '"'
+    end
+    if content_type then
+      headers[7] = "\r\ncontent-type: "
+      headers[8] = content_type
+    end
+    headers = concat(headers)
+    if self._data.indexes[name] then
+      self._data.data[self._data.indexes[name][1]] = {
+        name = name,
+        value = value,
+        headers = { headers }
+      }
+
+    else
+      -- Find maximum index
+      local max_index = 0
+      for _, indexes in pairs(self._data.indexes) do
+        for _, index in ipairs(indexes) do
+          if index > max_index then
+            max_index = index
+          end
+        end
+      end
+      -- Assign data to new index
+      local part_index = max_index + 1
+      self._data.indexes[name] = { part_index }
+      self._data.data[part_index] = {
+        name    = name,
+        value   = value,
+        headers = { headers }
+      }
+    end
+end
+
+
+function MultipartData:delete(name)
+  -- If part name repeats, then delete all occurrences
+  local indexes = self._data.indexes[name]
+
+  if indexes ~= nil then
+    for _, index in ipairs(indexes) do
+      remove(self._data.data, index)
+    end
+    self._data.indexes[name] = nil
+
+    -- need to recount index
+    -- Deleted indexes can be anywhere,
+    -- including between values of indexes for single part name.
+    -- For every index, need to count how many deleted indexes are bellow it
+    for key, index_vals in pairs(self._data.indexes) do
+      for i, val in ipairs(index_vals) do
+        local num_deleted = 0
+        for _, del_index in ipairs(indexes) do
+          if val > del_index then
+            num_deleted = num_deleted + 1
+          end
+        end
+        self._data.indexes[key][i] = val - num_deleted
+      end
+    end
+  end
+end
+
+
+function MultipartData:tostring()
+  return encode(self._data, self._boundary)
+end
+
+
+return MultipartData

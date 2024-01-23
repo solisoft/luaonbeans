@@ -39,10 +39,10 @@ function OnHttpRequest()
 		RoutePath("/controllers/welcome_controller.lua")
 	end
 
-	if GetPath() == "/upload" and GetMethod() == "POST" then
-	 	params.action = "create"
-   		RoutePath("/controllers/welcome_controller.lua")
-	end
+	-- if GetPath() == "/upload" and GetMethod() == "POST" then
+	-- 	params.action = "create"
+  -- 		RoutePath("/controllers/welcome_controller.lua")
+	-- end
 
 	if params.action == null then Route() end
 end

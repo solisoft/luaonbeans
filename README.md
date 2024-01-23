@@ -93,10 +93,53 @@ beans db:rollback
 beans specs
 ```
 
+## File upload
+
+You can handle file upload now easily. Any multipart data form will
+add params to the global `params` variable.
+
+by example this request :
+
+```sh
+curl -F "file[]=@redbean.png" -F "file[]=@logo.png" -F file2=@resume.pdf -F demo=1 http://localhost:8080/upload
+```
+
+will generate :
+
+```json
+{
+  "demo": "1",
+  "file2": {
+    "content": "<data>",
+    "ext": "pdf",
+    "size": 1234,
+    "filename": "resume.pdf",
+    "content_type": "application/pdf"
+  },
+  "file":[
+    {
+      "content": "<data>",
+      "ext": "png",
+      "size": 1234,
+      "filename": "redbean.png",
+      "content_type": "image/png"
+    },
+    {
+      "content": "<data>",
+      "ext": "png",
+      "size": 43Z1,
+      "filename": "logo.png",
+      "content_type": "image/png"
+    }
+  ]
+}
+```
+
+You can then iterate and do whatever you want with your content.
+
 ## TODO
 
 - Add specs for controllers & models from templates
-- File Upload
 - Oauth2
 
 !!! This project is under development !!!

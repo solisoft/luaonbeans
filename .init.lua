@@ -18,6 +18,9 @@ adb.UpdateCacheConfiguration({ mode = "on" })
 
 function OnHttpRequest()
 	params = GetParams()
+	PrepareMultiPartParams()
+
+	print(EncodeJson(params))
 
 	adb.RefreshToken(db_config[beans_env]) -- reconnect to arangoDB if needed
 
@@ -34,6 +37,11 @@ function OnHttpRequest()
 	if GetPath() == "/" then
 		params.action = "index"
 		RoutePath("/controllers/welcome_controller.lua")
+	end
+
+	if GetPath() == "/upload" and GetMethod() == "POST" then
+	 	params.action = "create"
+   		RoutePath("/controllers/welcome_controller.lua")
 	end
 
 	if params.action == null then Route() end

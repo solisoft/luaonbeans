@@ -1,3 +1,5 @@
+-- from https://github.com/Kong/lua-multipart/blob/master/src/multipart.lua
+
 local setmetatable = setmetatable
 local tostring     = tostring
 local insert       = table.insert
@@ -278,7 +280,7 @@ function MultipartData:get_as_array(name)
   end
 
   for _, index in ipairs(self._data.indexes[name]) do
-    insert(vals, self._data.data[index].value)
+    insert(vals, self._data.data[index])
   end
 
   return vals
@@ -386,5 +388,30 @@ function MultipartData:tostring()
   return encode(self._data, self._boundary)
 end
 
+function MultipartData:get_content_type(headers)
+  local content_type = null
+  for _, h in pairs(headers) do
+    local arr = string.split(h, ": ")
+    if arr[1] == "Content-Type" then
+      content_type = arr[2]
+      break
+    end
+  end
+  return content_type
+end
+
+function MultipartData:get_filename(headers)
+  local filename = null
+  for _, h in pairs(headers) do
+    local arr = string.split(h, ": ")
+    if arr[1] == "Content-Disposition" then
+      p = assert(re.compile([[filename="(.+)"]]))
+      m,filename = assert(p:search(h))
+
+      break
+    end
+  end
+  return filename
+end
 
 return MultipartData

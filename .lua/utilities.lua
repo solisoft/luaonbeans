@@ -196,7 +196,7 @@ end
 
 -- Prepare MultiPart Params and merge everything in params
 PrepareMultiPartParams = function()
-  if string.find(GetHeader("Content-Type"), "multipart") == 1 then
+  if GetHeader("Content-Type") ~= null and string.find(GetHeader("Content-Type"), "multipart") ~= null then
 		local keys = {}
 		local multipart_data = multipart(GetBody(), GetHeader("Content-Type"))
 

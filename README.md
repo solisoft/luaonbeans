@@ -136,10 +136,3 @@ will generate :
 ```
 
 You can then iterate and do whatever you want with your content.
-
-## TODO
-
-- Add specs for controllers & models from templates
-- Oauth2
-
-!!! This project is under development !!!

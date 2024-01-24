@@ -127,7 +127,7 @@ will generate :
     {
       "content": "<data>",
       "ext": "png",
-      "size": 43Z1,
+      "size": 4321,
       "filename": "logo.png",
       "content_type": "image/png"
     }

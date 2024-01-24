@@ -146,7 +146,7 @@ local app = {
     load_index()
   end,
 
-  -- GET posts#offlice => /post/:id/offline (see custom route)
+  -- GET posts#offlice => /posts/:id/offline (see custom route)
   offline = function()
     Write("Offline")
   end

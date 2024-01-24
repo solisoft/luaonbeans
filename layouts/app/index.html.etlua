@@ -11,6 +11,9 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&family=Open+Sans:wght@400;700&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="/layouts/app/css.css?<%= unix.stat("layouts/app/css.css"):mtim() %>" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
 <body class="min-h-screen flex flex-col">
 	<%- Partial("header") %>

@@ -1,6 +1,280 @@
 <div class="container mx-auto py-10 px-2">
   <h1>Welcome aboard</h1>
 
-  <p>Find me in <code>/controllers/welcome_controller.lua #index</code> : running in <code><%= beans_env %></code></p>
-  <p>Check README.md for more details</p>
+  <p>Lua on Beans is a simple redbean.dev tool for creating fast, testable MVC applications using Lua and ArangoDB.</p>
+
+  <h1 class="pt-10">Why ?</h1>
+  <p>You can find very great tools out there. So why the hell we create a new framework?
+  The answer is pretty simple : We want an easy and performant tool to build an app.</p>
+
+  <p>By example, Ruby on Rails is a great framework but it's slow and heavy.</p>
+  <p>Phoenix looks nice and fast but it's not that easy to start with.</p>
+  <p>&nbsp;</p>
+  <p>Lua is a small language easy to learn and it seems fast enough when embedded in redbean.dev</p>
+  <p>ArangoDB is a multi model document database very powerful and fast.</p>
+
+  <h1 class="pt-10">Requirements</h1>
+  <p>You just need ArangoDB running.</p>
+  <pre class="py-2 shadow"><code class="language-sh"><%= [[
+docker run -e ARANGO_RANDOM_ROOT_PASSWORD=1 -p 8529:8529 -d arangodb
+]] %></code></pre>
+
+  <p>You have to create an alias <code>alias beans="./luaonbeans.org -i beans"</code> and put it in you favorite shell config file.</p>
+
+  <h1 class="pt-5">Getting started</h1>
+
+  <pre class="py-2 shadow"><code class="language-sh"><%= [[
+git clone https://github.com/solisoft/luaonbeans --depth=1
+cd luaonbeans
+]] %></code></pre>
+  <p>You need then to create a <code>config/database.json</code> file based on <code>config/database.json.sample</code></p>
+  <p>Then create the DB</p>
+  <pre class="py-2 shadow"><code class="language-sh"><%= [[
+beans db:setup
+]] %></code></pre>
+  <p>You can start then the server :</p>
+  <pre class="py-2 shadow"><code class="language-sh"><%= [[
+./luaonbeans -D .
+]] %></code></pre>
+
+  <p>You should create the server on <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></p>
+
+  <h1 class="pt-5">Running specs</h1>
+  <pre class="py-2 shadow"><code class="language-sh"><%= [[
+beans specs
+]] %></code></pre>
+
+
+  <h1 class="pt-5">Commands</h1>
+
+<pre class="py-2 shadow"><code class="language-sh"><%= [[
+beans create controller posts
+beans create model post
+beans create scaffold posts
+beans create migration add_indexes_to_posts
+
+beans db:setup
+beans db:migrate
+beans db:rollback
+
+beans specs]] %></code></pre>
+
+  <h1 class="pt-5">Routes</h1>
+  <p>Routes are defined in the <code>.init.lua</code> file (inside the <code>OnHttpRequest()</code> method)</p>
+<pre class="py-2 shadow"><code class="language-lua"><%= [[
+-- Define a resource and create REST default routes
+Resource("posts")
+-- It will create index, new, create, update, edit, show and delete routes using the right HTTP verbs
+
+-- Nested CRUD
+Resource("comments", { root = "/posts/:post_id", post_id = "([0-9]+)" })
+
+-- Custom Route
+CustomRoute("GET", "/posts/:post_id/offline", {
+ 	post_id = "([0-9]+)", controller = "posts", action = "offline"
+})
+
+-- The Root url
+if GetPath() == "/" then
+  params.action = "index"
+  RoutePath("/controllers/welcome_controller.lua")
+end
+]] %></code></pre>
+
+
+
+  <h1 class="pt-5">Controller</h1>
+  <p>Here a CRUD sample : controllers/posts_controller.lua</p>
+<pre class="py-2 shadow"><code class="language-lua"><%= [[
+post = {}
+Post = require("post")
+
+-- A kind of before_each only: %%w(edit update show) :)
+if table.contains({ "edit", "update", "show" }, params.action) then
+  post = Post.get(params.id)
+end
+
+-- Here a method to be more DRI
+local function load_index()
+  local posts = Post.all()
+  Page("posts/index", "app", { posts = posts })
+end
+
+local app = {
+  -- GET posts#index => /posts
+  index = function() load_index() end,
+
+  -- GET posts#new => /posts/new
+  new = function() Page("posts/new", "app") end,
+
+  -- GET posts#show => /posts/:id
+  show = function() Page("posts/show", "app", { post = post }) end,
+
+  -- GET posts#edit => /posts/:id/edit
+  edit = function() Page("posts/edit", "app", { post = post }) end,
+
+  -- PUT posts#update => posts/:id
+  update = function()
+    local bodyParams = GetBodyParams()
+    local record = Post.update(params.id, bodyParams)
+
+    if record.error then
+      Page("posts/edit", "app", { post = table.merge(bodyParams, { _key = params.id }), record = record })
+      return
+    end
+
+    RedirectTo("/posts")
+  end,
+
+  -- POST posts#create => /posts
+  create = function()
+    local bodyParams = GetBodyParams()
+    local created_post = Post.create(bodyParams)
+
+    if created_post.error then
+      SetStatus(400)
+      Page("posts/new", "app", { post = bodyParams })
+      return
+    end
+
+    RedirectTo("/posts")
+  end,
+
+  -- DELETE posts#delete => /posts/:id
+  delete = function()
+    Post.destroy(params.id)
+    load_index()
+  end,
+
+  offline = function()
+    Write("Offline")
+  end
+}
+
+assert(app[params.action] ~= null, "Missing method '" .. params.action .. "'!")
+app[params.action]()]] %></code></pre>
+
+
+
+  <h1 class="pt-5">Views</h1>
+
+  <div class="grid grid-cols-2 gap-5">
+    <div>views/posts/index.etlua
+    <pre class="py-2 shadow"><code class="language-html"><%= [[<div class="container mx-auto py-10">
+  <h1>##model_plural_capitalized##</h1>
+
+  <table class="w-full">
+    <thead>
+      <tr>
+        <th class="text-left">Key</th>
+        <th class="text-left">Title</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%% for _, doc in pairs(posts) do %%>
+        <%% if doc then %%>
+        <tr>
+          <td><%%= doc._key %%></td>
+          <td><%%= doc.title %%></td>
+          <td><%%= doc.text %%></td>
+          <td>
+            <a href="/posts/<%%= doc._key %%>">Show</a> ||
+            <a href="/posts/<%%= doc._key %%>/edit">Edit</a> ||
+            <a href="#" hx-target="body" hx-confirm="Are you sure ?"  hx-delete="/posts/<%%= doc._key %%>">Destroy</a>
+          </td>
+        </tr>
+        <%% end %%>
+      <%% end %%>
+    </tbody>
+  </table>
+
+  <div class="pt-10">
+    <a href="/posts/new">Create a new Post</a>
+  </div>
+</div>]] %></code></pre>
+<div>views/posts/show.etlua
+<pre class="py-2 shadow"><code class="language-html"><%= [[
+<div class="container mx-auto py-10">
+  <h1>Showing Post</h1>
+
+  <%%= EncodeJson(post) %%>
+
+  <div><a href="/posts">Back</a></div>
+</div>]] %></code></pre>
+    </div>
+    </div>
+    <div>views/posts/new.etlua
+<pre class="py-2 shadow"><code class="language-html"><%= [[
+<div class="container mx-auto py-10">
+  <h1>New Post</h1>
+  <form action="/posts" method="POST" class="flex flex-col gap-2">
+    <div class="flex gap-4 items-center">
+      <label for="title">Title</label>
+      <input type="text" name="title" required value="<%%= post.title or "" %%>" />
+    </div>
+
+    <div class="pt-10 flex gap-5 items-center">
+      <input type="submit" value="Create"> <a href="/posts">Back</a>
+    </div>
+  </form>
+</div>]] %></code></pre>
+
+<div>views/posts/edit.etlua
+<pre class="py-2 shadow"><code class="language-html"><%= [[
+<div class="container mx-auto py-10">
+  <h1>Editing Post :</h1>
+
+  <form
+    action="/posts/<%%= post._key %%>"
+    method="POST"
+    class="flex flex-col gap-2"
+    >
+    <div class="flex gap-4 items-center">
+      <label for="title">Title</label>
+      <input type="text" name="title" required value="<%%= post.title %%>" />
+    </div>
+
+    <%% if record then %%>
+      <div class="bg-red-200  p-3 text-red-700 rounded">
+        <strong>Something went wrong while updating the record !!</strong> <br>  <%%= EncodeJson(record) %%>
+      </div>
+    <%% end %%>
+
+    <div class="pt-10 flex gap-5 items-center">
+      <input type="submit" value="Update"> <a href="/posts">Back</a>
+    </div>
+  </form>
+
+</div>]] %></code></pre>
+    </div>
+    </div>
+
+
+
+
+  </div>
+
+  <h1 class="pt-5">Model</h1>
+models/post.lua<pre class="py-2 shadow"><code class="language-lua"><%= [[
+return {
+  all = function()
+    return adb.Aql("FOR post IN posts SORT post._key ASC RETURN post").result
+  end,
+
+  get = function(key)
+    return adb.GetDocument("posts/" .. key)
+  end,
+
+  create = function(dataset)
+    return adb.CreateDocument("posts", dataset)
+  end,
+
+  update = function(key, dataset)
+    return adb.UpdateDocument("posts/" .. key, dataset)
+  end,
+
+  destroy = function(key)
+    return adb.DeleteDocument("posts/" .. key)
+  end
+}]] %></code></pre>
 </div>

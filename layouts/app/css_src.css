@@ -33,3 +33,7 @@ a {
 code {
   @apply bg-black rounded px-2 py-1;
 }
+
+a {
+  @apply text-yellow-300 hover:text-yellow-100
+}

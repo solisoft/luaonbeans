@@ -1,7 +1,7 @@
 <div class="container mx-auto py-10 px-2">
   <h1>Welcome aboard</h1>
 
-  <p>Lua on Beans is a simple redbean.dev tool for creating fast, testable MVC applications using Lua and ArangoDB.</p>
+  <p>Lua on Beans is a simple <a href="https://redbean.dev" target="_blank">redbean.dev</a> tool for creating fast, testable MVC applications using Lua and ArangoDB.</p>
 
   <h1 class="pt-10">Why ?</h1>
   <p>You can find very great tools out there. So why the hell we create a new framework?
@@ -146,6 +146,7 @@ local app = {
     load_index()
   end,
 
+  -- GET posts#offlice => /post/:id/offline (see custom route)
   offline = function()
     Write("Offline")
   end

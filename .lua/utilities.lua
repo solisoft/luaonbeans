@@ -39,9 +39,7 @@ end
 -- Strings
 
 string.split = function(inputStr, sep)
-  if sep == nil then
-    sep = "%s" -- Default to whitespace
-  end
+  sep = sep or "%s"
   local t = {}
   for str in string.gmatch(inputStr, "([^"..sep.."]+)") do
     table.insert(t, str)

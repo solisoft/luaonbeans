@@ -1,0 +1,1112 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>[Lua on Bens] micro MVC framework for redbeand &amp; arangodb</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="a New MVC framework based on redbean.dev and arangoDB" />
+	<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&family=Open+Sans:wght@400;700&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/layouts/app/css.css?1706137666" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <style>/*
+    ! tailwindcss v3.4.0 | MIT License | https://tailwindcss.com
+    */
+
+    /*
+    1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
+    2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
+    */
+
+    *,
+    ::before,
+    ::after {
+      box-sizing: border-box;
+      /* 1 */
+      border-width: 0;
+      /* 2 */
+      border-style: solid;
+      /* 2 */
+      border-color: #e5e7eb;
+      /* 2 */
+    }
+
+    ::before,
+    ::after {
+      --tw-content: '';
+    }
+
+    /*
+    1. Use a consistent sensible line-height in all browsers.
+    2. Prevent adjustments of font size after orientation changes in iOS.
+    3. Use a more readable tab size.
+    4. Use the user's configured `sans` font-family by default.
+    5. Use the user's configured `sans` font-feature-settings by default.
+    6. Use the user's configured `sans` font-variation-settings by default.
+    7. Disable tap highlights on iOS
+    */
+
+    html,
+    :host {
+      line-height: 1.5;
+      /* 1 */
+      -webkit-text-size-adjust: 100%;
+      /* 2 */
+      -moz-tab-size: 4;
+      /* 3 */
+      -o-tab-size: 4;
+         tab-size: 4;
+      /* 3 */
+      font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      /* 4 */
+      font-feature-settings: normal;
+      /* 5 */
+      font-variation-settings: normal;
+      /* 6 */
+      -webkit-tap-highlight-color: transparent;
+      /* 7 */
+    }
+
+    /*
+    1. Remove the margin in all browsers.
+    2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
+    */
+
+    body {
+      margin: 0;
+      /* 1 */
+      line-height: inherit;
+      /* 2 */
+    }
+
+    /*
+    1. Add the correct height in Firefox.
+    2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
+    3. Ensure horizontal rules are visible by default.
+    */
+
+    hr {
+      height: 0;
+      /* 1 */
+      color: inherit;
+      /* 2 */
+      border-top-width: 1px;
+      /* 3 */
+    }
+
+    /*
+    Add the correct text decoration in Chrome, Edge, and Safari.
+    */
+
+    abbr:where([title]) {
+      -webkit-text-decoration: underline dotted;
+              text-decoration: underline dotted;
+    }
+
+    /*
+    Remove the default font size and weight for headings.
+    */
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-size: inherit;
+      font-weight: inherit;
+    }
+
+    /*
+    Reset links to optimize for opt-in styling instead of opt-out.
+    */
+
+    a {
+      color: inherit;
+      text-decoration: inherit;
+    }
+
+    /*
+    Add the correct font weight in Edge and Safari.
+    */
+
+    b,
+    strong {
+      font-weight: bolder;
+    }
+
+    /*
+    1. Use the user's configured `mono` font-family by default.
+    2. Use the user's configured `mono` font-feature-settings by default.
+    3. Use the user's configured `mono` font-variation-settings by default.
+    4. Correct the odd `em` font sizing in all browsers.
+    */
+
+    code,
+    kbd,
+    samp,
+    pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      /* 1 */
+      font-feature-settings: normal;
+      /* 2 */
+      font-variation-settings: normal;
+      /* 3 */
+      font-size: 1em;
+      /* 4 */
+    }
+
+    /*
+    Add the correct font size in all browsers.
+    */
+
+    small {
+      font-size: 80%;
+    }
+
+    /*
+    Prevent `sub` and `sup` elements from affecting the line height in all browsers.
+    */
+
+    sub,
+    sup {
+      font-size: 75%;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+    }
+
+    sub {
+      bottom: -0.25em;
+    }
+
+    sup {
+      top: -0.5em;
+    }
+
+    /*
+    1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
+    2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
+    3. Remove gaps between table borders by default.
+    */
+
+    table {
+      text-indent: 0;
+      /* 1 */
+      border-color: inherit;
+      /* 2 */
+      border-collapse: collapse;
+      /* 3 */
+    }
+
+    /*
+    1. Change the font styles in all browsers.
+    2. Remove the margin in Firefox and Safari.
+    3. Remove default padding in all browsers.
+    */
+
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+      font-family: inherit;
+      /* 1 */
+      font-feature-settings: inherit;
+      /* 1 */
+      font-variation-settings: inherit;
+      /* 1 */
+      font-size: 100%;
+      /* 1 */
+      font-weight: inherit;
+      /* 1 */
+      line-height: inherit;
+      /* 1 */
+      color: inherit;
+      /* 1 */
+      margin: 0;
+      /* 2 */
+      padding: 0;
+      /* 3 */
+    }
+
+    /*
+    Remove the inheritance of text transform in Edge and Firefox.
+    */
+
+    button,
+    select {
+      text-transform: none;
+    }
+
+    /*
+    1. Correct the inability to style clickable types in iOS and Safari.
+    2. Remove default button styles.
+    */
+
+    button,
+    [type='button'],
+    [type='reset'],
+    [type='submit'] {
+      -webkit-appearance: button;
+      /* 1 */
+      background-color: transparent;
+      /* 2 */
+      background-image: none;
+      /* 2 */
+    }
+
+    /*
+    Use the modern Firefox focus style for all focusable elements.
+    */
+
+    :-moz-focusring {
+      outline: auto;
+    }
+
+    /*
+    Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
+    */
+
+    :-moz-ui-invalid {
+      box-shadow: none;
+    }
+
+    /*
+    Add the correct vertical alignment in Chrome and Firefox.
+    */
+
+    progress {
+      vertical-align: baseline;
+    }
+
+    /*
+    Correct the cursor style of increment and decrement buttons in Safari.
+    */
+
+    ::-webkit-inner-spin-button,
+    ::-webkit-outer-spin-button {
+      height: auto;
+    }
+
+    /*
+    1. Correct the odd appearance in Chrome and Safari.
+    2. Correct the outline style in Safari.
+    */
+
+    [type='search'] {
+      -webkit-appearance: textfield;
+      /* 1 */
+      outline-offset: -2px;
+      /* 2 */
+    }
+
+    /*
+    Remove the inner padding in Chrome and Safari on macOS.
+    */
+
+    ::-webkit-search-decoration {
+      -webkit-appearance: none;
+    }
+
+    /*
+    1. Correct the inability to style clickable types in iOS and Safari.
+    2. Change font properties to `inherit` in Safari.
+    */
+
+    ::-webkit-file-upload-button {
+      -webkit-appearance: button;
+      /* 1 */
+      font: inherit;
+      /* 2 */
+    }
+
+    /*
+    Add the correct display in Chrome and Safari.
+    */
+
+    summary {
+      display: list-item;
+    }
+
+    /*
+    Removes the default spacing and border for appropriate elements.
+    */
+
+    blockquote,
+    dl,
+    dd,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    hr,
+    figure,
+    p,
+    pre {
+      margin: 0;
+    }
+
+    fieldset {
+      margin: 0;
+      padding: 0;
+    }
+
+    legend {
+      padding: 0;
+    }
+
+    ol,
+    ul,
+    menu {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    /*
+    Reset default styling for dialogs.
+    */
+
+    dialog {
+      padding: 0;
+    }
+
+    /*
+    Prevent resizing textareas horizontally by default.
+    */
+
+    textarea {
+      resize: vertical;
+    }
+
+    /*
+    1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
+    2. Set the default placeholder color to the user's configured gray 400 color.
+    */
+
+    input::-moz-placeholder, textarea::-moz-placeholder {
+      opacity: 1;
+      /* 1 */
+      color: #9ca3af;
+      /* 2 */
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      opacity: 1;
+      /* 1 */
+      color: #9ca3af;
+      /* 2 */
+    }
+
+    /*
+    Set the default cursor for buttons.
+    */
+
+    button,
+    [role="button"] {
+      cursor: pointer;
+    }
+
+    /*
+    Make sure disabled buttons don't get the pointer cursor.
+    */
+
+    :disabled {
+      cursor: default;
+    }
+
+    /*
+    1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
+    2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
+       This can trigger a poorly considered lint error in some tools but is included by design.
+    */
+
+    img,
+    svg,
+    video,
+    canvas,
+    audio,
+    iframe,
+    embed,
+    object {
+      display: block;
+      /* 1 */
+      vertical-align: middle;
+      /* 2 */
+    }
+
+    /*
+    Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
+    */
+
+    img,
+    video {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Make elements with the HTML hidden attribute stay hidden by default */
+
+    [hidden] {
+      display: none;
+    }
+
+    *, ::before, ::after {
+      --tw-border-spacing-x: 0;
+      --tw-border-spacing-y: 0;
+      --tw-translate-x: 0;
+      --tw-translate-y: 0;
+      --tw-rotate: 0;
+      --tw-skew-x: 0;
+      --tw-skew-y: 0;
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+      --tw-pan-x:  ;
+      --tw-pan-y:  ;
+      --tw-pinch-zoom:  ;
+      --tw-scroll-snap-strictness: proximity;
+      --tw-gradient-from-position:  ;
+      --tw-gradient-via-position:  ;
+      --tw-gradient-to-position:  ;
+      --tw-ordinal:  ;
+      --tw-slashed-zero:  ;
+      --tw-numeric-figure:  ;
+      --tw-numeric-spacing:  ;
+      --tw-numeric-fraction:  ;
+      --tw-ring-inset:  ;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-color: rgb(59 130 246 / 0.5);
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-colored: 0 0 #0000;
+      --tw-blur:  ;
+      --tw-brightness:  ;
+      --tw-contrast:  ;
+      --tw-grayscale:  ;
+      --tw-hue-rotate:  ;
+      --tw-invert:  ;
+      --tw-saturate:  ;
+      --tw-sepia:  ;
+      --tw-drop-shadow:  ;
+      --tw-backdrop-blur:  ;
+      --tw-backdrop-brightness:  ;
+      --tw-backdrop-contrast:  ;
+      --tw-backdrop-grayscale:  ;
+      --tw-backdrop-hue-rotate:  ;
+      --tw-backdrop-invert:  ;
+      --tw-backdrop-opacity:  ;
+      --tw-backdrop-saturate:  ;
+      --tw-backdrop-sepia:  ;
+    }
+
+    ::backdrop {
+      --tw-border-spacing-x: 0;
+      --tw-border-spacing-y: 0;
+      --tw-translate-x: 0;
+      --tw-translate-y: 0;
+      --tw-rotate: 0;
+      --tw-skew-x: 0;
+      --tw-skew-y: 0;
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+      --tw-pan-x:  ;
+      --tw-pan-y:  ;
+      --tw-pinch-zoom:  ;
+      --tw-scroll-snap-strictness: proximity;
+      --tw-gradient-from-position:  ;
+      --tw-gradient-via-position:  ;
+      --tw-gradient-to-position:  ;
+      --tw-ordinal:  ;
+      --tw-slashed-zero:  ;
+      --tw-numeric-figure:  ;
+      --tw-numeric-spacing:  ;
+      --tw-numeric-fraction:  ;
+      --tw-ring-inset:  ;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-color: rgb(59 130 246 / 0.5);
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-colored: 0 0 #0000;
+      --tw-blur:  ;
+      --tw-brightness:  ;
+      --tw-contrast:  ;
+      --tw-grayscale:  ;
+      --tw-hue-rotate:  ;
+      --tw-invert:  ;
+      --tw-saturate:  ;
+      --tw-sepia:  ;
+      --tw-drop-shadow:  ;
+      --tw-backdrop-blur:  ;
+      --tw-backdrop-brightness:  ;
+      --tw-backdrop-contrast:  ;
+      --tw-backdrop-grayscale:  ;
+      --tw-backdrop-hue-rotate:  ;
+      --tw-backdrop-invert:  ;
+      --tw-backdrop-opacity:  ;
+      --tw-backdrop-saturate:  ;
+      --tw-backdrop-sepia:  ;
+    }
+
+    .container {
+      width: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .container {
+        max-width: 640px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        max-width: 768px;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .container {
+        max-width: 1024px;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .container {
+        max-width: 1280px;
+      }
+    }
+
+    @media (min-width: 1536px) {
+      .container {
+        max-width: 1536px;
+      }
+    }
+
+    .mx-auto {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .my-5 {
+      margin-top: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .table {
+      display: table;
+    }
+
+    .grid {
+      display: grid;
+    }
+
+    .min-h-screen {
+      min-height: 100vh;
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    .grow {
+      flex-grow: 1;
+    }
+
+    .grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .flex-col {
+      flex-direction: column;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .justify-center {
+      justify-content: center;
+    }
+
+    .gap-10 {
+      gap: 2.5rem;
+    }
+
+    .gap-2 {
+      gap: 0.5rem;
+    }
+
+    .gap-4 {
+      gap: 1rem;
+    }
+
+    .gap-5 {
+      gap: 1.25rem;
+    }
+
+    .rounded {
+      border-radius: 0.25rem;
+    }
+
+    .bg-black {
+      --tw-bg-opacity: 1;
+      background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+    }
+
+    .bg-red-200 {
+      --tw-bg-opacity: 1;
+      background-color: rgb(254 202 202 / var(--tw-bg-opacity));
+    }
+
+    .p-3 {
+      padding: 0.75rem;
+    }
+
+    .px-2 {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
+    .py-10 {
+      padding-top: 2.5rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .py-2 {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .py-5 {
+      padding-top: 1.25rem;
+      padding-bottom: 1.25rem;
+    }
+
+    .pt-10 {
+      padding-top: 2.5rem;
+    }
+
+    .pt-5 {
+      padding-top: 1.25rem;
+    }
+
+    .text-left {
+      text-align: left;
+    }
+
+    .text-4xl {
+      font-size: 2.25rem;
+      line-height: 2.5rem;
+    }
+
+    .text-red-700 {
+      --tw-text-opacity: 1;
+      color: rgb(185 28 28 / var(--tw-text-opacity));
+    }
+
+    .text-white {
+      --tw-text-opacity: 1;
+      color: rgb(255 255 255 / var(--tw-text-opacity));
+    }
+
+    .shadow {
+      --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+      box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      border-width: 1px;
+      --tw-border-opacity: 1;
+      border-color: rgb(58 104 126 / var(--tw-border-opacity));
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
+    html {
+      background: rgb(33,0,66);
+      background: radial-gradient(at top, rgba(33,0,66,1) 0%, rgba(62,9,121,1) 58%, rgb(26, 10, 59) 100%);
+      color: white;
+    }
+
+    input[type="submit"] {
+      border-radius: 0.25rem;
+      --tw-bg-opacity: 1;
+      background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+      --tw-text-opacity: 1;
+      color: rgb(255 255 255 / var(--tw-text-opacity));
+    }
+
+    h1 {
+      padding-bottom: 1.25rem;
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+      font-weight: 700;
+    }
+
+    a {
+      cursor: pointer;
+      --tw-text-opacity: 1;
+      color: rgb(153 193 208 / var(--tw-text-opacity));
+    }
+
+    a:hover {
+      cursor: pointer;
+      --tw-text-opacity: 1;
+      color: rgb(58 104 126 / var(--tw-text-opacity));
+      text-decoration-line: underline;
+    }
+
+    .rubik {
+      font-family: 'Jost', sans-serif;
+      font-family: 'Open Sans', sans-serif;
+      font-family: 'Rubik Doodle Shadow', system-ui;
+    }
+
+    code {
+      border-radius: 0.25rem;
+      --tw-bg-opacity: 1;
+      background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+    }
+
+    a {
+      --tw-text-opacity: 1;
+      color: rgb(253 224 71 / var(--tw-text-opacity));
+    }
+
+    a:hover {
+      --tw-text-opacity: 1;
+      color: rgb(254 249 195 / var(--tw-text-opacity));
+    }
+
+    @media (min-width: 640px) {
+      .sm\:text-6xl {
+        font-size: 3.75rem;
+        line-height: 1;
+      }
+    }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+	<header class="my-5">
+    <div class="container mx-auto flex justify-center px-2">
+      <h1 class="rubik text-4xl xs:text-5xl sm:text-6xl">Lua on Beans</h1>
+    </div>
+  </header>
+
+	<div class="grow"><div class="container mx-auto py-10 px-2">
+  <h1>Welcome aboard</h1>
+
+  <p>Lua on Beans is a simple <a href="https://redbean.dev" target="_blank">redbean.dev</a> tool for creating fast, testable MVC applications using Lua and ArangoDB.</p>
+
+  <h1 class="pt-10">Why ?</h1>
+  <p>You can find very great tools out there. So why the hell are we creating a new framework?
+  The answer is pretty simple : We want an easy and performant tool to build an app.</p>
+
+  <p>By example, Ruby on Rails is a great framework but it's slow and heavy.</p>
+  <p>Phoenix looks nice and fast but it's not that easy to start with.</p>
+  <p>&nbsp;</p>
+  <p>Lua is a small language easy to learn and it seems very fast when embedded in redbean.dev</p>
+  <p>ArangoDB is a multi model document database very powerful and fast.</p>
+
+  <h1 class="pt-10">Requirements</h1>
+  <p>You just need ArangoDB running.</p>
+  <pre class="py-2 shadow"><code class="language-sh">docker run -e ARANGO_RANDOM_ROOT_PASSWORD=1 -p 8529:8529 -d arangodb
+</code></pre>
+
+  <p>You have to create an alias <code>alias beans="./luaonbeans.org -i beans"</code> and put it in you favorite shell config file.</p>
+
+  <h1 class="pt-5">Getting started</h1>
+
+  <pre class="py-2 shadow"><code class="language-sh">git clone https://github.com/solisoft/luaonbeans --depth=1
+cd luaonbeans
+</code></pre>
+  <p>You need then to create a <code>config/database.json</code> file based on <code>config/database.json.sample</code></p>
+  <p>Then create the DB</p>
+  <pre class="py-2 shadow"><code class="language-sh">beans db:setup
+</code></pre>
+  <p>You can start then the server :</p>
+  <pre class="py-2 shadow"><code class="language-sh">./luaonbeans -D .
+</code></pre>
+
+  <p>You should create the server on <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></p>
+
+  <h1 class="pt-5">Running specs</h1>
+  <pre class="py-2 shadow"><code class="language-sh">beans specs
+</code></pre>
+
+
+  <h1 class="pt-5">Commands</h1>
+
+<pre class="py-2 shadow"><code class="language-sh">beans create controller posts
+beans create model post
+beans create scaffold posts
+beans create migration add_indexes_to_posts
+
+beans db:setup
+beans db:migrate
+beans db:rollback
+
+beans specs</code></pre>
+
+  <h1 class="pt-5">Routes</h1>
+  <p>Routes are defined in the <code>.init.lua</code> file (inside the <code>OnHttpRequest()</code> method)</p>
+<pre class="py-2 shadow"><code class="language-lua">-- Define a resource and create REST default routes
+Resource(&quot;posts&quot;)
+-- It will create index, new, create, update, edit, show and delete routes using the right HTTP verbs
+
+-- Nested CRUD
+Resource(&quot;comments&quot;, { root = &quot;/posts/:post_id&quot;, post_id = &quot;([0-9]+)&quot; })
+
+-- Custom Route
+CustomRoute(&quot;GET&quot;, &quot;/posts/:post_id/offline&quot;, {
+ 	post_id = &quot;([0-9]+)&quot;, controller = &quot;posts&quot;, action = &quot;offline&quot;
+})
+
+-- The Root url
+if GetPath() == &quot;/&quot; then
+  params.action = &quot;index&quot;
+  RoutePath(&quot;/controllers/welcome_controller.lua&quot;)
+end
+</code></pre>
+
+
+
+  <h1 class="pt-5">Controller</h1>
+  <p>Here a CRUD sample : controllers/posts_controller.lua</p>
+<pre class="py-2 shadow"><code class="language-lua">post = {}
+Post = require(&quot;post&quot;)
+
+-- A kind of before_each only: %w(edit update show) :)
+if table.contains({ &quot;edit&quot;, &quot;update&quot;, &quot;show&quot; }, params.action) then
+  post = Post.get(params.id)
+end
+
+-- Here a method to be more DRI
+local function load_index()
+  local posts = Post.all()
+  Page(&quot;posts/index&quot;, &quot;app&quot;, { posts = posts })
+end
+
+local app = {
+  -- GET posts#index =&gt; /posts
+  index = function() load_index() end,
+
+  -- GET posts#new =&gt; /posts/new
+  new = function() Page(&quot;posts/new&quot;, &quot;app&quot;) end,
+
+  -- GET posts#show =&gt; /posts/:id
+  show = function() Page(&quot;posts/show&quot;, &quot;app&quot;, { post = post }) end,
+
+  -- GET posts#edit =&gt; /posts/:id/edit
+  edit = function() Page(&quot;posts/edit&quot;, &quot;app&quot;, { post = post }) end,
+
+  -- PUT posts#update =&gt; posts/:id
+  update = function()
+    local bodyParams = GetBodyParams()
+    local record = Post.update(params.id, bodyParams)
+
+    if record.error then
+      Page(&quot;posts/edit&quot;, &quot;app&quot;, { post = table.merge(bodyParams, { _key = params.id }), record = record })
+      return
+    end
+
+    RedirectTo(&quot;/posts&quot;)
+  end,
+
+  -- POST posts#create =&gt; /posts
+  create = function()
+    local bodyParams = GetBodyParams()
+    local created_post = Post.create(bodyParams)
+
+    if created_post.error then
+      SetStatus(400)
+      Page(&quot;posts/new&quot;, &quot;app&quot;, { post = bodyParams })
+      return
+    end
+
+    RedirectTo(&quot;/posts&quot;)
+  end,
+
+  -- DELETE posts#delete =&gt; /posts/:id
+  delete = function()
+    Post.destroy(params.id)
+    load_index()
+  end,
+
+  -- GET posts#offlice =&gt; /posts/:id/offline (see custom route)
+  offline = function()
+    Write(&quot;Offline&quot;)
+  end
+}
+
+assert(app[params.action] ~= null, &quot;Missing method &#039;&quot; .. params.action .. &quot;&#039;!&quot;)
+app[params.action]()</code></pre>
+
+
+
+  <h1 class="pt-5">Views</h1>
+  <p>Notice that we use <a href="https://htmx.org/">HTMx</a> but you could use anything else.</p>
+  <div class="grid grid-cols-2 gap-5">
+    <div>views/posts/index.etlua
+    <pre class="py-2 shadow"><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
+  &lt;h1&gt;##model_plural_capitalized##&lt;/h1&gt;
+
+  &lt;table class=&quot;w-full&quot;&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th class=&quot;text-left&quot;&gt;Key&lt;/th&gt;
+        &lt;th class=&quot;text-left&quot;&gt;Title&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;% for _, doc in pairs(posts) do %&gt;
+        &lt;% if doc then %&gt;
+        &lt;tr&gt;
+          &lt;td&gt;&lt;%= doc._key %&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;%= doc.title %&gt;&lt;/td&gt;
+          &lt;td&gt;&lt;%= doc.text %&gt;&lt;/td&gt;
+          &lt;td&gt;
+            &lt;a href=&quot;/posts/&lt;%= doc._key %&gt;&quot;&gt;Show&lt;/a&gt; ||
+            &lt;a href=&quot;/posts/&lt;%= doc._key %&gt;/edit&quot;&gt;Edit&lt;/a&gt; ||
+            &lt;a href=&quot;#&quot; hx-target=&quot;body&quot;
+               hx-confirm=&quot;Are you sure ?&quot;
+               hx-delete=&quot;/posts/&lt;%= doc._key %&gt;&quot;&gt;
+               Destroy
+            &lt;/a&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;% end %&gt;
+      &lt;% end %&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;div class=&quot;pt-10&quot;&gt;
+    &lt;a href=&quot;/posts/new&quot;&gt;Create a new Post&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+<div>views/posts/show.etlua
+<pre class="py-2 shadow"><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
+  &lt;h1&gt;Showing Post&lt;/h1&gt;
+
+  &lt;%= EncodeJson(post) %&gt;
+
+  &lt;div&gt;&lt;a href=&quot;/posts&quot;&gt;Back&lt;/a&gt;&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    </div>
+    </div>
+    <div>views/posts/new.etlua
+<pre class="py-2 shadow"><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
+  &lt;h1&gt;New Post&lt;/h1&gt;
+  &lt;form action=&quot;/posts&quot; method=&quot;POST&quot;
+        class=&quot;flex flex-col gap-2&quot;&gt;
+    &lt;div class=&quot;flex gap-4 items-center&quot;&gt;
+      &lt;label for=&quot;title&quot;&gt;Title&lt;/label&gt;
+      &lt;input type=&quot;text&quot; name=&quot;title&quot; required
+             value=&quot;&lt;%= post.title or &quot;&quot; %&gt;&quot; /&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;pt-10 flex gap-5 items-center&quot;&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;Create&quot;&gt;
+      &lt;a href=&quot;/posts&quot;&gt;Back&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+&lt;/div&gt;</code></pre>
+
+<div>views/posts/edit.etlua
+<pre class="py-2 shadow"><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
+  &lt;h1&gt;Editing Post :&lt;/h1&gt;
+
+  &lt;form
+    action=&quot;/posts/&lt;%= post._key %&gt;&quot;
+    method=&quot;POST&quot;
+    class=&quot;flex flex-col gap-2&quot;
+    &gt;
+    &lt;div class=&quot;flex gap-4 items-center&quot;&gt;
+      &lt;label for=&quot;title&quot;&gt;Title&lt;/label&gt;
+      &lt;input type=&quot;text&quot; name=&quot;title&quot;
+             required value=&quot;&lt;%= post.title %&gt;&quot; /&gt;
+    &lt;/div&gt;
+
+    &lt;% if record then %&gt;
+      &lt;div class=&quot;bg-red-200  p-3 text-red-700 rounded&quot;&gt;
+        &lt;strong&gt;
+          Something went wrong while updating
+          the record !!
+        &lt;/strong&gt; &lt;br&gt;  &lt;%= EncodeJson(record) %&gt;
+      &lt;/div&gt;
+    &lt;% end %&gt;
+
+    &lt;div class=&quot;pt-10 flex gap-5 items-center&quot;&gt;
+      &lt;input type=&quot;submit&quot; value=&quot;Update&quot;&gt;
+      &lt;a href=&quot;/posts&quot;&gt;Back&lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+
+&lt;/div&gt;</code></pre>
+    </div>
+    </div>
+
+
+
+
+  </div>
+
+  <h1 class="pt-5">Model</h1>
+models/post.lua<pre class="py-2 shadow"><code class="language-lua">return {
+  all = function()
+    return adb.Aql(&quot;FOR post IN posts SORT post._key ASC RETURN post&quot;).result
+  end,
+
+  get = function(key)
+    return adb.GetDocument(&quot;posts/&quot; .. key)
+  end,
+
+  create = function(dataset)
+    return adb.CreateDocument(&quot;posts&quot;, dataset)
+  end,
+
+  update = function(key, dataset)
+    return adb.UpdateDocument(&quot;posts/&quot; .. key, dataset)
+  end,
+
+  destroy = function(key)
+    return adb.DeleteDocument(&quot;posts/&quot; .. key)
+  end
+}</code></pre>
+</div></div>
+	<footer class="bg-black text-white py-5">
+	<div class="container mx-auto flex justify-center">
+		Lua on Beans - Licence MIT -
+	</div>
+</footer>
+
+</body>
+</html>

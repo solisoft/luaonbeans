@@ -4,13 +4,13 @@
   <p>Lua on Beans is a simple <a href="https://redbean.dev" target="_blank">redbean.dev</a> tool for creating fast, testable MVC applications using Lua and ArangoDB.</p>
 
   <h1 class="pt-10">Why ?</h1>
-  <p>You can find very great tools out there. So why the hell we create a new framework?
+  <p>You can find very great tools out there. So why the hell are we creating a new framework?
   The answer is pretty simple : We want an easy and performant tool to build an app.</p>
 
   <p>By example, Ruby on Rails is a great framework but it's slow and heavy.</p>
   <p>Phoenix looks nice and fast but it's not that easy to start with.</p>
   <p>&nbsp;</p>
-  <p>Lua is a small language easy to learn and it seems fast enough when embedded in redbean.dev</p>
+  <p>Lua is a small language easy to learn and it seems very fast when embedded in redbean.dev</p>
   <p>ArangoDB is a multi model document database very powerful and fast.</p>
 
   <h1 class="pt-10">Requirements</h1>
@@ -158,7 +158,7 @@ app[params.action]()]] %></code></pre>
 
 
   <h1 class="pt-5">Views</h1>
-
+  <p>Notice that we use <a href="https://htmx.org/">HTMx</a> but you could use anything else.</p>
   <div class="grid grid-cols-2 gap-5">
     <div>views/posts/index.etlua
     <pre class="py-2 shadow"><code class="language-html"><%= [[<div class="container mx-auto py-10">
@@ -181,7 +181,11 @@ app[params.action]()]] %></code></pre>
           <td>
             <a href="/posts/<%%= doc._key %%>">Show</a> ||
             <a href="/posts/<%%= doc._key %%>/edit">Edit</a> ||
-            <a href="#" hx-target="body" hx-confirm="Are you sure ?"  hx-delete="/posts/<%%= doc._key %%>">Destroy</a>
+            <a href="#" hx-target="body"
+               hx-confirm="Are you sure ?"
+               hx-delete="/posts/<%%= doc._key %%>">
+               Destroy
+            </a>
           </td>
         </tr>
         <%% end %%>
@@ -208,14 +212,17 @@ app[params.action]()]] %></code></pre>
 <pre class="py-2 shadow"><code class="language-html"><%= [[
 <div class="container mx-auto py-10">
   <h1>New Post</h1>
-  <form action="/posts" method="POST" class="flex flex-col gap-2">
+  <form action="/posts" method="POST"
+        class="flex flex-col gap-2">
     <div class="flex gap-4 items-center">
       <label for="title">Title</label>
-      <input type="text" name="title" required value="<%%= post.title or "" %%>" />
+      <input type="text" name="title" required
+             value="<%%= post.title or "" %%>" />
     </div>
 
     <div class="pt-10 flex gap-5 items-center">
-      <input type="submit" value="Create"> <a href="/posts">Back</a>
+      <input type="submit" value="Create">
+      <a href="/posts">Back</a>
     </div>
   </form>
 </div>]] %></code></pre>
@@ -232,17 +239,22 @@ app[params.action]()]] %></code></pre>
     >
     <div class="flex gap-4 items-center">
       <label for="title">Title</label>
-      <input type="text" name="title" required value="<%%= post.title %%>" />
+      <input type="text" name="title"
+             required value="<%%= post.title %%>" />
     </div>
 
     <%% if record then %%>
       <div class="bg-red-200  p-3 text-red-700 rounded">
-        <strong>Something went wrong while updating the record !!</strong> <br>  <%%= EncodeJson(record) %%>
+        <strong>
+          Something went wrong while updating
+          the record !!
+        </strong> <br>  <%%= EncodeJson(record) %%>
       </div>
     <%% end %%>
 
     <div class="pt-10 flex gap-5 items-center">
-      <input type="submit" value="Update"> <a href="/posts">Back</a>
+      <input type="submit" value="Update">
+      <a href="/posts">Back</a>
     </div>
   </form>
 

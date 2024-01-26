@@ -1,3 +1,6 @@
 .DStore
 redbean.com
 config/database.json
+_system
+_appbundles
+foxx

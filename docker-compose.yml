@@ -1,0 +1,16 @@
+version: "3.1"
+
+services:
+  arangodb:
+    image: arangodb:latest
+    restart: always
+    environment:
+      ARANGO_ROOT_PASSWORD: password
+    ports:
+      - 8529:8529
+    volumes:
+      - arangodb-data:/var/lib/arangodb3
+      - ./foxx:/var/lib/arangodb3-apps
+
+volumes:
+  arangodb-data:

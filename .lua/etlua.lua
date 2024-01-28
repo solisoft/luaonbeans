@@ -7,7 +7,8 @@ end
 local load, setfenv, assert, type, error, tostring, tonumber, setmetatable
 do
   local _obj_0 = _G
-  load, setfenv, assert, type, error, tostring, tonumber, setmetatable = _obj_0.load, _obj_0.setfenv, _obj_0.assert, _obj_0.type, _obj_0.error, _obj_0.tostring, _obj_0.tonumber, _obj_0.setmetatable
+  load, setfenv, assert, type, error, tostring, tonumber, setmetatable = _obj_0.load, _obj_0.setfenv, _obj_0.assert,
+      _obj_0.type, _obj_0.error, _obj_0.tostring, _obj_0.tonumber, _obj_0.setmetatable
 end
 setfenv = setfenv or function(fn, env)
   local name
@@ -123,7 +124,7 @@ do
   _base_0.__index = _base_0
   _class_0 = setmetatable({
     __init = function(self)
-      self.buffer = { }
+      self.buffer = {}
       self.i = 0
     end,
     __base = _base_0,
@@ -276,7 +277,7 @@ do
       self.str = str
       assert(type(self.str) == "string", "expecting string for parse")
       self.pos = 1
-      self.chunks = { }
+      self.chunks = {}
       while true do
         local found, err = self:next_tag()
         if err then
@@ -292,12 +293,12 @@ do
       local line_no, err_msg = err:match("%[.-%]:(%d+): (.*)$")
       line_no = tonumber(line_no)
       if not (line_no) then
-        return 
+        return
       end
       local line = get_line(code, line_no)
       local source_pos = tonumber(line:match("^%-%-%[%[(%d+)%]%]"))
       if not (source_pos) then
-        return 
+        return
       end
       return self:error_for_pos(source_pos, err_msg)
     end,
@@ -335,9 +336,9 @@ do
     end,
     run = function(self, fn, env, buffer, i, ...)
       if env == nil then
-        env = { }
+        env = {}
       end
-      local combined_env = setmetatable({ }, {
+      local combined_env = setmetatable({}, {
         __index = function(self, name)
           local val = env[name]
           if val == nil then
@@ -347,7 +348,7 @@ do
         end
       })
       if not (buffer) then
-        buffer = { }
+        buffer = {}
         i = 0
       end
       setfenv(fn, combined_env)

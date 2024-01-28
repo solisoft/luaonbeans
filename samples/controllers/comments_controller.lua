@@ -1,4 +1,3 @@
-
 comment = {}
 Comments = require("comments")
 
@@ -70,5 +69,5 @@ local app = {
   end
 }
 
-assert(app[params.action] ~= null, "Missing method '" .. params.action .. "'!")
+assert(app[params.action] ~= nil, "Missing method '" .. params.action .. "'!")
 app[params.action]()

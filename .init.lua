@@ -4,8 +4,8 @@ require "utilities"
 
 ENV = {}
 for _, var in pairs(unix.environ()) do
-	var = string.split(var, "=")
-	ENV[var[1]] = var[2]
+  var = string.split(var, "=")
+  ENV[var[1]] = var[2]
 end
 
 beans_env = ENV['BEANS_ENV'] or "development"
@@ -13,34 +13,34 @@ beans_env = ENV['BEANS_ENV'] or "development"
 -- ArangoDB connection
 db_config = DecodeJson(Slurp("config/database.json"))
 adb = require "arango"
-assert(adb.Auth(db_config[beans_env]) ~= null)
+assert(adb.Auth(db_config[beans_env]) ~= nil)
 adb.UpdateCacheConfiguration({ mode = "on" })
 
 function OnHttpRequest()
-	params = GetParams()
-	PrepareMultiPartParams()
+  params = GetParams()
+  PrepareMultiPartParams()
 
-	adb.RefreshToken(db_config[beans_env]) -- reconnect to arangoDB if needed
+  adb.RefreshToken(db_config[beans_env]) -- reconnect to arangoDB if needed
 
-	-- Routes
-	---- Basic CRUD
-	-- Resource("posts")
-	---- Nested CRUD
-	-- Resource("comments", { root = "/posts/:post_id", post_id = "([0-9]+)" })
-	---- Custom Ruute
-	-- CustomRoute("GET", "/posts/:post_id/offline", {
-	-- 	post_id = "([0-9]+)", controller = "posts", action = "offline"
-	-- })
-	---- define root route
-	if GetPath() == "/" then
-		params.action = "index"
-		RoutePath("/controllers/welcome_controller.lua")
-	end
+  -- Routes
+  ---- Basic CRUD
+  -- Resource("posts")
+  ---- Nested CRUD
+  -- Resource("comments", { root = "/posts/:post_id", post_id = "([0-9]+)" })
+  ---- Custom Ruute
+  -- CustomRoute("GET", "/posts/:post_id/offline", {
+  -- 	post_id = "([0-9]+)", controller = "posts", action = "offline"
+  -- })
+  ---- define root route
+  if GetPath() == "/" then
+    params.action = "index"
+    RoutePath("/controllers/welcome_controller.lua")
+  end
 
-	-- if GetPath() == "/upload" and GetMethod() == "POST" then
-	-- 	params.action = "create"
+  -- if GetPath() == "/upload" and GetMethod() == "POST" then
+  -- 	params.action = "create"
   -- 		RoutePath("/controllers/welcome_controller.lua")
-	-- end
+  -- end
 
-	if params.action == null then Route() end
+  if params.action == null then Route() end
 end

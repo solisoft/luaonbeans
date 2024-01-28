@@ -109,12 +109,12 @@ end
 
 setup_db = function(env)
   print("Setup " .. env .. " DB")
-  assert(adb.Auth(db_config.system) ~= null)
+  assert(adb.Auth(db_config.system) ~= nil)
   if env == "test" then
     adb.DeleteDatabase(db_config[env].db_name)
   end
   adb.CreateDatabase(db_config[env].db_name)
-  assert(adb.Auth(db_config[env]) ~= null)
+  assert(adb.Auth(db_config[env]) ~= nil)
   adb.CreateCollection("migrations")
   adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
   adb.CreateDocument("migrations", { filename = "0" })
@@ -136,7 +136,7 @@ end
 
 db_migrate = function()
   print("Running migrations ...")
-  assert(adb.Auth(db_config[beans_env]) ~= null)
+  assert(adb.Auth(db_config[beans_env]) ~= nil)
   latest_version = adb.Aql(
     "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m.filename"
   ).result[1]
@@ -158,7 +158,7 @@ if arg[1] == "db:migrate" then
 end
 
 if arg[1] == "db:rollback" then
-  assert(adb.Auth(db_config[beans_env]) ~= null)
+  assert(adb.Auth(db_config[beans_env]) ~= nil)
   latest_version = adb.Aql(
     "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m"
   ).result[1]

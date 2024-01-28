@@ -86,7 +86,8 @@ return {
 
           collection = adb.UpdateCollection("test_data", {
             schema = {
-              message = "The document does not contain an array of numbers in attribute 'nums', or one of the numbers is greater than 6.",
+              message =
+              "The document does not contain an array of numbers in attribute 'nums', or one of the numbers is greater than 6.",
               level = "moderate",
               type = "json",
               rule = {
@@ -94,13 +95,13 @@ return {
                   nums = {
                     type = "array",
                     items = {
-                        type = "number",
-                        maximum = 6
+                      type = "number",
+                      maximum = 6
                     }
                   }
                 },
                 additionalProperties = {
-                    type = "string"
+                  type = "string"
                 },
                 required = { "nums" }
               }
@@ -188,12 +189,12 @@ return {
 
       describe('Create and Delete Database', function()
         it('create and delete database', function()
-          assert(adb.Auth(db_config["system"]) ~= null)
+          assert(adb.Auth(db_config["system"]) ~= nil)
           local database = adb.CreateDatabase('luaonbean_1234_spec')
           expect.equal(database.code, 201)
           database = adb.DeleteDatabase('luaonbean_1234_spec')
           expect.equal(database.code, 200)
-          assert(adb.Auth(db_config[beans_env]) ~= null)
+          assert(adb.Auth(db_config[beans_env]) ~= nil)
         end)
       end)
 
@@ -201,14 +202,14 @@ return {
 
       describe('Transactions', function()
         it('create and commit a transaction', function()
-          local transaction = adb.BeginTransaction({ collections = { } })
+          local transaction = adb.BeginTransaction({ collections = {} })
           expect.equal(transaction.code, 201)
           transaction = adb.CommitTransaction(transaction.result.id)
           expect.equal(transaction.code, 200)
         end)
 
         it('create and abort a transaction', function()
-          local transaction = adb.BeginTransaction({ collections = { } })
+          local transaction = adb.BeginTransaction({ collections = {} })
           expect.equal(transaction.code, 201)
           transaction = adb.AbortTransaction(transaction.result.id)
           expect.equal(transaction.code, 200)
@@ -246,7 +247,7 @@ return {
       describe('RefreshToken', function()
         it('refresh auth token', function()
           last_db_connect = 1000
-          assert(adb.RefreshToken(db_config["test"]) == null)
+          assert(adb.RefreshToken(db_config["test"]) == nil)
         end)
       end)
     end)

@@ -6,4 +6,3 @@ local app = {
 }
 
 return app[params.action]()
-

@@ -15,14 +15,14 @@ local sub          = string.sub
 local RANDOM_BOUNDARY = sub(tostring({}), 10)
 
 
-local MultipartData = { RANDOM_BOUNDARY = RANDOM_BOUNDARY}
+local MultipartData = { RANDOM_BOUNDARY = RANDOM_BOUNDARY }
 
 
 MultipartData.__index = MultipartData
 
 
 setmetatable(MultipartData, {
-  __call = function (cls, ...)
+  __call = function(cls, ...)
     return cls.new(...)
   end,
 })
@@ -49,16 +49,16 @@ local function decode(body, boundary)
   end
 
   local part_name
-  local part_index    = 1
-  local part_headers  = {}
-  local part_value    = {}
-  local part_value_ct = 0
+  local part_index            = 1
+  local part_headers          = {}
+  local part_value            = {}
+  local part_value_ct         = 0
 
   local end_boundary_length   = boundary and #boundary + 2
   local processing_part_value = false
 
-  local position = 1
-  local done     = false
+  local position              = 1
+  local done                  = false
 
   repeat
     local s = find(body, "[\r\n]", position)
@@ -68,11 +68,9 @@ local function decode(body, boundary)
     if s then
       line = sub(body, position, s - 1)
       position = s + 1
-
     else
       if position == 1 then
         line = body
-
       else
         line = sub(body, position)
       end
@@ -85,18 +83,17 @@ local function decode(body, boundary)
         part_value_ct             = part_value_ct + 1
         part_value[part_value_ct] = sub(body, s, s)
       end
-
     else
       if sub(line, 1, 2) == "--" and sub(line, 3, end_boundary_length) == boundary then
         processing_part_value = false
 
         if part_name ~= nil then
           if part_value[part_value_ct] == "\n" then
-             part_value[part_value_ct] = nil
+            part_value[part_value_ct] = nil
           end
 
           if part_value[part_value_ct - 1] == "\r" then
-             part_value[part_value_ct - 1] = nil
+            part_value[part_value_ct - 1] = nil
           end
 
           result.data[part_index] = {
@@ -118,7 +115,6 @@ local function decode(body, boundary)
           part_name     = nil
           part_index    = part_index + 1
         end
-
       else
         --Beginning of part
         if not processing_part_value and line:sub(1, 19):lower() == "content-disposition" then
@@ -139,7 +135,6 @@ local function decode(body, boundary)
             processing_part_value = true
             position = s + 4
           end
-
         elseif not processing_part_value and is_header(line) then
           insert(part_headers, line)
 
@@ -147,13 +142,12 @@ local function decode(body, boundary)
             processing_part_value = true
             position = s + 4
           end
-
         else
-          processing_part_value = true
+          processing_part_value     = true
 
           -- The value part begins
-          part_value_ct               = part_value_ct + 1
-          part_value[part_value_ct]   = line
+          part_value_ct             = part_value_ct + 1
+          part_value[part_value_ct] = line
 
           if s then
             part_value_ct             = part_value_ct + 1
@@ -162,7 +156,6 @@ local function decode(body, boundary)
         end
       end
     end
-
   until done
 
   if part_name ~= nil then
@@ -231,8 +224,8 @@ function MultipartData.new(data, content_type)
   if content_type then
     local boundary = match(content_type, ";%s*boundary=(%S+)")
     if boundary then
-      if (sub(boundary, 1, 1) == '"' and sub(boundary, -1)  == '"') or
-         (sub(boundary, 1, 1) == "'" and sub(boundary, -1)  == "'") then
+      if (sub(boundary, 1, 1) == '"' and sub(boundary, -1) == '"') or
+          (sub(boundary, 1, 1) == "'" and sub(boundary, -1) == "'") then
         boundary = sub(boundary, 2, -2)
       end
 
@@ -247,7 +240,6 @@ function MultipartData.new(data, content_type)
   return instance
 end
 
-
 function MultipartData:get(name)
   -- Get first index for part
   local index = self._data.indexes[name]
@@ -257,7 +249,6 @@ function MultipartData:get(name)
 
   return self._data.data[index[1]]
 end
-
 
 function MultipartData:get_all()
   local result = {}
@@ -269,7 +260,6 @@ function MultipartData:get_all()
 
   return result
 end
-
 
 function MultipartData:get_as_array(name)
   local vals = {}
@@ -285,7 +275,6 @@ function MultipartData:get_as_array(name)
 
   return vals
 end
-
 
 function MultipartData:get_all_as_arrays()
   -- Get all fields as arrays
@@ -313,47 +302,44 @@ function MultipartData:get_all_with_arrays()
   return result
 end
 
-
 function MultipartData:set_simple(name, value, filename, content_type)
-    local headers = {'Content-Disposition: form-data; name="' , name , '"'}
-    if filename then
-      headers[4] = '; filename="'
-      headers[5] = filename
-      headers[6] = '"'
-    end
-    if content_type then
-      headers[7] = "\r\ncontent-type: "
-      headers[8] = content_type
-    end
-    headers = concat(headers)
-    if self._data.indexes[name] then
-      self._data.data[self._data.indexes[name][1]] = {
-        name = name,
-        value = value,
-        headers = { headers }
-      }
-
-    else
-      -- Find maximum index
-      local max_index = 0
-      for _, indexes in pairs(self._data.indexes) do
-        for _, index in ipairs(indexes) do
-          if index > max_index then
-            max_index = index
-          end
+  local headers = { 'Content-Disposition: form-data; name="', name, '"' }
+  if filename then
+    headers[4] = '; filename="'
+    headers[5] = filename
+    headers[6] = '"'
+  end
+  if content_type then
+    headers[7] = "\r\ncontent-type: "
+    headers[8] = content_type
+  end
+  headers = concat(headers)
+  if self._data.indexes[name] then
+    self._data.data[self._data.indexes[name][1]] = {
+      name = name,
+      value = value,
+      headers = { headers }
+    }
+  else
+    -- Find maximum index
+    local max_index = 0
+    for _, indexes in pairs(self._data.indexes) do
+      for _, index in ipairs(indexes) do
+        if index > max_index then
+          max_index = index
         end
       end
-      -- Assign data to new index
-      local part_index = max_index + 1
-      self._data.indexes[name] = { part_index }
-      self._data.data[part_index] = {
-        name    = name,
-        value   = value,
-        headers = { headers }
-      }
     end
+    -- Assign data to new index
+    local part_index = max_index + 1
+    self._data.indexes[name] = { part_index }
+    self._data.data[part_index] = {
+      name    = name,
+      value   = value,
+      headers = { headers }
+    }
+  end
 end
-
 
 function MultipartData:delete(name)
   -- If part name repeats, then delete all occurrences
@@ -383,13 +369,12 @@ function MultipartData:delete(name)
   end
 end
 
-
 function MultipartData:tostring()
   return encode(self._data, self._boundary)
 end
 
 function MultipartData:get_content_type(headers)
-  local content_type = null
+  local content_type = nil
   for _, h in pairs(headers) do
     local arr = string.split(h, ": ")
     if arr[1] == "Content-Type" then
@@ -401,12 +386,12 @@ function MultipartData:get_content_type(headers)
 end
 
 function MultipartData:get_filename(headers)
-  local filename = null
+  local filename = nil
   for _, h in pairs(headers) do
     local arr = string.split(h, ": ")
     if arr[1] == "Content-Disposition" then
       p = assert(re.compile([[filename="(.+)"]]))
-      m,filename = assert(p:search(h))
+      m, filename = assert(p:search(h))
 
       break
     end

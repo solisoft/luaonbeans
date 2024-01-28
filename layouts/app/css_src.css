@@ -2,38 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-input[type="text"], textarea {
-  @apply w-full py-1 px-2 border border-[#3A687E]
+input[type="text"],
+textarea {
+  @apply w-full border border-[#3A687E] px-2 py-1;
 }
 
 html {
-  background: rgb(33,0,66);
-  background: radial-gradient(at top, rgba(33,0,66,1) 0%, rgba(62,9,121,1) 58%, rgb(26, 10, 59) 100%);
+  background: rgb(33, 0, 66);
+  background: radial-gradient(
+    at top,
+    rgba(33, 0, 66, 1) 0%,
+    rgba(62, 9, 121, 1) 58%,
+    rgb(26, 10, 59) 100%
+  );
   color: white;
 }
 
 input[type="submit"] {
-  @apply bg-black rounded text-white py-2 px-5
+  @apply rounded bg-black px-5 py-2 text-white;
 }
 
 h1 {
-  @apply text-xl font-bold pb-5
+  @apply pb-5 text-xl font-bold;
 }
 
 a {
-  @apply text-[#99C1D0] hover:text-[#3A687E] hover:underline hover:cursor-pointer cursor-pointer
+  @apply cursor-pointer text-[#99C1D0] hover:cursor-pointer hover:text-[#3A687E] hover:underline;
 }
 
 .rubik {
-  font-family: 'Jost', sans-serif;
-  font-family: 'Open Sans', sans-serif;
-  font-family: 'Rubik Doodle Shadow', system-ui;
+  font-family: "Jost", sans-serif;
+  font-family: "Open Sans", sans-serif;
+  font-family: "Rubik Doodle Shadow", system-ui;
 }
 
 code {
-  @apply bg-black rounded px-2 py-1;
+  @apply rounded bg-black px-2 py-1;
 }
 
 a {
-  @apply text-yellow-300 hover:text-yellow-100
+  @apply text-yellow-300 hover:text-yellow-100;
 }

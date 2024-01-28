@@ -144,7 +144,8 @@ return {
           local indexes = adb.GetAllIndexes("test_data")
           expect.truthy(indexes.code == 200)
           expect.equal(#table.keys(indexes.identifiers), 1)
-          local index = adb.CreateIndex("test_data", { type = "persistent", unique = true, fields = { "filename" } })
+          local index = adb.CreateIndex("test_data",
+            { type = "persistent", unique = true, fields = { "filename" } })
           expect.truthy(index.code == 201)
           indexes = adb.GetAllIndexes("test_data")
           expect.truthy(indexes.code == 200)
@@ -158,7 +159,8 @@ return {
         it('create index', function()
           local collection = adb.CreateCollection("test_data")
           expect.truthy(collection.code == 200)
-          local index = adb.CreateIndex("test_data", { type = "persistent", unique = true, fields = { "filename" } })
+          local index = adb.CreateIndex("test_data",
+            { type = "persistent", unique = true, fields = { "filename" } })
           expect.truthy(index.code == 201)
           expect.equal(index.fields, { "filename" })
           collection = adb.DeleteCollection("test_data")
@@ -170,7 +172,8 @@ return {
         it('delete index', function()
           local collection = adb.CreateCollection("test_data")
           expect.truthy(collection.code == 200)
-          local index = adb.CreateIndex("test_data", { type = "persistent", unique = true, fields = { "filename" } })
+          local index = adb.CreateIndex("test_data",
+            { type = "persistent", unique = true, fields = { "filename" } })
           expect.truthy(index.code == 201)
           expect.equal(index.fields, { "filename" })
           local indexes = adb.GetAllIndexes("test_data")

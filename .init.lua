@@ -20,7 +20,7 @@ function OnHttpRequest()
   Params = GetParams()
   PrepareMultiPartParams()
 
-  adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
+  adb.RefreshToken(db_config[BeansEnv])   -- reconnect to arangoDB if needed
 
   -- Routes
   ---- Basic CRUD

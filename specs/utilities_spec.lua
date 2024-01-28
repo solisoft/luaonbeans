@@ -2,7 +2,6 @@
 
 return {
   run = function()
-
     describe('utilities', function()
       lester.before(function()
         -- This function is run before every test.
@@ -83,6 +82,5 @@ return {
         expect.equal(Camelize("hello_world"), "HelloWorld")
       end)
     end)
-
   end
 }

@@ -7,7 +7,7 @@ return {
         -- This function is run before every test.
       end)
 
-      describe('welcome#index', function() -- Describe blocks can be nested.
+      describe('welcome#index', function()       -- Describe blocks can be nested.
         it('load page', function()
           local status, h, body = Fetch("http://localhost:8080")
           expect.equal(status, 200)

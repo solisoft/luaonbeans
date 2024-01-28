@@ -165,9 +165,11 @@ local color_codes = {
 local quiet_o_char = string.char(226, 151, 143)
 
 -- Colors table, returning proper color code if color mode is enabled.
-local colors = setmetatable({}, { __index = function(_, key)
-  return lester.color and color_codes[key] or ''
-end})
+local colors = setmetatable({}, {
+  __index = function(_, key)
+    return lester.color and color_codes[key] or ''
+  end
+})
 
 --- Table of terminal colors codes, can be customized.
 lester.colors = colors
@@ -175,16 +177,16 @@ lester.colors = colors
 -- Parse command line arguments from `arg` table.
 -- It `arg` is nil then the global `arg` is used.
 function lester.parse_args(arg)
-  for _,opt in ipairs(arg or _G.arg) do
+  for _, opt in ipairs(arg or _G.arg) do
     local name, value
     if opt:find('^%-%-filter') then
       name = 'filter'
       value = opt:match('^%-%-filter%=(.*)$')
     elseif opt:find('^%-%-no%-[a-z0-9-]+$') then
-      name = opt:match('^%-%-no%-([a-z0-9-]+)$'):gsub('-','_')
+      name = opt:match('^%-%-no%-([a-z0-9-]+)$'):gsub('-', '_')
       value = false
     elseif opt:find('^%-%-[a-z0-9-]+$') then
-      name = opt:match('^%-%-([a-z0-9-]+)$'):gsub('-','_')
+      name = opt:match('^%-%-([a-z0-9-]+)$'):gsub('-', '_')
       value = true
     end
     if value ~= nil and lester[name] ~= nil and (type(lester[name]) == 'boolean' or type(lester[name]) == 'string') then
@@ -222,8 +224,8 @@ function lester.describe(name, func)
     local io_write = io.write
     local colors_reset, colors_green = colors.reset, colors.green
     io_write(failures == 0 and colors_green or colors.red, '[====] ',
-             colors.magenta, name, colors_reset, ' | ',
-             colors_green, successes, colors_reset, ' successes / ')
+      colors.magenta, name, colors_reset, ' | ',
+      colors_green, successes, colors_reset, ' successes / ')
     if skipped > 0 then
       io_write(colors.yellow, skipped, colors_reset, ' skipped / ')
     end
@@ -246,9 +248,9 @@ local function show_error_line(err)
   local colors_reset = colors.reset
   local short_src, currentline = info.short_src, info.currentline
   io_write(' (', colors.blue, short_src, colors_reset,
-           ':', colors.bright, currentline, colors_reset)
+    ':', colors.bright, currentline, colors_reset)
   if err and lester.show_traceback then
-    local fnsrc = short_src..':'..currentline
+    local fnsrc = short_src .. ':' .. currentline
     for cap1, cap2 in err:gmatch('\t[^\n:]+:(%d+): in function <([^>]+)>\n') do
       if cap2 == fnsrc then
         io_write('/', colors.bright, cap1, colors_reset)
@@ -263,7 +265,7 @@ end
 local function show_test_name(name)
   local io_write = io.write
   local colors_reset = colors.reset
-  for _,descname in ipairs(names) do
+  for _, descname in ipairs(names) do
     io_write(colors.magenta, descname, colors_reset, ' | ')
   end
   io_write(colors.bright, name, colors_reset)
@@ -276,7 +278,7 @@ end
 function lester.it(name, func, enabled)
   -- Skip the test silently if it does not match the filter.
   if lester.filter then
-    local fullname = table.concat(names, ' | ')..' | '..name
+    local fullname = table.concat(names, ' | ') .. ' | ' .. name
     if not fullname:match(lester.filter) then
       return
     end
@@ -298,8 +300,8 @@ function lester.it(name, func, enabled)
     return
   end
   -- Execute before handlers.
-  for _,levelbefores in pairs(befores) do
-    for _,beforefn in ipairs(levelbefores) do
+  for _, levelbefores in pairs(befores) do
+    for _, beforefn in ipairs(levelbefores) do
       beforefn(name)
     end
   end
@@ -339,7 +341,7 @@ function lester.it(name, func, enabled)
       io_write(colors.green, o, colors_reset)
     else -- Show complete test name on failure.
       io_write(last_succeeded and '\n' or '',
-               colors.red, '[FAIL] ', colors_reset)
+        colors.red, '[FAIL] ', colors_reset)
       show_test_name(name)
       show_error_line(err)
       io_write('\n')
@@ -351,7 +353,7 @@ function lester.it(name, func, enabled)
       local errfile, errline, errmsg, rest = err:match('^([^:\n]+):(%d+): ([^\n]+)(.*)')
       if errfile and errline and errmsg and rest then
         io_write(colors.blue, errfile, colors_reset,
-                 ':', colors.bright, errline, colors_reset, ': ')
+          ':', colors.bright, errline, colors_reset, ': ')
         if errmsg:match('^%w([^:]*)$') then
           io_write(colors.red, errmsg, colors_reset)
         else
@@ -372,8 +374,8 @@ function lester.it(name, func, enabled)
     lester.exit()
   end
   -- Execute after handlers.
-  for _,levelafters in pairs(afters) do
-    for _,afterfn in ipairs(levelafters) do
+  for _, levelafters in pairs(afters) do
+    for _, afterfn in ipairs(levelafters) do
       afterfn(name)
     end
   end
@@ -388,7 +390,7 @@ function lester.before(func)
     levelbefores = {}
     befores[level] = levelbefores
   end
-  levelbefores[#levelbefores+1] = func
+  levelbefores[#levelbefores + 1] = func
 end
 
 --- Set a function that is called after every test inside a describe block.
@@ -400,7 +402,7 @@ function lester.after(func)
     levelafters = {}
     afters[level] = levelafters
   end
-  levelafters[#levelafters+1] = func
+  levelafters[#levelafters + 1] = func
 end
 
 --- Pretty print statistics of all test runs.
@@ -409,10 +411,10 @@ function lester.report()
   local now = lester.seconds()
   local colors_reset = colors.reset
   io.write(lester.quiet and '\n' or '',
-           colors.green, total_successes, colors_reset, ' successes / ',
-           colors.yellow, total_skipped, colors_reset, ' skipped / ',
-           colors.red, total_failures, colors_reset, ' failures / ',
-           colors.bright, string.format('%.6f', now - (lester_start or now)), colors_reset, ' seconds\n')
+    colors.green, total_successes, colors_reset, ' successes / ',
+    colors.yellow, total_skipped, colors_reset, ' skipped / ',
+    colors.red, total_failures, colors_reset, ' failures / ',
+    colors.bright, string.format('%.6f', now - (lester_start or now)), colors_reset, ' seconds\n')
   io.flush()
   return total_failures == 0
 end
@@ -434,8 +436,8 @@ lester.expect = expect
 -- then it is converted to a Lua hexdecimal string.
 function expect.tohumanstring(v)
   local s = tostring(v)
-  if s:find'[^ -~\n\t]' then -- string contains non printable ASCII
-    return '"'..s:gsub('.', function(c) return string.format('\\x%02X', c:byte()) end)..'"'
+  if s:find '[^ -~\n\t]' then -- string contains non printable ASCII
+    return '"' .. s:gsub('.', function(c) return string.format('\\x%02X', c:byte()) end) .. '"'
   end
   return s
 end
@@ -454,7 +456,7 @@ function expect.fail(func, expected)
       found = string.find(tostring(err), expected, 1, true)
     end
     if not found then
-      error('expected function to fail\nexpected:\n'..tostring(expected)..'\ngot:\n'..tostring(err), 2)
+      error('expected function to fail\nexpected:\n' .. tostring(expected) .. '\ngot:\n' .. tostring(err), 2)
     end
   end
 end
@@ -463,35 +465,35 @@ end
 function expect.not_fail(func)
   local ok, err = pcall(func)
   if not ok then
-    error('expected function to not fail\ngot error:\n'..expect.tohumanstring(err), 2)
+    error('expected function to not fail\ngot error:\n' .. expect.tohumanstring(err), 2)
   end
 end
 
 --- Check if a value is not `nil`.
 function expect.exist(v)
   if v == nil then
-    error('expected value to exist\ngot:\n'..expect.tohumanstring(v), 2)
+    error('expected value to exist\ngot:\n' .. expect.tohumanstring(v), 2)
   end
 end
 
 --- Check if a value is `nil`.
 function expect.not_exist(v)
   if v ~= nil then
-    error('expected value to not exist\ngot:\n'..expect.tohumanstring(v), 2)
+    error('expected value to not exist\ngot:\n' .. expect.tohumanstring(v), 2)
   end
 end
 
 --- Check if an expression is evaluates to `true`.
 function expect.truthy(v)
   if not v then
-    error('expected expression to be true\ngot:\n'..expect.tohumanstring(v), 2)
+    error('expected expression to be true\ngot:\n' .. expect.tohumanstring(v), 2)
   end
 end
 
 --- Check if an expression is evaluates to `false`.
 function expect.falsy(v)
   if v then
-    error('expected expression to be false\ngot:\n'..expect.tohumanstring(v), 2)
+    error('expected expression to be false\ngot:\n' .. expect.tohumanstring(v), 2)
   end
 end
 
@@ -512,11 +514,11 @@ end
 local function strict_eq_key_suffix(k)
   if type(k) == 'string' then
     if k:find('^[a-zA-Z_][a-zA-Z0-9]*$') then -- string is a lua field
-      return '.'..k
-    elseif k:find'[^ -~\n\t]' then -- string contains non printable ASCII
-      return '["'..k:gsub('.', function(c) return string.format('\\x%02X', c:byte()) end)..'"]'
+      return '.' .. k
+    elseif k:find '[^ -~\n\t]' then           -- string contains non printable ASCII
+      return '["' .. k:gsub('.', function(c) return string.format('\\x%02X', c:byte()) end) .. '"]'
     else
-      return '["'..k..'"]'
+      return '["' .. k .. '"]'
     end
   else
     return string.format('[%s]', rawtostring(k))
@@ -535,23 +537,23 @@ function expect.strict_eq(t1, t2, name)
   if t1type == 'table' then
     if getmetatable(t1) ~= getmetatable(t2) then
       return false, string.format("expected metatables to be equal for %s\nfirst: %s\nsecond: %s",
-        name,  expect.tohumanstring(t1), expect.tohumanstring(t2))
+        name, expect.tohumanstring(t1), expect.tohumanstring(t2))
     end
-    for k,v1 in pairs(t1) do
-      local ok, err = expect.strict_eq(v1, t2[k], name..strict_eq_key_suffix(k))
+    for k, v1 in pairs(t1) do
+      local ok, err = expect.strict_eq(v1, t2[k], name .. strict_eq_key_suffix(k))
       if not ok then
         return false, err
       end
     end
-    for k,v2 in pairs(t2) do
-      local ok, err = expect.strict_eq(v2, t1[k], name..strict_eq_key_suffix(k))
+    for k, v2 in pairs(t2) do
+      local ok, err = expect.strict_eq(v2, t1[k], name .. strict_eq_key_suffix(k))
       if not ok then
         return false, err
       end
     end
   elseif t1 ~= t2 then
     return false, string.format("expected values to be equal for %s\nfirst:\n%s\nsecond:\n%s",
-      name,  expect.tohumanstring(t1), expect.tohumanstring(t2))
+      name, expect.tohumanstring(t1), expect.tohumanstring(t2))
   end
   return true
 end
@@ -568,7 +570,7 @@ end
 function expect.not_equal(v1, v2)
   if expect.strict_eq(v1, v2) then
     local v1s, v2s = expect.tohumanstring(v1), expect.tohumanstring(v2)
-    error('expected values to be not equal\nfirst value:\n'..v1s..'\nsecond value:\n'..v2s, 2)
+    error('expected values to be not equal\nfirst value:\n' .. v1s .. '\nsecond value:\n' .. v2s, 2)
   end
 end
 

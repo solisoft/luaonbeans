@@ -961,7 +961,7 @@ CustomRoute(&quot;GET&quot;, &quot;/posts/:post_id/offline&quot;, {
 
 -- The Root url
 if GetPath() == &quot;/&quot; then
-  params.action = &quot;index&quot;
+  Params.action = &quot;index&quot;
   RoutePath(&quot;/controllers/welcome_controller.lua&quot;)
 end
 </code></pre>
@@ -972,8 +972,8 @@ end
 Post = require(&quot;post&quot;)
 
 -- A kind of before_each only: %w(edit update show) :)
-if table.contains({ &quot;edit&quot;, &quot;update&quot;, &quot;show&quot; }, params.action) then
-  post = Post.get(params.id)
+if table.contains({ &quot;edit&quot;, &quot;update&quot;, &quot;show&quot; }, Params.action) then
+  post = Post.get(Params.id)
 end
 
 -- Here a method to be more DRI
@@ -998,10 +998,10 @@ local app = {
   -- PUT posts#update =&gt; posts/:id
   update = function()
     local bodyParams = GetBodyParams()
-    local record = Post.update(params.id, bodyParams)
+    local record = Post.update(Params.id, bodyParams)
 
     if record.error then
-      Page(&quot;posts/edit&quot;, &quot;app&quot;, { post = table.merge(bodyParams, { _key = params.id }), record = record })
+      Page(&quot;posts/edit&quot;, &quot;app&quot;, { post = table.merge(bodyParams, { _key = Params.id }), record = record })
       return
     end
 
@@ -1024,7 +1024,7 @@ local app = {
 
   -- DELETE posts#delete =&gt; /posts/:id
   delete = function()
-    Post.destroy(params.id)
+    Post.destroy(Params.id)
     load_index()
   end,
 
@@ -1034,8 +1034,8 @@ local app = {
   end
 }
 
-assert(app[params.action] ~= nil, &quot;Missing method &#039;&quot; .. params.action .. &quot;&#039;!&quot;)
-app[params.action]()</code></pre>
+assert(app[Params.action] ~= nil, &quot;Missing method &#039;&quot; .. Params.action .. &quot;&#039;!&quot;)
+app[Params.action]()</code></pre>
 
         <h1 class="pt-5">Views</h1>
         <p>

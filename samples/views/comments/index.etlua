@@ -17,9 +17,9 @@
           <td><%= doc.title %></td>
           <td><%= doc.text %></td>
           <td>
-            <a href="/posts/<%= params.post_id %>/comments/<%= doc._key %>">Show</a> ||
-            <a href="/posts/<%= params.post_id %>/comments/<%= doc._key %>/edit">Edit</a> ||
-            <a href="#" hx-target="body" hx-confirm="Are you sure ?"  hx-delete="/posts/<%= params.post_id %>/comments/<%= doc._key %>">Destroy</a>
+            <a href="/posts/<%= Params.post_id %>/comments/<%= doc._key %>">Show</a> ||
+            <a href="/posts/<%= Params.post_id %>/comments/<%= doc._key %>/edit">Edit</a> ||
+            <a href="#" hx-target="body" hx-confirm="Are you sure ?"  hx-delete="/posts/<%= Params.post_id %>/comments/<%= doc._key %>">Destroy</a>
           </td>
         </tr>
         <% end %>
@@ -28,7 +28,7 @@
   </table>
 
   <div class="pt-10 flex gap-10" >
-    <a href="/posts/<%= params.post_id %>/comments/new">Create a new Comment</a>
-    <a href="/posts/<%= params.post_id %>">Back to post</a>
+    <a href="/posts/<%= Params.post_id %>/comments/new">Create a new Comment</a>
+    <a href="/posts/<%= Params.post_id %>">Back to post</a>
   </div>
 </div>

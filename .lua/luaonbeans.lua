@@ -30,7 +30,6 @@ function Resource(name, options)
   options.root = options.root .. "/"
 
   local path = GetPath()
-  local id = nil
   local parser = nil
   local matcher = nil
 
@@ -40,14 +39,14 @@ function Resource(name, options)
     options.root = options.root:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
   end
 
-  params["controller"] = name
+  Params["controller"] = name
 
   if (#extractedPatterns > 0) then
     parser = re.compile(options.root)
     matcher = { parser:search(path) }
     for i, match in ipairs(matcher) do
       if i > 1 then
-        params[extractedPatterns[i - 1]:gsub(":", "")] = match
+        Params[extractedPatterns[i - 1]:gsub(":", "")] = match
       end
     end
   end
@@ -57,7 +56,7 @@ function Resource(name, options)
     matcher = parser:search(path)
 
     if matcher then
-      params["action"] = "index"
+      Params["action"] = "index"
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
@@ -65,24 +64,24 @@ function Resource(name, options)
     parser = re.compile("^" .. options.root .. name .. "/new$")
     matcher = parser:search(path)
     if matcher then
-      params["action"] = "new"
+      Params["action"] = "new"
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
 
     parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, params["id"] = parser:search(path)
+    matcher, Params["id"] = parser:search(path)
     if matcher then
-      params["action"] = "show"
+      Params["action"] = "show"
 
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
 
     parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)/edit$")
-    matcher, params["id"] = parser:search(path)
+    matcher, Params["id"] = parser:search(path)
     if matcher then
-      params["action"] = "edit"
+      Params["action"] = "edit"
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
@@ -92,16 +91,16 @@ function Resource(name, options)
     parser = re.compile("^" .. options.root .. name .. "$")
     matcher = parser:search(path)
     if matcher then
-      params["action"] = "create"
+      Params["action"] = "create"
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
 
     -- Use POST instead of PUT if needed
     parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, params["id"] = parser:search(path)
+    matcher, Params["id"] = parser:search(path)
     if matcher then
-      params["action"] = "update"
+      Params["action"] = "update"
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
@@ -109,9 +108,9 @@ function Resource(name, options)
 
   if GetMethod() == "PUT" or GetMethod() == "PATCH" then
     parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, params["id"] = parser:search(path)
+    matcher, Params["id"] = parser:search(path)
     if matcher then
-      params["action"] = "update"
+      Params["action"] = "update"
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
@@ -119,9 +118,9 @@ function Resource(name, options)
 
   if GetMethod() == "DELETE" then
     parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, params["id"] = parser:search(path)
+    matcher, Params["id"] = parser:search(path)
     if matcher then
-      params["action"] = "delete"
+      Params["action"] = "delete"
       RoutePath("/controllers/" .. name .. "_controller.lua")
       return
     end
@@ -137,20 +136,20 @@ function CustomRoute(method, url, options)
   end
 
   if (#extractedPatterns > 0) then
-    parser = re.compile(url)
-    matcher = { parser:search(path) }
+    local parser = re.compile(url)
+    local matcher = { parser:search(path) }
     for i, match in ipairs(matcher) do
       if i > 1 then
-        params[extractedPatterns[i - 1]:gsub(":", "")] = match
+        Params[extractedPatterns[i - 1]:gsub(":", "")] = match
       end
     end
   end
 
-  parser = re.compile("^" .. url .. "$")
-  matcher = parser:search(path)
+  local parser = re.compile("^" .. url .. "$")
+  local matcher = parser:search(path)
   if matcher and GetMethod() == method then
-    params.controller = options.controller
-    params.action = options.action
+    Params.controller = options.controller
+    Params.action = options.action
 
     RoutePath("/controllers/" .. options.controller .. "_controller.lua")
     return
@@ -158,12 +157,12 @@ function CustomRoute(method, url, options)
 end
 
 function GetBodyParams()
-  local body_params = {}
-  for i, data in pairs(params) do
-    if type(data) == "table" then body_params[data[1]] = data[2] end
+  local body_Params = {}
+  for i, data in pairs(Params) do
+    if type(data) == "table" then body_Params[data[1]] = data[2] end
   end
 
-  return body_params
+  return body_Params
 end
 
 function RedirectTo(path, status)

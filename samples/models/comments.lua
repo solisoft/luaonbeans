@@ -7,7 +7,7 @@ return {
         SORT comment._key ASC RETURN comment
       )
       RETURN { post, comments }
-    ]], { key = params.post_id }).result[1]
+    ]], { key = Params.post_id }).result[1]
   end,
 
   get = function(key)

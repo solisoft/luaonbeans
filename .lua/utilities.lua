@@ -30,7 +30,7 @@ table.merge = function(t1, t2)
 end
 
 table.append = function(t1, t2)
-  for k, v in ipairs(t2) do
+  for _, v in ipairs(t2) do
     table.insert(t1, v)
   end
   return t1
@@ -59,7 +59,7 @@ string.strip = function(str)
   return (str:gsub("^%s*(.-)%s*$", "%1"))
 end
 
-vowels = { "a", "e", "i", "o", "u" }
+local vowels = { "a", "e", "i", "o", "u" }
 
 local function pluralizeWord(word)
   if word:match("f$") or word:match("fe$") then
@@ -126,7 +126,7 @@ end
 -- utilities
 
 GenerateTempFilename = function()
-  filename = EncodeBase64(GetRandomBytes(32))
+  local filename = EncodeBase64(GetRandomBytes(32))
   filename = string.gsub(filename, "[\\/]", "")
   return "tmp/" .. filename
 end
@@ -167,7 +167,7 @@ RunCommand = function(command)
 end
 
 GetFileExt = function(content_type)
-  allowed_types = {
+  local allowed_types = {
     ["image/gif"] = "gif",
     ["image/jpeg"] = "jpg",
     ["image/png"] = "png",
@@ -192,9 +192,9 @@ GetFileExt = function(content_type)
   return allowed_types[content_type]
 end
 
--- Prepare MultiPart Params and merge everything in params
+-- Prepare MultiPart Params and merge everything in Params
 PrepareMultiPartParams = function()
-  if GetHeader("Content-Type") ~= null and string.find(GetHeader("Content-Type"), "multipart") ~= nil then
+  if GetHeader("Content-Type") ~= nil and string.find(GetHeader("Content-Type"), "multipart") ~= nil then
     local keys = {}
     local multipart_data = multipart(GetBody(), GetHeader("Content-Type"))
 
@@ -205,19 +205,18 @@ PrepareMultiPartParams = function()
     for _, k in pairs(keys) do
       local param = multipart_data:get(k)
       if #param.headers == 1 then
-        params[k] = param.value
+        Params[k] = param.value
       else
         local m = string.find(k, "%[%]")
-        if m ~= null and m > 1 then
+        if m ~= nil and m > 1 then
           local k_str = string.gsub(k, "%[%]", "")
-          params[k_str] = {}
+          Params[k_str] = {}
           for _, param in pairs(multipart_data:get_as_array(k)) do
             local content_type = multipart_data:get_content_type(param.headers)
             local filename = multipart_data:get_filename(param.headers)
-            local arr = string.split(filename, ".")
             local ext = GetFileExt(content_type)
             if ext then
-              table.insert(params[k_str], {
+              table.insert(Params[k_str], {
                 ext = ext,
                 filename = filename,
                 content_type = content_type,
@@ -229,10 +228,9 @@ PrepareMultiPartParams = function()
         else
           local content_type = multipart_data:get_content_type(param.headers)
           local filename = multipart_data:get_filename(param.headers)
-          local arr = string.split(filename, ".")
           local ext = GetFileExt(content_type)
           if ext then
-            params[k] = {
+            Params[k] = {
               ext = ext,
               filename = filename,
               content_type = content_type,

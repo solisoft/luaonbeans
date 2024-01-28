@@ -2,5 +2,5 @@
   <h1>Showing Comment</h1>
   <%= EncodeJson(comment) %>
 
-  <div><a href="/posts/<%= params.post_id %>/comments">Back</a></div>
+  <div><a href="/posts/<%= Params.post_id %>/comments">Back</a></div>
 </div>

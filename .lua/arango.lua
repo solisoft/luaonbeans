@@ -1,6 +1,6 @@
-api_url = ""
-arango_jwt = ""
-last_db_connect = GetTime()
+ApiURL = ""
+ArangoJWT = ""
+LastDBConnect = GetTime()
 
 local function Table_append(t1, t2)
   for k, v in ipairs(t2) do
@@ -11,17 +11,17 @@ local function Table_append(t1, t2)
 end
 
 local function Api_url(path)
-  return api_url .. path
+  return ApiURL .. path
 end
 
-local function Api_run(path, method, params, headers)
-  params = params or {}
+local function Api_run(path, method, Params, headers)
+  Params = Params or {}
   headers = headers or {}
   local ok, h, body = Fetch(
     Api_url(path), {
       method = method,
-      body = EncodeJson(params),
-      headers = Table_append({ ["Authorization"] = "bearer " .. arango_jwt }, headers)
+      body = EncodeJson(Params),
+      headers = Table_append({ ["Authorization"] = "bearer " .. ArangoJWT }, headers)
     }
   )
 
@@ -36,13 +36,13 @@ local function Auth(db_config)
     }
   )
 
-  api_url = db_config.url .. "/_db/" .. db_config.db_name .. "/_api"
+  ApiURL = db_config.url .. "/_db/" .. db_config.db_name .. "/_api"
 
   if ok == 200 then
-    arango_jwt = DecodeJson(body)["jwt"]
+    ArangoJWT = DecodeJson(body)["jwt"]
   end
 
-  return arango_jwt
+  return ArangoJWT
 end
 
 local function Raw_aql(stm)
@@ -76,118 +76,117 @@ local function Aql(str, bindvars, options)
   return request
 end
 
-local function with_params(endpoint, method, handle, params)
-  params = params or {}
-  return Api_run(endpoint .. handle, method, params)
+local function with_Params(endpoint, method, handle, Params)
+  Params = Params or {}
+  return Api_run(endpoint .. handle, method, Params)
 end
 
-local function without_params(endpoint, method, handle)
-  params = params or {}
+local function without_Params(endpoint, method, handle)
   return Api_run(endpoint .. handle, method)
 end
 
 -- Documents
 
-local function UpdateDocument(handle, params)
-  return with_params("/document/", "PATCH", handle, params)
+local function UpdateDocument(handle, Params)
+  return with_Params("/document/", "PATCH", handle, Params)
 end
 
-local function CreateDocument(handle, params)
-  return with_params("/document/", "POST", handle, params)
+local function CreateDocument(handle, Params)
+  return with_Params("/document/", "POST", handle, Params)
 end
 
 local function GetDocument(handle)
-  return without_params("/document/", "GET", handle)
+  return without_Params("/document/", "GET", handle)
 end
 
 local function DeleteDocument(handle)
-  return without_params("/document/", "DELETE", handle)
+  return without_Params("/document/", "DELETE", handle)
 end
 
 ---Collections
 
-local function UpdateCollection(collection, params)
-  return with_params("/collection/", "PUT", collection .. "/properties", params)
+local function UpdateCollection(collection, Params)
+  return with_Params("/collection/", "PUT", collection .. "/properties", Params)
 end
 
-local function RenameCollection(collection, params)
-  return with_params("/collection/", "PUT", collection .. "/rename", params)
+local function RenameCollection(collection, Params)
+  return with_Params("/collection/", "PUT", collection .. "/rename", Params)
 end
 
 local function CreateCollection(collection, options)
-  local params = { name = collection, options = (options or {}) }
-  return with_params("/collection/", "POST", "", params)
+  local Params = { name = collection, options = (options or {}) }
+  return with_Params("/collection/", "POST", "", Params)
 end
 
 local function GetCollection(collection)
-  return without_params("/collection/", "GET", collection)
+  return without_Params("/collection/", "GET", collection)
 end
 
 local function DeleteCollection(collection)
-  return without_params("/collection/", "DELETE", collection)
+  return without_Params("/collection/", "DELETE", collection)
 end
 
 -- Databases
 
 local function CreateDatabase(name, options)
-  local params = { name = name, options = (options or {}) }
-  return with_params("/database", "POST", "", params)
+  local Params = { name = name, options = (options or {}) }
+  return with_Params("/database", "POST", "", Params)
 end
 
 local function DeleteDatabase(name)
-  return without_params("/database/", "DELETE", name)
+  return without_Params("/database/", "DELETE", name)
 end
 
 -- Indexes
 
 local function GetAllIndexes(collection)
-  return without_params("/index?collection=" .. collection, "GET", "")
+  return without_Params("/index?collection=" .. collection, "GET", "")
 end
 
-local function CreateIndex(handle, params)
-  return with_params("/index?collection=" .. handle, "POST", "", params)
+local function CreateIndex(handle, Params)
+  return with_Params("/index?collection=" .. handle, "POST", "", Params)
 end
 
 local function DeleteIndex(handle)
-  return without_params("/index/", "DELETE", handle)
+  return without_Params("/index/", "DELETE", handle)
 end
 
 -- QueryCache
 
 local function GetQueryCacheEntries()
-  return without_params("/query-cache/entries", "GET", "")
+  return without_Params("/query-cache/entries", "GET", "")
 end
 
 local function GetQueryCacheConfiguration()
-  return without_params("/query-cache/properties", "GET", "")
+  return without_Params("/query-cache/properties", "GET", "")
 end
 
-local function UpdateCacheConfiguration(params)
-  return with_params("/query-cache/properties", "PUT", "", params)
+local function UpdateCacheConfiguration(Params)
+  return with_Params("/query-cache/properties", "PUT", "", Params)
 end
 
 local function DeleteQueryCache()
-  return without_params("/query-cache", "DELETE", "")
+  return without_Params("/query-cache", "DELETE", "")
 end
 
 -- Stream transactions
 -- POST /_api/transaction/begin
-local function BeginTransaction(params)
-  return with_params("/transaction/begin", "POST", "", params)
+local function BeginTransaction(Params)
+  return with_Params("/transaction/begin", "POST", "", Params)
 end
 
 local function CommitTransaction(transaction_id)
-  return without_params("/transaction/", "PUT", transaction_id)
+  return without_Params("/transaction/", "PUT", transaction_id)
 end
 
 local function AbortTransaction(transaction_id)
-  return without_params("/transaction/", "DELETE", transaction_id)
+  return without_Params("/transaction/", "DELETE", transaction_id)
 end
 
 local function RefreshToken(db_config)
-  if GetTime() - last_db_connect > 600 then
+  if GetTime() - LastDBConnect > 600 then
     Auth(db_config)
-    last_db_connect = GetTime()
+    LastDBConnect = GetTime()
   end
 end
 
@@ -200,6 +199,7 @@ return {
   DeleteDocument = DeleteDocument,
   PatchDocument = UpdateDocument,
 
+  GetCollection = GetCollection,
   UpdateCollection = UpdateCollection,
   RenameCollection = RenameCollection,
   CreateCollection = CreateCollection,

@@ -96,7 +96,7 @@ beans specs
 ## File upload
 
 You can handle file upload now easily. Any multipart data form will
-add params to the global `params` variable.
+add Params to the global `Params` variable.
 
 by example this request :
 

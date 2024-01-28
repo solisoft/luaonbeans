@@ -2,8 +2,8 @@ post = {}
 Posts = require("posts")
 
 -- A kind of before_each only: %w(edit update show) :)
-if table.contains({ "edit", "update", "show" }, params.action) then
-  post = Posts.get(params.id)
+if table.contains({ "edit", "update", "show" }, Params.action) then
+  post = Posts.get(Params.id)
 end
 
 -- Here a method to be more DRI
@@ -28,10 +28,10 @@ local app = {
   -- PUT posts#update => posts/:id
   update = function()
     local bodyParams = GetBodyParams()
-    local record = Posts.update(params.id, bodyParams)
+    local record = Posts.update(Params.id, bodyParams)
 
     if record.error then
-      Page("posts/edit", "app", { post = table.merge(bodyParams, { _key = params.id }), record = record })
+      Page("posts/edit", "app", { post = table.merge(bodyParams, { _key = Params.id }), record = record })
       return
     end
 
@@ -54,7 +54,7 @@ local app = {
 
   -- DELETE posts#delete => /posts/:id
   delete = function()
-    Posts.destroy(params.id)
+    Posts.destroy(Params.id)
     load_index()
   end,
 
@@ -63,5 +63,5 @@ local app = {
   end
 }
 
-assert(app[params.action] ~= nil, "Missing method '" .. params.action .. "'!")
-app[params.action]()
+assert(app[Params.action] ~= nil, "Missing method '" .. Params.action .. "'!")
+app[Params.action]()

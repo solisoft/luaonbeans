@@ -5,4 +5,4 @@ local app = {
   end
 }
 
-return app[params.action]()
+return app[Params.action]()

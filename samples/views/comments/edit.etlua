@@ -2,7 +2,7 @@
   <h1>Editing Comment :</h1>
 
   <form
-    action="/posts/<%= params.post_id %>/comments/<%= comment._key %>"
+    action="/posts/<%= Params.post_id %>/comments/<%= comment._key %>"
     method="POST"
     class="flex flex-col gap-2"
     >
@@ -23,7 +23,7 @@
     <% end %>
 
     <div class="pt-10 flex gap-5 items-center">
-      <input type="submit" value="Update"> <a href="/posts/<%= params.post_id %>/comments">Back</a>
+      <input type="submit" value="Update"> <a href="/posts/<%= Params.post_id %>/comments">Back</a>
     </div>
   </form>
 

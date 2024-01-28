@@ -43,8 +43,8 @@ end
 
 local function toboolean(value) return value == 1 end
 
-local function sort_request(client, command, key, params)
-  --[[ params = {
+local function sort_request(client, command, key, Params)
+  --[[ Params = {
       by    = 'weight_*',
       get   = 'object_*',
       limit = { 0, 10 },
@@ -53,42 +53,42 @@ local function sort_request(client, command, key, params)
   } ]]
   local query = { key }
 
-  if params then
-    if params.by then
+  if Params then
+    if Params.by then
       table.insert(query, 'BY')
-      table.insert(query, params.by)
+      table.insert(query, Params.by)
     end
 
-    if type(params.limit) == 'table' then
+    if type(Params.limit) == 'table' then
       -- TODO: check for lower and upper limits
       table.insert(query, 'LIMIT')
-      table.insert(query, params.limit[1])
-      table.insert(query, params.limit[2])
+      table.insert(query, Params.limit[1])
+      table.insert(query, Params.limit[2])
     end
 
-    if params.get then
-      if (type(params.get) == 'table') then
-        for _, getarg in pairs(params.get) do
+    if Params.get then
+      if (type(Params.get) == 'table') then
+        for _, getarg in pairs(Params.get) do
           table.insert(query, 'GET')
           table.insert(query, getarg)
         end
       else
         table.insert(query, 'GET')
-        table.insert(query, params.get)
+        table.insert(query, Params.get)
       end
     end
 
-    if params.sort then
-      table.insert(query, params.sort)
+    if Params.sort then
+      table.insert(query, Params.sort)
     end
 
-    if params.alpha == true then
+    if Params.alpha == true then
       table.insert(query, 'ALPHA')
     end
 
-    if params.store then
+    if Params.store then
       table.insert(query, 'STORE')
-      table.insert(query, params.store)
+      table.insert(query, Params.store)
     end
   end
 
@@ -221,25 +221,25 @@ local function parse_info(response)
 end
 
 local function scan_request(client, command, ...)
-  local args, req, params = { ... }, {}, nil
+  local args, req, Params = { ... }, {}, nil
 
   if command == 'SCAN' then
     table.insert(req, args[1])
-    params = args[2]
+    Params = args[2]
   else
     table.insert(req, args[1])
     table.insert(req, args[2])
-    params = args[3]
+    Params = args[3]
   end
 
-  if params and params.match then
+  if Params and Params.match then
     table.insert(req, 'MATCH')
-    table.insert(req, params.match)
+    table.insert(req, Params.match)
   end
 
-  if params and params.count then
+  if Params and Params.count then
     table.insert(req, 'COUNT')
-    table.insert(req, params.count)
+    table.insert(req, Params.count)
   end
 
   request.multibulk(client, command, req)
@@ -723,7 +723,7 @@ do
     local options, block
     if not arg2 then
       options, block = {}, arg1
-    elseif arg1 then   --and arg2, implicitly
+    elseif arg1 then --and arg2, implicitly
       options, block = type(arg1) == "table" and arg1 or { arg1 }, arg2
     else
       client.error("Invalid parameters for redis transaction.")
@@ -746,7 +746,7 @@ do
       local tx_block = block
       block = function(client, ...)
         client:multi()
-        return tx_block(client, ...)       --can't wrap this in pcall because we're in a coroutine.
+        return tx_block(client, ...) --can't wrap this in pcall because we're in a coroutine.
       end
     end
 

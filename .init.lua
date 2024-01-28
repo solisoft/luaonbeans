@@ -8,19 +8,19 @@ for _, var in pairs(unix.environ()) do
   ENV[var[1]] = var[2]
 end
 
-beans_env = ENV['BEANS_ENV'] or "development"
+BeansEnv = ENV['BEANS_ENV'] or "development"
 
 -- ArangoDB connection
-db_config = DecodeJson(Slurp("config/database.json"))
+local db_config = DecodeJson(Slurp("config/database.json"))
 adb = require "arango"
-assert(adb.Auth(db_config[beans_env]) ~= nil)
+assert(adb.Auth(db_config[BeansEnv]) ~= nil)
 adb.UpdateCacheConfiguration({ mode = "on" })
 
 function OnHttpRequest()
-  params = GetParams()
+  Params = GetParams()
   PrepareMultiPartParams()
 
-  adb.RefreshToken(db_config[beans_env]) -- reconnect to arangoDB if needed
+  adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
 
   -- Routes
   ---- Basic CRUD
@@ -33,14 +33,14 @@ function OnHttpRequest()
   -- })
   ---- define root route
   if GetPath() == "/" then
-    params.action = "index"
+    Params.action = "index"
     RoutePath("/controllers/welcome_controller.lua")
   end
 
   -- if GetPath() == "/upload" and GetMethod() == "POST" then
-  -- 	params.action = "create"
+  -- 	Params.action = "create"
   -- 		RoutePath("/controllers/welcome_controller.lua")
   -- end
 
-  if params.action == null then Route() end
+  if Params.action == nil then Route() end
 end

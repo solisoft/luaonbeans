@@ -2,8 +2,8 @@ comment = {}
 Comments = require("comments")
 
 -- A kind of before_each only: %w(edit update show) :)
-if table.contains({ "edit", "update", "show" }, params.action) then
-  comment = Comments.get(params.id)
+if table.contains({ "edit", "update", "show" }, Params.action) then
+  comment = Comments.get(Params.id)
 end
 
 -- Here a method to be more DRI
@@ -34,22 +34,22 @@ local app = {
   -- PUT comments#update => comments/:id
   update = function()
     local bodyParams = GetBodyParams()
-    bodyParams.post_key = params.post_id
+    bodyParams.post_key = Params.post_id
 
-    local record = Comments.update(params.id, bodyParams)
+    local record = Comments.update(Params.id, bodyParams)
 
     if record.error then
-      Page("comments/edit", "app", { comment = table.merge(bodyParams, { _key = params.id }), record = record })
+      Page("comments/edit", "app", { comment = table.merge(bodyParams, { _key = Params.id }), record = record })
       return
     end
 
-    RedirectTo("/posts/" .. params.post_id .. "/comments")
+    RedirectTo("/posts/" .. Params.post_id .. "/comments")
   end,
 
   -- comment comments#create => /comments
   create = function()
     local bodyParams = GetBodyParams()
-    bodyParams.post_key = params.post_id
+    bodyParams.post_key = Params.post_id
 
     local created_comment = Comments.create(bodyParams)
 
@@ -59,15 +59,15 @@ local app = {
       return
     end
 
-    RedirectTo("/posts/" .. params.post_id .. "/comments")
+    RedirectTo("/posts/" .. Params.post_id .. "/comments")
   end,
 
   -- DELETE comments#delete => /comments/:id
   delete = function()
-    Comments.destroy(params.id)
+    Comments.destroy(Params.id)
     load_index()
   end
 }
 
-assert(app[params.action] ~= nil, "Missing method '" .. params.action .. "'!")
-app[params.action]()
+assert(app[Params.action] ~= nil, "Missing method '" .. Params.action .. "'!")
+app[Params.action]()

@@ -49,3 +49,29 @@ PrepareMultiPartParams = function()
     end
   end
 end
+
+GetFileExt = function(content_type)
+  local allowed_types = {
+    ["image/gif"] = "gif",
+    ["image/jpeg"] = "jpg",
+    ["image/png"] = "png",
+    ["image/svg+xml"] = "svg",
+    ["image/webp"] = "webp",
+    ["image/x-icon"] = "ico",
+
+    ["video/mp4"] = "mp4",
+    ["video/mpeg"] = "mpeg",
+    ["video/ogg"] = "ogv",
+    ["video/quicktime"] = "mov",
+    ["video/webm"] = "webm",
+    ["video/x-flv"] = "flv",
+    ["video/x-mng"] = "mng",
+    ["video/x-ms-asf"] = "asx",
+    ["video/x-ms-wmv"] = "wmv",
+    ["video/x-msvideo"] = "avi",
+
+    ["application/pdf"] = "pdf",
+    ["text/plain"] = "txt"
+  }
+  return allowed_types[content_type]
+end

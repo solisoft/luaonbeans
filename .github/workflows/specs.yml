@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: circleci/node:latest
+    runs-on: node:latest
     services:
       arangodb:
         image: arangodb/arangodb:latest
@@ -21,11 +21,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
 
       - name: Copy database configuration
         run: cp config/database.json.sample config/database.json

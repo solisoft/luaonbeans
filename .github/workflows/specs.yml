@@ -31,7 +31,7 @@ jobs:
       - name: Start Application
         run: |
           sudo sh -c 'echo -1 > /proc/sys/fs/binfmt_misc/status'
-          ./luaonbeans.org -D .
+          ./luaonbeans.org -D . -s -d
           sleep 1
 
       - name: Run tests

@@ -26,10 +26,7 @@ jobs:
         run: cp config/database.json.sample config/database.json
 
       - name: Wait for ArangoDB to be up
-        run: |
-          while ! nc -z localhost 8529; do
-            sleep 1
-          done
+        run: sleep 10
 
       - name: Start Application
         run: |

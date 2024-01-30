@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: circleci/node:latest
     services:
       arangodb:
         image: arangodb/arangodb:latest
@@ -35,11 +35,7 @@ jobs:
           while ! nc -z localhost 8529; do
             sleep 1
           done
-      - name: Get latest version of redbean.dev
-        run: |
-          wget https://redbean.dev/redbean-2.2.com
-          chmod +x redbean-2.2.com
-          mv redbean-2.2.com luaonbeans.org
+
       - name: Start Application
         run: |
           ./luaonbeans.org -D .

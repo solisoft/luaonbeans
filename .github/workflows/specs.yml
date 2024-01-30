@@ -37,9 +37,9 @@ jobs:
           done
       - name: Get latest version of redbean.dev
         run: |
-          wget https://cosmo.zip/pub/cosmos/bin/redbean
-          chmod +x redbean
-          mv redbean  luaonbeans.org
+          wget https://redbean.dev/redbean-2.2.com
+          chmod +x redbean-2.2.com
+          mv redbean-2.2.com luaonbeans.org
       - name: Start Application
         run: |
           ./luaonbeans.org -D .

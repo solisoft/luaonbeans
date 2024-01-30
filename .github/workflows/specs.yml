@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: node:latest
+    runs-on: macos-latest
     services:
       arangodb:
         image: arangodb/arangodb:latest
@@ -21,6 +21,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
 
       - name: Copy database configuration
         run: cp config/database.json.sample config/database.json

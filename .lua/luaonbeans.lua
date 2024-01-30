@@ -1,6 +1,6 @@
 function Page(view, layout, bindVarsView, bindVarsLayout)
-  layout = etlua.compile(LoadAsset("layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
-  view = etlua.compile(LoadAsset("views/" .. view .. ".etlua"))(bindVarsView or {})
+  layout = Etlua.compile(LoadAsset("layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
+  view = Etlua.compile(LoadAsset("views/" .. view .. ".etlua"))(bindVarsView or {})
   Write(layout:gsub("@yield", view))
 end
 
@@ -13,7 +13,7 @@ function Partial(partial, bindVars)
     bindVars.extras = req["extras"]
   end
 
-  return etlua.compile(LoadAsset("partials/" .. partial .. ".html.etlua"))(bindVars)
+  return Etlua.compile(LoadAsset("partials/" .. partial .. ".html.etlua"))(bindVars)
 end
 
 function extractPatterns(inputStr)
@@ -42,7 +42,7 @@ function Resource(name, options)
   Params["controller"] = name
 
   if (#extractedPatterns > 0) then
-    parser = re.compile(options.root)
+    parser = Re.compile(options.root)
     matcher = { parser:search(path) }
     for i, match in ipairs(matcher) do
       if i > 1 then
@@ -52,7 +52,7 @@ function Resource(name, options)
   end
 
   if GetMethod() == "GET" then
-    parser = re.compile("^" .. options.root .. name .. "$")
+    parser = Re.compile("^" .. options.root .. name .. "$")
     matcher = parser:search(path)
 
     if matcher then
@@ -61,7 +61,7 @@ function Resource(name, options)
       return
     end
 
-    parser = re.compile("^" .. options.root .. name .. "/new$")
+    parser = Re.compile("^" .. options.root .. name .. "/new$")
     matcher = parser:search(path)
     if matcher then
       Params["action"] = "new"
@@ -69,7 +69,7 @@ function Resource(name, options)
       return
     end
 
-    parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
+    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "show"
@@ -78,7 +78,7 @@ function Resource(name, options)
       return
     end
 
-    parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)/edit$")
+    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)/edit$")
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "edit"
@@ -88,7 +88,7 @@ function Resource(name, options)
   end
 
   if GetMethod() == "POST" then
-    parser = re.compile("^" .. options.root .. name .. "$")
+    parser = Re.compile("^" .. options.root .. name .. "$")
     matcher = parser:search(path)
     if matcher then
       Params["action"] = "create"
@@ -97,7 +97,7 @@ function Resource(name, options)
     end
 
     -- Use POST instead of PUT if needed
-    parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
+    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "update"
@@ -107,7 +107,7 @@ function Resource(name, options)
   end
 
   if GetMethod() == "PUT" or GetMethod() == "PATCH" then
-    parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
+    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "update"
@@ -117,7 +117,7 @@ function Resource(name, options)
   end
 
   if GetMethod() == "DELETE" then
-    parser = re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
+    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "delete"
@@ -136,7 +136,7 @@ function CustomRoute(method, url, options)
   end
 
   if (#extractedPatterns > 0) then
-    local parser = re.compile(url)
+    local parser = Re.compile(url)
     local matcher = { parser:search(path) }
     for i, match in ipairs(matcher) do
       if i > 1 then
@@ -145,7 +145,7 @@ function CustomRoute(method, url, options)
     end
   end
 
-  local parser = re.compile("^" .. url .. "$")
+  local parser = Re.compile("^" .. url .. "$")
   local matcher = parser:search(path)
   if matcher and GetMethod() == method then
     Params.controller = options.controller

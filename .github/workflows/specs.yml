@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      arangodb:
+        image: arangodb/arangodb:latest
+        env:
+          ARANGO_ROOT_PASSWORD: password
+        ports:
+          - 8529:8529
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Copy database configuration
+        run: cp config/database.json.sample config/database.json
+
+      - name: Wait for ArangoDB to be up
+        run: |
+          while ! nc -z localhost 8529; do
+            sleep 1
+          done
+
+      - name: Start Application
+        run: |
+          ./luaonbeans.org -D .
+          sleep 10 # This is to ensure the application has time to start up
+
+      - name: Run tests
+        run: ./luaonbeans.org -i beans specs

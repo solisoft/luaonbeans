@@ -25,7 +25,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: "14"
 
       - name: Copy database configuration
         run: cp config/database.json.sample config/database.json
@@ -35,11 +35,15 @@ jobs:
           while ! nc -z localhost 8529; do
             sleep 1
           done
-
+      - name: Get latest version of redbean.dev
+        run: |
+          wget https://cosmo.zip/pub/cosmos/bin/redbean
+          chmod +x redbean
+          mv redbean  luaonbeans.org
       - name: Start Application
         run: |
           ./luaonbeans.org -D .
-          sleep 10 # This is to ensure the application has time to start up
+          sleep 1
 
       - name: Run tests
         run: ./luaonbeans.org -i beans specs

@@ -26,7 +26,7 @@ function OnHttpRequest()
 
   -- Routes
   ---- Basic CRUD
-  Resource("posts")
+  -- Resource("posts")
   ---- Nested CRUD
   -- Resource("comments", { root = "/posts/:post_id", post_id = "([0-9]+)" })
   ---- Custom Ruute

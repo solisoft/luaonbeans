@@ -1,6 +1,7 @@
 <div class="container mx-auto py-10">
   <h1>New ##model_singular_capitalized##</h1>
   <form action="/##model_plural##" method="POST" class="flex flex-col gap-2">
+    <%= AuthenticityTokenTag() %>
     <div class="flex gap-4 items-center">
       <label for="title">Title</label>
       <input type="text" name="title" required value="<%= ##model_singular##.title or "" %>" />

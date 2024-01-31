@@ -20,6 +20,8 @@ function OnHttpRequest()
   Params = GetParams()
   PrepareMultiPartParams()
 
+  GenerateCSRFToken()
+
   Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
 
   -- Routes

@@ -6,9 +6,8 @@ Multipart = require "multipart"
 require "utilities.table"
 require "utilities.string"
 require "utilities.multipart"
+require "utilities.csrf"
 require "luaonbeans"
-
--- utilities
 
 GenerateTempFilename = function()
   local filename = EncodeBase64(GetRandomBytes(32))

@@ -1,6 +1,8 @@
 ##model_singular## = {}
 ##model_singular_capitalized## = require("##model_singular##")
 
+CheckCSRFToken() -- C
+
 -- A kind of before_each only: %w(edit update show) :)
 if table.contains({ "edit", "update", "show" }, Params.action) then
   ##model_singular## = ##model_singular_capitalized##.get(Params.id)

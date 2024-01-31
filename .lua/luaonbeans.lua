@@ -8,7 +8,7 @@ function Partial(partial, bindVars)
   bindVars = bindVars or {}
   local results = {}
   if bindVars.aql then
-    local req = adb.Aql(bindVars.aql, bindVars.bindVars or {})
+    local req = Adb.Aql(bindVars.aql, bindVars.bindVars or {})
     bindVars.results = req["result"]
     bindVars.extras = req["extras"]
   end

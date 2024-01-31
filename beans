@@ -109,15 +109,15 @@ end
 
 setup_db = function(env)
   print("Setup " .. env .. " DB")
-  assert(adb.Auth(db_config.system) ~= nil)
+  assert(Adb.Auth(db_config.system) ~= nil)
   if env == "test" then
-    adb.DeleteDatabase(db_config[env].db_name)
+    Adb.DeleteDatabase(db_config[env].db_name)
   end
-  adb.CreateDatabase(db_config[env].db_name)
-  assert(adb.Auth(db_config[env]) ~= nil)
-  adb.CreateCollection("migrations")
-  adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
-  adb.CreateDocument("migrations", { filename = "0" })
+  Adb.CreateDatabase(db_config[env].db_name)
+  assert(Adb.Auth(db_config[env]) ~= nil)
+  Adb.CreateCollection("migrations")
+  Adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
+  Adb.CreateDocument("migrations", { filename = "0" })
 end
 
 if arg[1] == "db:setup" then
@@ -136,8 +136,8 @@ end
 
 db_migrate = function()
   print("Running migrations ...")
-  assert(adb.Auth(db_config[beans_env]) ~= nil)
-  latest_version = adb.Aql(
+  assert(Adb.Auth(db_config[beans_env]) ~= nil)
+  latest_version = Adb.Aql(
     "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m.filename"
   ).result[1]
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. "/migrations")) do
@@ -146,7 +146,7 @@ db_migrate = function()
         print("Processing " .. name)
         local migration = require(string.gsub(name, ".lua", ""))
         if migration.up() then
-          adb.CreateDocument("migrations", { filename = name })
+          Adb.CreateDocument("migrations", { filename = name })
         end
       end
     end
@@ -158,15 +158,15 @@ if arg[1] == "db:migrate" then
 end
 
 if arg[1] == "db:rollback" then
-  assert(adb.Auth(db_config[beans_env]) ~= nil)
-  latest_version = adb.Aql(
+  assert(Adb.Auth(db_config[beans_env]) ~= nil)
+  latest_version = Adb.Aql(
     "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m"
   ).result[1]
   if latest_version.filename ~= "0" then
     print("Processing " .. latest_version.filename)
     local migration = require(string.gsub(latest_version.filename, ".lua", ""))
     if migration.down() then
-      adb.DeleteDocument(latest_version._id)
+      Adb.DeleteDocument(latest_version._id)
     end
   else
     print("Nothing to rollback!")

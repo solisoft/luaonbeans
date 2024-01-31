@@ -1163,23 +1163,23 @@ app[Params.action]()</code></pre>
         models/post.lua
         <pre class="py-2 shadow"><code class="language-lua">return {
   all = function()
-    return adb.Aql(&quot;FOR post IN posts SORT post._key ASC RETURN post&quot;).result
+    return Adb.Aql(&quot;FOR post IN posts SORT post._key ASC RETURN post&quot;).result
   end,
 
   get = function(key)
-    return adb.GetDocument(&quot;posts/&quot; .. key)
+    return Adb.GetDocument(&quot;posts/&quot; .. key)
   end,
 
   create = function(dataset)
-    return adb.CreateDocument(&quot;posts&quot;, dataset)
+    return Adb.CreateDocument(&quot;posts&quot;, dataset)
   end,
 
   update = function(key, dataset)
-    return adb.UpdateDocument(&quot;posts/&quot; .. key, dataset)
+    return Adb.UpdateDocument(&quot;posts/&quot; .. key, dataset)
   end,
 
   destroy = function(key)
-    return adb.DeleteDocument(&quot;posts/&quot; .. key)
+    return Adb.DeleteDocument(&quot;posts/&quot; .. key)
   end
 }</code></pre>
       </div>

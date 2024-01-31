@@ -11,16 +11,16 @@ end
 BeansEnv = ENV['BEANS_ENV'] or "development"
 
 -- ArangoDB connection
-local db_config = DecodeJson(Slurp("config/database.json"))
-adb = require "arango"
-assert(adb.Auth(db_config[BeansEnv]) ~= nil)
-adb.UpdateCacheConfiguration({ mode = "on" })
+local db_config = DecodeJson(LoadAsset("config/database.json"))
+Adb = require "arango"
+assert(Adb.Auth(db_config[BeansEnv]) ~= nil)
+Adb.UpdateCacheConfiguration({ mode = "on" })
 
 function OnHttpRequest()
   Params = GetParams()
   PrepareMultiPartParams()
 
-  adb.RefreshToken(db_config[BeansEnv])   -- reconnect to arangoDB if needed
+  Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
 
   -- Routes
   ---- Basic CRUD

@@ -5,7 +5,7 @@ lester = require("lester")
 beans_env = unix.environ()['BEANS_ENV'] or "development"
 
 db_config = DecodeJson(Slurp("config/database.json"))
-adb = require "arango"
+Adb = require "arango"
 
 recursive_files = function(dir, files_found)
   files_found = files_found or {}

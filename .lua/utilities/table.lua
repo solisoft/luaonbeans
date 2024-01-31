@@ -30,3 +30,13 @@ table.append = function(t1, t2)
   end
   return t1
 end
+
+table.reject = function(t, key)
+  local result = {}
+  for k, v in pairs(t) do
+    if k ~= key then
+      result[k] = v
+    end
+  end
+  return result
+end

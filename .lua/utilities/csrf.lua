@@ -14,10 +14,10 @@ end
 
 CheckCSRFToken = function()
   if GetMethod() == "POST" then
-    assert(Params["authenticity_token"] == GetCookie("_authenticity_token"))
+    assert(GetBodyParams()["authenticity_token"] == GetCookie("_authenticity_token"))
   end
 end
 
 AuthenticityTokenTag = function()
-  return '<input type="hidden" name="authenticity_token" value="' .. GetCookie("_authenticity_token") .. '"'
+  return '<input type="hidden" name="authenticity_token" value="' .. GetCookie("_authenticity_token") .. '" />'
 end

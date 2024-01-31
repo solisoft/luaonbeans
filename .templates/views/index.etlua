@@ -14,7 +14,6 @@
         <tr>
           <td><%= doc._key %></td>
           <td><%= doc.title %></td>
-          <td><%= doc.text %></td>
           <td>
             <a href="/##model_plural##/<%= doc._key %>">Show</a> ||
             <a href="/##model_plural##/<%= doc._key %>/edit">Edit</a> ||

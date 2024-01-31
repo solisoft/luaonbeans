@@ -18,6 +18,9 @@ html {
   color: white;
 }
 
+input {
+  @apply text-black;
+}
 input[type="submit"] {
   @apply rounded bg-black px-5 py-2 text-white;
 }

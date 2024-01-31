@@ -29,7 +29,7 @@ local app = {
 
   -- PUT ##model_plural###update => ##model_plural##/:id
   update = function()
-    local bodyParams = GetBodyParams()
+    local bodyParams = table.reject(GetBodyParams(), "authenticity_token")
     local record = ##model_singular_capitalized##.update(Params.id, bodyParams)
 
     if record.error then
@@ -42,7 +42,7 @@ local app = {
 
   -- POST ##model_plural###create => /##model_plural##
   create = function()
-    local bodyParams = GetBodyParams()
+    local bodyParams = table.reject(GetBodyParams(), "authenticity_token")
     local created_##model_singular## = ##model_singular_capitalized##.create(bodyParams)
 
     if created_##model_singular##.error then

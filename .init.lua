@@ -44,5 +44,10 @@ function OnHttpRequest()
   -- 		RoutePath("/controllers/welcome_controller.lua")
   -- end
 
-  if Params.action == nil then Route() end
+  if Params.action == nil then
+    if RoutePath("/public" .. GetPath()) == false then
+      SetStatus(404)
+      Page("404", "app")
+    end
+  end
 end

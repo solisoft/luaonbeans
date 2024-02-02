@@ -89,6 +89,8 @@ end
 post = {}
 Post = require("post")
 
+CheckCSRFToken()
+
 -- A kind of before_each only: %%w(edit update show) :)
 if table.contains({ "edit", "update", "show" }, Params.action) then
   post = Post.get(Params.id)

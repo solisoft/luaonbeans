@@ -975,6 +975,8 @@ end
         <pre class="py-2 shadow"><code class="language-lua">post = {}
 Post = require(&quot;post&quot;)
 
+CheckCSRFToken()
+
 -- A kind of before_each only: %w(edit update show) :)
 if table.contains({ &quot;edit&quot;, &quot;update&quot;, &quot;show&quot; }, Params.action) then
   post = Post.get(Params.id)

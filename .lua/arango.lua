@@ -114,7 +114,9 @@ local function RenameCollection(collection, Params)
 end
 
 local function CreateCollection(collection, options)
-  local Params = { name = collection, options = (options or {}) }
+  options = options or {}
+  local Params = { name = collection }
+  Params = table.merge(Params, options)
   return with_Params("/collection/", "POST", "", Params)
 end
 

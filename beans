@@ -160,7 +160,7 @@ end
 if arg[1] == "db:rollback" then
   assert(Adb.Auth(db_config[beans_env]) ~= nil)
   latest_version = Adb.Aql(
-    "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m"
+    "FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m"
   ).result[1]
   if latest_version.filename ~= "0" then
     print("Processing " .. latest_version.filename)

@@ -170,3 +170,8 @@ function RedirectTo(path, status)
   SetStatus(status)
   SetHeader("Location", path)
 end
+
+function WriteJSON(object)
+  SetHeader('Content-Type', 'application/json; charset=utf-8')
+  Write(EncodeJson(object))
+end

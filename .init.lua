@@ -16,8 +16,19 @@ Adb = require "arango"
 assert(Adb.Auth(db_config[BeansEnv]) ~= nil)
 Adb.UpdateCacheConfiguration({ mode = "on" })
 
+function OnError(status, message)
+  -- Define the error for an API
+  -- WriteJSON({ status = status, message = message })
+
+  -- Define the error page via a page with a layout
+  Params.status = status
+  Params.message = message
+  Page('errors/index', 'app')
+end
+
 function OnHttpRequest()
   Params = GetParams()
+
   PrepareMultiPartParams()
 
   GenerateCSRFToken()

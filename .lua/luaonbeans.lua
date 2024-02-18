@@ -15,7 +15,6 @@ end
 
 function Partial(partial, bindVars)
   bindVars = bindVars or {}
-  local results = {}
   if bindVars.aql then
     local req = Adb.Aql(bindVars.aql, bindVars.bindVars or {})
     bindVars.results = req["result"]

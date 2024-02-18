@@ -44,19 +44,19 @@ create_views = function(controller_name)
   unix.mkdir("views/" .. words.plural)
   local template = Slurp(".templates/views/index.etlua")
   template = process_template(template, words)
-  Barf("views/".. words.plural .."/index.etlua", template)
+  Barf("app/views/".. words.plural .."/index.etlua", template)
 
   template = Slurp(".templates/views/new.etlua")
   template = process_template(template, words)
-  Barf("views/".. words.plural .."/new.etlua", template)
+  Barf("app/views/".. words.plural .."/new.etlua", template)
 
   template = Slurp(".templates/views/edit.etlua")
   template = process_template(template, words)
-  Barf("views/".. words.plural .."/edit.etlua", template)
+  Barf("app/views/".. words.plural .."/edit.etlua", template)
 
   template = Slurp(".templates/views/show.etlua")
   template = process_template(template, words)
-  Barf("views/".. words.plural .."/show.etlua", template)
+  Barf("app/views/".. words.plural .."/show.etlua", template)
 end
 
 create_controller = function(controller_name)
@@ -64,7 +64,7 @@ create_controller = function(controller_name)
   local template = Slurp(".templates/controller.lua")
   local spec = Slurp(".templates/empty_spec.lua")
   template = process_template(template, words)
-  Barf("controllers/" .. words.plural .. "_controller.lua", template)
+  Barf("app/controllers/" .. words.plural .. "_controller.lua", template)
   Barf("specs/controllers/" .. words.plural .. "_spec.lua", spec)
 end
 
@@ -80,7 +80,7 @@ create_model = function(model_name)
   local template = Slurp(".templates/model.lua")
   local spec = Slurp(".templates/empty_spec.lua")
   template = process_template(template, words)
-  Barf("models/" .. words.singular .. ".lua", template)
+  Barf("app/models/" .. words.singular .. ".lua", template)
   Barf("specs/models/" .. words.singular .. "_spec.lua", spec)
   create_migration("create " .. words.plural .. " table")
 end

@@ -11,7 +11,7 @@ recursive_files = function(dir, files_found)
   files_found = files_found or {}
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. dir)) do
     if name ~= '.' and name ~= '..' then
-      if path.isdir(name) then
+      if path.isdir(dir:sub(2) .. "/" .. name) then
         files_found = recursive_files(dir .. "/" .. name, files_found)
       else
         files_found = table.append(files_found, { dir .. "/" .. name })

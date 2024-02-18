@@ -1,6 +1,0 @@
-<div class="container mx-auto py-10">
-  <h1>Showing Comment</h1>
-  <%= EncodeJson(comment) %>
-
-  <div><a href="/posts/<%= Params.post_id %>/comments">Back</a></div>
-</div>

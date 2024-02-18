@@ -1,6 +1,6 @@
 function Page(view, layout, bindVarsView, bindVarsLayout)
-  local layout = Etlua.compile(LoadAsset("layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
-  local view = Etlua.compile(LoadAsset("views/" .. view .. ".etlua"))(bindVarsView or {})
+  local layout = Etlua.compile(LoadAsset("app/views/layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
+  local view = Etlua.compile(LoadAsset("app/views/" .. view .. ".etlua"))(bindVarsView or {})
 
   local content = layout:gsub("@yield", view)
   local etag = EncodeBase64(Md5(content))
@@ -22,7 +22,7 @@ function Partial(partial, bindVars)
     bindVars.extras = req["extras"]
   end
 
-  return Etlua.compile(LoadAsset("partials/" .. partial .. ".html.etlua"))(bindVars)
+  return Etlua.compile(LoadAsset("app/views/partials/" .. partial .. ".html.etlua"))(bindVars)
 end
 
 function extractPatterns(inputStr)
@@ -66,7 +66,7 @@ function Resource(name, options)
 
     if matcher then
       Params["action"] = "index"
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
 
@@ -74,7 +74,7 @@ function Resource(name, options)
     matcher = parser:search(path)
     if matcher then
       Params["action"] = "new"
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
 
@@ -83,7 +83,7 @@ function Resource(name, options)
     if matcher then
       Params["action"] = "show"
 
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
 
@@ -91,7 +91,7 @@ function Resource(name, options)
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "edit"
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
   end
@@ -101,7 +101,7 @@ function Resource(name, options)
     matcher = parser:search(path)
     if matcher then
       Params["action"] = "create"
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
 
@@ -110,7 +110,7 @@ function Resource(name, options)
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "update"
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
   end
@@ -120,7 +120,7 @@ function Resource(name, options)
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "update"
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
   end
@@ -130,7 +130,7 @@ function Resource(name, options)
     matcher, Params["id"] = parser:search(path)
     if matcher then
       Params["action"] = "delete"
-      RoutePath("/controllers/" .. name .. "_controller.lua")
+      RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
     end
   end
@@ -160,7 +160,7 @@ function CustomRoute(method, url, options)
     Params.controller = options.controller
     Params.action = options.action
 
-    RoutePath("/controllers/" .. options.controller .. "_controller.lua")
+    RoutePath("/app/controllers/" .. options.controller .. "_controller.lua")
     return
   end
 end

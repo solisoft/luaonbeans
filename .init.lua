@@ -47,7 +47,7 @@ function OnHttpRequest()
   ---- define root route
   if GetPath() == "/" then
     Params.action = "index"
-    RoutePath("/controllers/welcome_controller.lua")
+    RoutePath("/app/controllers/welcome_controller.lua")
   end
 
   -- if GetPath() == "/upload" and GetMethod() == "POST" then

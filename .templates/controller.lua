@@ -59,10 +59,6 @@ local app = {
     ##model_singular_capitalized##.destroy(Params.id)
     load_index()
   end,
-
-  offline = function()
-    Write("Offline")
-  end
 }
 
 assert(app[Params.action] ~= nil, "Missing method '" .. Params.action .. "'!")

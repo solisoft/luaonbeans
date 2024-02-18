@@ -1,7 +1,16 @@
 function Page(view, layout, bindVarsView, bindVarsLayout)
-  layout = Etlua.compile(LoadAsset("layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
-  view = Etlua.compile(LoadAsset("views/" .. view .. ".etlua"))(bindVarsView or {})
-  Write(layout:gsub("@yield", view))
+  local layout = Etlua.compile(LoadAsset("layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
+  local view = Etlua.compile(LoadAsset("views/" .. view .. ".etlua"))(bindVarsView or {})
+
+  local content = layout:gsub("@yield", view)
+  local etag = EncodeBase64(Md5(content))
+
+  if etag == GetHeader("If-None-Match") then
+    SetStatus(304)
+  else
+    SetHeader('Etag', etag)
+    Write(content)
+  end
 end
 
 function Partial(partial, bindVars)
@@ -173,5 +182,13 @@ end
 
 function WriteJSON(object)
   SetHeader('Content-Type', 'application/json; charset=utf-8')
-  Write(EncodeJson(object))
+  local json = EncodeJson(object)
+  local etag = EncodeBase64(Md5(json))
+
+  if etag == GetHeader("If-None-Match") then
+    SetStatus(304)
+  else
+    SetHeader('Etag', etag)
+    Write(json)
+  end
 end

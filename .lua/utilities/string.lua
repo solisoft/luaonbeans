@@ -84,3 +84,7 @@ end
 Camelize = function(str)
   return Capitalize(string.gsub(str, '%W+(%w+)', Capitalize))
 end
+
+Slugify = function(str)
+  return (str:gsub("[%s_]+", "-"):gsub("[^%w-]+", ""):gsub("-+", "-")):gsub("^[-]+", ""):gsub("[-]+$", ""):lower()
+end

@@ -81,6 +81,13 @@ return {
         expect.equal(Camelize("hello world"), "HelloWorld")
         expect.equal(Camelize("hello_world"), "HelloWorld")
       end)
+
+      it('Slugify', function()
+        expect.equal(Slugify("Hello World"), "hello-world")
+        expect.equal(Slugify("Hello World !!"), "hello-world")
+        expect.equal(Slugify("hello    world"), "hello-world")
+        expect.equal(Slugify("   hello    world"), "hello-world")
+      end)
     end)
   end
 }

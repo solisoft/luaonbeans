@@ -39,11 +39,6 @@ return {
         expect.equal(#string.split("Hello;world;:)", ";"), 3)
       end)
 
-      it('string.to_slug', function()
-        expect.equal(string.to_slug("Hello World!!!"), "hello-world")
-        expect.equal(string.to_slug("Hello  %  World"), "hello-world")
-      end)
-
       it('string.strip', function()
         expect.equal(string.strip("Hello World  "), "Hello World")
         expect.equal(string.strip("Hello World\n"), "Hello World")

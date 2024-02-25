@@ -36,6 +36,7 @@ function Resource(name, options)
   options = options or { root = "" }
   options.root = options.root or ""
   options.root = options.root .. "/"
+  local routes = options.only or { "index", "new", "show", "create", "update", "edit", "delete" }
 
   local path = GetPath()
   local parser = nil
@@ -63,7 +64,7 @@ function Resource(name, options)
     parser = Re.compile("^" .. options.root .. name .. "$")
     matcher = parser:search(path)
 
-    if matcher then
+    if matcher and table.contains(routes, "index") then
       Params["action"] = "index"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
@@ -71,7 +72,7 @@ function Resource(name, options)
 
     parser = Re.compile("^" .. options.root .. name .. "/new$")
     matcher = parser:search(path)
-    if matcher then
+    if matcher and table.contains(routes, "new") then
       Params["action"] = "new"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
@@ -79,7 +80,7 @@ function Resource(name, options)
 
     parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
-    if matcher then
+    if matcher and table.contains(routes, "show") then
       Params["action"] = "show"
 
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
@@ -88,7 +89,7 @@ function Resource(name, options)
 
     parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)/edit$")
     matcher, Params["id"] = parser:search(path)
-    if matcher then
+    if matcher and table.contains(routes, "edit") then
       Params["action"] = "edit"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
@@ -98,7 +99,7 @@ function Resource(name, options)
   if GetMethod() == "POST" then
     parser = Re.compile("^" .. options.root .. name .. "$")
     matcher = parser:search(path)
-    if matcher then
+    if matcher and table.contains(routes, "create") then
       Params["action"] = "create"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
@@ -107,7 +108,7 @@ function Resource(name, options)
     -- Use POST instead of PUT if needed
     parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
-    if matcher then
+    if matcher and table.contains(routes, "update") then
       Params["action"] = "update"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
@@ -117,7 +118,7 @@ function Resource(name, options)
   if GetMethod() == "PUT" or GetMethod() == "PATCH" then
     parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
-    if matcher then
+    if matcher and table.contains(routes, "update") then
       Params["action"] = "update"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return
@@ -127,7 +128,7 @@ function Resource(name, options)
   if GetMethod() == "DELETE" then
     parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
-    if matcher then
+    if matcher and table.contains(routes, "dekete") then
       Params["action"] = "delete"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return

@@ -9,14 +9,6 @@ string.split = function(inputStr, sep)
   return t
 end
 
-string.to_slug = function(str)
-  local slug = string.gsub(string.gsub(str, "[^ A-Za-z0-9]", "-"), "[ ]+", "-")
-  slug = string.gsub(slug, "[-]+", "-")
-  slug = string.gsub(slug, "[-]+$", "")
-
-  return string.lower(slug)
-end
-
 string.strip = function(str)
   return (str:gsub("^%s*(.-)%s*$", "%1"))
 end

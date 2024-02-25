@@ -1,3 +1,5 @@
+Routes = {}
+
 function Page(view, layout, bindVarsView, bindVarsLayout)
   local layout = Etlua.compile(LoadAsset("app/views/layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
   local view = Etlua.compile(LoadAsset("app/views/" .. view .. ".etlua"))(bindVarsView or {})
@@ -128,7 +130,7 @@ function Resource(name, options)
   if GetMethod() == "DELETE" then
     parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
     matcher, Params["id"] = parser:search(path)
-    if matcher and table.contains(routes, "dekete") then
+    if matcher and table.contains(routes, "delete") then
       Params["action"] = "delete"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
       return

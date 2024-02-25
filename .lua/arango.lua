@@ -2,14 +2,6 @@ ApiURL = ""
 ArangoJWT = ""
 LastDBConnect = GetTime()
 
-local function Table_append(t1, t2)
-  for k, v in ipairs(t2) do
-    table.insert(t1, v)
-  end
-
-  return t1
-end
-
 local function Api_url(path)
   return ApiURL .. path
 end
@@ -21,7 +13,7 @@ local function Api_run(path, method, Params, headers)
     Api_url(path), {
       method = method,
       body = EncodeJson(Params),
-      headers = Table_append({ ["Authorization"] = "bearer " .. ArangoJWT }, headers)
+      headers = table.append({ ["Authorization"] = "bearer " .. ArangoJWT }, headers)
     }
   )
 
@@ -53,7 +45,7 @@ local function Raw_aql(stm)
 
   while has_more do
     body = Api_run("/cursor/" .. body["id"], "PUT")
-    result = Table_append(result, body["result"])
+    result = table.append(result, body["result"])
     has_more = body["hasMore"]
   end
 

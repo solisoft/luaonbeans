@@ -1,8 +1,8 @@
 Routes = {}
 
 function Page(view, layout, bindVarsView, bindVarsLayout)
-  local layout = Etlua.compile(LoadAsset("app/views/layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
-  local view = Etlua.compile(LoadAsset("app/views/" .. view .. ".etlua"))(bindVarsView or {})
+  layout = Etlua.compile(LoadAsset("app/views/layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
+  view = Etlua.compile(LoadAsset("app/views/" .. view .. ".etlua"))(bindVarsView or {})
 
   local content = layout:gsub("@yield", view)
   local etag = EncodeBase64(Md5(content))

@@ -192,12 +192,12 @@ return {
 
       describe('Create and Delete Database', function()
         it('create and delete database', function()
-          assert(Adb.Auth(db_config["system"]) ~= nil)
+          assert(Adb.Auth(DBConfig["system"]) ~= nil)
           local database = Adb.CreateDatabase('luaonbean_1234_spec')
           expect.equal(database.code, 201)
           database = Adb.DeleteDatabase('luaonbean_1234_spec')
           expect.equal(database.code, 200)
-          assert(Adb.Auth(db_config[beans_env]) ~= nil)
+          assert(Adb.Auth(DBConfig["test"]) ~= nil)
         end)
       end)
 
@@ -250,7 +250,7 @@ return {
       describe('RefreshToken', function()
         it('refresh auth token', function()
           last_db_connect = 1000
-          assert(Adb.RefreshToken(db_config["test"]) == nil)
+          assert(Adb.RefreshToken(DBConfig["test"]) == nil)
         end)
       end)
     end)

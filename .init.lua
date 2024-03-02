@@ -29,7 +29,7 @@ end
 function OnHttpRequest()
   Params = GetParams()
 
-  PrepareMultiPartParams()
+  PrepareMultiPartParams() -- if you handle file uploads
 
   GenerateCSRFToken()
 

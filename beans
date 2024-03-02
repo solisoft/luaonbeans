@@ -2,17 +2,17 @@ package.path = package.path .. ";.lua/?.lua;migrations/?.lua;specs/?.lua"
 require("utilities")
 lester = require("lester")
 
-beans_env = unix.environ()['BEANS_ENV'] or "development"
+BeansEnv = unix.environ()['BEANS_ENV'] or "development"
 
-db_config = DecodeJson(Slurp("config/database.json"))
+DBConfig = DecodeJson(Slurp("config/database.json"))
 Adb = require "arango"
 
-recursive_files = function(dir, files_found)
+RecursiveFiles = function(dir, files_found)
   files_found = files_found or {}
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. dir)) do
     if name ~= '.' and name ~= '..' then
       if path.isdir(dir:sub(2) .. "/" .. name) then
-        files_found = recursive_files(dir .. "/" .. name, files_found)
+        files_found = RecursiveFiles(dir .. "/" .. name, files_found)
       else
         files_found = table.append(files_found, { dir .. "/" .. name })
       end
@@ -21,11 +21,11 @@ recursive_files = function(dir, files_found)
   return files_found
 end
 
-json_print = function(value)
+JSONPrint = function(value)
   print(EncodeJson(value))
 end
 
-define_words = function(name)
+DefineWords = function(name)
   return {
     model = Camelize(name),
     plural = Pluralize(name),
@@ -33,111 +33,111 @@ define_words = function(name)
   }
 end
 
-process_template = function(template, words)
+ProcessTemplate = function(template, words)
   template = string.gsub(template, "##model_plural##", words.plural)
   template = string.gsub(template, "##model_singular##", words.singular)
   return string.gsub(template, "##model_singular_capitalized##", words.model)
 end
 
-create_views = function(controller_name)
-  local words = define_words(controller_name)
+CreateView = function(controller_name)
+  local words = DefineWords(controller_name)
   unix.mkdir("views/" .. words.plural)
   local template = Slurp(".templates/views/index.etlua")
-  template = process_template(template, words)
-  Barf("app/views/".. words.plural .."/index.etlua", template)
+  template = ProcessTemplate(template, words)
+  Barf("app/views/" .. words.plural .. "/index.etlua", template)
 
   template = Slurp(".templates/views/new.etlua")
-  template = process_template(template, words)
-  Barf("app/views/".. words.plural .."/new.etlua", template)
+  template = ProcessTemplate(template, words)
+  Barf("app/views/" .. words.plural .. "/new.etlua", template)
 
   template = Slurp(".templates/views/edit.etlua")
-  template = process_template(template, words)
-  Barf("app/views/".. words.plural .."/edit.etlua", template)
+  template = ProcessTemplate(template, words)
+  Barf("app/views/" .. words.plural .. "/edit.etlua", template)
 
   template = Slurp(".templates/views/show.etlua")
-  template = process_template(template, words)
-  Barf("app/views/".. words.plural .."/show.etlua", template)
+  template = ProcessTemplate(template, words)
+  Barf("app/views/" .. words.plural .. "/show.etlua", template)
 end
 
-create_controller = function(controller_name)
-  local words = define_words(controller_name)
+CreateController = function(controller_name)
+  local words = DefineWords(controller_name)
   local template = Slurp(".templates/controller.lua")
   local spec = Slurp(".templates/empty_spec.lua")
-  template = process_template(template, words)
+  template = ProcessTemplate(template, words)
   Barf("app/controllers/" .. words.plural .. "_controller.lua", template)
   Barf("specs/controllers/" .. words.plural .. "_spec.lua", spec)
 end
 
-create_migration = function(name)
-  local words = define_words(name)
+CreateMigration = function(name)
+  local words = DefineWords(name)
   local template = Slurp(".templates/migration.lua")
-  template = process_template(template, words)
+  template = ProcessTemplate(template, words)
   Barf("migrations/" .. os.date("%Y%m%d-%H%I%S_") .. string.to_slug(name) .. ".lua", template)
 end
 
-create_model = function(model_name)
-  local words = define_words(model_name)
+CreateModel = function(model_name)
+  local words = DefineWords(model_name)
   local template = Slurp(".templates/model.lua")
   local spec = Slurp(".templates/empty_spec.lua")
-  template = process_template(template, words)
+  template = ProcessTemplate(template, words)
   Barf("app/models/" .. words.singular .. ".lua", template)
   Barf("specs/models/" .. words.singular .. "_spec.lua", spec)
-  create_migration("create " .. words.plural .. " table")
+  CreateMigration("create " .. words.plural .. " table")
 end
 
 if arg[1] == "create" then
   if arg[2] == "migration" then
-    create_migration(arg[3])
+    CreateMigration(arg[3])
   end
 
   if arg[2] == "controller" then
-    create_controller(Singularize(arg[3]))
+    CreateController(Singularize(arg[3]))
   end
 
   if arg[2] == "model" then
-    create_model(Singularize(arg[3]))
+    CreateModel(Singularize(arg[3]))
   end
 
   if arg[2] == "scaffold" then
     singular = Singularize(arg[3])
 
-    create_controller(singular)
-    create_views(singular)
-    create_model(singular)
+    CreateController(singular)
+    CreateView(singular)
+    CreateModel(singular)
   end
 end
 
-setup_db = function(env)
+SetupDB = function(env)
   print("Setup " .. env .. " DB")
-  assert(Adb.Auth(db_config.system) ~= nil)
+  assert(Adb.Auth(DBConfig.system) ~= nil)
   if env == "test" then
-    Adb.DeleteDatabase(db_config[env].db_name)
+    Adb.DeleteDatabase(DBConfig[env].db_name)
   end
-  Adb.CreateDatabase(db_config[env].db_name)
-  assert(Adb.Auth(db_config[env]) ~= nil)
+  Adb.CreateDatabase(DBConfig[env].db_name)
+  assert(Adb.Auth(DBConfig[env]) ~= nil)
   Adb.CreateCollection("migrations")
   Adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
   Adb.CreateDocument("migrations", { filename = "0" })
 end
 
 if arg[1] == "db:setup" then
-  if db_config.production then
-    setup_db("production")
+  if DBConfig.production then
+    SetupDB("production")
   end
 
-  if db_config.development then
-    setup_db("development")
+  if DBConfig.development then
+    SetupDB("development")
   end
 
-  if db_config.test then
-    setup_db("test")
+  if DBConfig.test then
+    SetupDB("test")
   end
 end
 
-db_migrate = function()
+DBMigrate = function()
   print("Running migrations ...")
-  assert(Adb.Auth(db_config[beans_env]) ~= nil)
-  latest_version = Adb.Aql(
+  assert(Adb.Auth(DBConfig[BeansEnv]) ~= nil)
+  local latest_version = Adb.Aql(
     "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m.filename"
   ).result[1]
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. "/migrations")) do
@@ -154,12 +154,12 @@ db_migrate = function()
 end
 
 if arg[1] == "db:migrate" then
-  db_migrate()
+  DBMigrate()
 end
 
 if arg[1] == "db:rollback" then
-  assert(Adb.Auth(db_config[beans_env]) ~= nil)
-  latest_version = Adb.Aql(
+  assert(Adb.Auth(DBConfig[BeansEnv]) ~= nil)
+  local latest_version = Adb.Aql(
     "FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m"
   ).result[1]
   if latest_version.filename ~= "0" then
@@ -174,13 +174,13 @@ if arg[1] == "db:rollback" then
 end
 
 if arg[1] == "specs" then
-  beans_env = "test"
-  setup_db("test")
-  db_migrate()
+  BeansEnv = "test"
+  SetupDB("test")
+  DBMigrate()
 
   describe, it, expect = lester.describe, lester.it, lester.expect
 
-  for _, spec in pairs(recursive_files("/specs")) do
+  for _, spec in pairs(RecursiveFiles("/specs")) do
     if string.find(spec, "_spec.lua") then
       spec = spec:sub(8)
       spec = require(string.gsub(spec, ".lua", ""))

@@ -1,6 +1,11 @@
 version: "3.1"
 
 services:
+  app:
+    build: .
+    ports:
+      - 7000:8080
+
   arangodb:
     image: arangodb:latest
     restart: always

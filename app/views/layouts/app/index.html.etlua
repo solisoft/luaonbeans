@@ -9,7 +9,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&family=Open+Sans:wght@400;700&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="/app.css?<%= unix.stat("public/app.css"):mtim() %>" />
+	<link rel="stylesheet" href="/app.css" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>

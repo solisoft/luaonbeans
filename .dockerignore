@@ -1,0 +1,10 @@
+# flyctl launch added from .gitignore
+**/.DS_Store
+**/redbean.com
+**/config/database.json
+**/_system
+**/_appbundles
+**/foxx
+**/node_modules
+**/build.org
+fly.toml

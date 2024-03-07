@@ -6,3 +6,4 @@ _appbundles
 foxx
 node_modules
 build.org
+fly.toml

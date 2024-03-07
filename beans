@@ -4,7 +4,7 @@ lester = require("lester")
 
 BeansEnv = unix.environ()['BEANS_ENV'] or "development"
 
-DBConfig = DecodeJson(LoadAsset("config/database.json"))
+DBConfig = DecodeJson(Slurp("config/database.json"))
 Adb = require "arango"
 
 RecursiveFiles = function(dir, files_found)
@@ -42,27 +42,27 @@ end
 CreateView = function(controller_name)
   local words = DefineWords(controller_name)
   unix.mkdir("views/" .. words.plural)
-  local template = LoadAsset(".templates/views/index.etlua")
+  local template = Slurp(".templates/views/index.etlua")
   template = ProcessTemplate(template, words)
   Barf("app/views/" .. words.plural .. "/index.etlua", template)
 
-  template = LoadAsset(".templates/views/new.etlua")
+  template = Slurp(".templates/views/new.etlua")
   template = ProcessTemplate(template, words)
   Barf("app/views/" .. words.plural .. "/new.etlua", template)
 
-  template = LoadAsset(".templates/views/edit.etlua")
+  template = Slurp(".templates/views/edit.etlua")
   template = ProcessTemplate(template, words)
   Barf("app/views/" .. words.plural .. "/edit.etlua", template)
 
-  template = LoadAsset(".templates/views/show.etlua")
+  template = Slurp(".templates/views/show.etlua")
   template = ProcessTemplate(template, words)
   Barf("app/views/" .. words.plural .. "/show.etlua", template)
 end
 
 CreateController = function(controller_name)
   local words = DefineWords(controller_name)
-  local template = LoadAsset(".templates/controller.lua")
-  local spec = LoadAsset(".templates/empty_spec.lua")
+  local template = Slurp(".templates/controller.lua")
+  local spec = Slurp(".templates/empty_spec.lua")
   template = ProcessTemplate(template, words)
   Barf("app/controllers/" .. words.plural .. "_controller.lua", template)
   Barf("specs/controllers/" .. words.plural .. "_spec.lua", spec)
@@ -70,15 +70,15 @@ end
 
 CreateMigration = function(name)
   local words = DefineWords(name)
-  local template = LoadAsset(".templates/migration.lua")
+  local template = Slurp(".templates/migration.lua")
   template = ProcessTemplate(template, words)
   Barf("migrations/" .. os.date("%Y%m%d-%H%I%S_") .. string.to_slug(name) .. ".lua", template)
 end
 
 CreateModel = function(model_name)
   local words = DefineWords(model_name)
-  local template = LoadAsset(".templates/model.lua")
-  local spec = LoadAsset(".templates/empty_spec.lua")
+  local template = Slurp(".templates/model.lua")
+  local spec = Slurp(".templates/empty_spec.lua")
   template = ProcessTemplate(template, words)
   Barf("app/models/" .. words.singular .. ".lua", template)
   Barf("specs/models/" .. words.singular .. "_spec.lua", spec)

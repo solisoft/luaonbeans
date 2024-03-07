@@ -12,10 +12,10 @@ BeansEnv = ENV['BEANS_ENV'] or "development"
 
 -- ArangoDB connection
 
--- local db_config = DecodeJson(LoadAsset("config/database.json"))
--- Adb = require "arango"
--- Adb.Auth(db_config[BeansEnv])
--- Adb.UpdateCacheConfiguration({ mode = "on" })
+local db_config = DecodeJson(LoadAsset("config/database.json"))
+Adb = require "arango"
+Adb.Auth(db_config[BeansEnv])
+Adb.UpdateCacheConfiguration({ mode = "on" })
 
 function OnError(status, message)
   -- Define the error for an API
@@ -34,7 +34,7 @@ function OnHttpRequest()
 
   GenerateCSRFToken()
 
-  -- Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
+  Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
 
   -- Routes
   ---- Basic CRUD

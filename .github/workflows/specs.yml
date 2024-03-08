@@ -36,3 +36,7 @@ jobs:
 
       - name: Run tests
         run: ./luaonbeans.org -i beans specs
+
+      - name: Semver Release
+        uses: K-Phoen/semver-release-action@v1.3.2
+

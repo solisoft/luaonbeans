@@ -37,7 +37,10 @@ jobs:
       - name: Run tests
         run: ./luaonbeans.org -i beans specs
 
-      - name: semver
-        uses: grumpy-programmer/conventional-commits-semver-release@v1.1.17
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # token is mandatory to create the release
+      - name: calculate version
+        id: calculate-version
+        uses: bitshifted/git-auto-semver@v1
+        with:
+          main_branch: master
+          create_tag: true
+          tag_prefix: 'tags'

@@ -38,6 +38,6 @@ jobs:
         run: ./luaonbeans.org -i beans specs
 
       - name: semver
-        uses: grumpy-programmer/conventional-commits-semver-release@v1
+        uses: grumpy-programmer/conventional-commits-semver-release@v1.1.17
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # token is mandatory to create the release

@@ -4,7 +4,7 @@ local function routes()
   -- Resource("posts")
   ---- Nested CRUD
   -- Resource("comments", { root = "/posts/:post_id", post_id = "([0-9]+)" })
-  ---- Custom Ruute
+  ---- Custom Route
   -- CustomRoute("GET", "/posts/:post_id/offline", {
   -- 	post_id = "([0-9]+)", controller = "posts", action = "offline"
   -- })

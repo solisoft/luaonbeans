@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/solisoft/luaonbeans/compare/v0.1.0...v0.2.0) (2024-03-10)
+
+
+### Features
+
+* move routes to the routes.lua files ([8a7956e](https://github.com/solisoft/luaonbeans/commit/8a7956e18ec18d618fa8ee5fc6c5597c98a529aa))
+* move routes to the routes.lua files ([a847545](https://github.com/solisoft/luaonbeans/commit/a8475459edf77876864d35effd75b579ce2cd08c))
+
 ## [0.1.0](https://github.com/solisoft/luaonbeans/compare/v0.0.1...v0.1.0) (2024-03-08)
 
 

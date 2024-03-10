@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.2](https://github.com/solisoft/luaonbeans/compare/v0.2.1...v0.2.2) (2024-03-10)
+
+
+### Bug Fixes
+
+* add spaces ([0744f8d](https://github.com/solisoft/luaonbeans/commit/0744f8d01b900575d5123bbc585abaf250b919d2))
+* fix typo and add comments on .init.lua ([c0379f3](https://github.com/solisoft/luaonbeans/commit/c0379f39cdc94147af97e95f803aa0784cb063c9))
+* remove spaces ([f38d9a6](https://github.com/solisoft/luaonbeans/commit/f38d9a63f218e380b870bed11d0c98f88df1e060))
+* remove spaces ([5f1811a](https://github.com/solisoft/luaonbeans/commit/5f1811aed4dabfabf1567d399096453452a602bb))
+
 ## [0.2.1](https://github.com/solisoft/luaonbeans/compare/v0.2.0...v0.2.1) (2024-03-10)
 
 

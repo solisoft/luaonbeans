@@ -16,8 +16,8 @@ local function routes()
   end
 
   -- if GetPath() == "/upload" and GetMethod() == "POST" then
-  --  Params.action = "create"
-  --  RoutePath("/controllers/welcome_controller.lua")
+  --   Params.action = "create"
+  --   RoutePath("/controllers/welcome_controller.lua")
   -- end
 
   if Params.action == nil then

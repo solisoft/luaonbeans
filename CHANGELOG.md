@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/solisoft/luaonbeans/compare/v0.2.0...v0.2.1) (2024-03-10)
+
+
+### Bug Fixes
+
+* missing to_slug code ([8e942a7](https://github.com/solisoft/luaonbeans/commit/8e942a76c6e949acbc03a26b2f07c25e8488a060))
+
 ## [0.2.0](https://github.com/solisoft/luaonbeans/compare/v0.1.0...v0.2.0) (2024-03-10)
 
 

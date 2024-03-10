@@ -12,6 +12,7 @@ Adb = require "arango"
 Adb.Auth(db_config[BeansEnv])
 Adb.UpdateCacheConfiguration({ mode = "on" })
 
+-- OnError hook
 function OnError(status, message)
   -- Define the error for an API
   -- WriteJSON({ status = status, message = message })
@@ -22,6 +23,7 @@ function OnError(status, message)
   Page('errors/index', 'app')
 end
 
+-- OnHttpRequest hook
 function OnHttpRequest()
   Params = GetParams()
   PrepareMultiPartParams()              -- if you handle file uploads

@@ -72,7 +72,7 @@ CreateMigration = function(name)
   local words = DefineWords(name)
   local template = Slurp(".templates/migration.lua")
   template = ProcessTemplate(template, words)
-  Barf("migrations/" .. os.date("%Y%m%d-%H%I%S_") .. string.to_slug(name) .. ".lua", template)
+  Barf("migrations/" .. os.date("%Y%m%d-%H%I%S_") .. Slugify(name) .. ".lua", template)
 end
 
 CreateModel = function(model_name)

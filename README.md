@@ -18,13 +18,11 @@ Then configure the `config/database.json` file
 
 Then run `./luaonbeans.org -D .` ; You should be able to open : [http://localhost:8080](http://localhost:8080)
 
-
 Create a `beans` alias for your favorite shell
 
 ```sh
 alias beans="./luaonbeans.org -i beans"
 ```
-
 
 ## Running tests
 
@@ -116,7 +114,7 @@ will generate :
     "filename": "resume.pdf",
     "content_type": "application/pdf"
   },
-  "file":[
+  "file": [
     {
       "content": "<data>",
       "ext": "png",

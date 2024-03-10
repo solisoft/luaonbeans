@@ -20,7 +20,6 @@ RUN zip -r /redbean.com specs
 RUN zip -r /redbean.com migrations
 RUN zip -r /redbean.com config
 
-
 FROM scratch
 
 COPY --from=build /redbean.com /

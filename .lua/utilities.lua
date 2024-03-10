@@ -9,6 +9,14 @@ require "utilities.multipart"
 require "utilities.csrf"
 require "luaonbeans"
 
+ENV = {}
+for _, var in pairs(unix.environ()) do
+  var = string.split(var, "=")
+  ENV[var[1]] = var[2]
+end
+
+BeansEnv = ENV['BEANS_ENV'] or "development"
+
 GenerateTempFilename = function()
   local filename = EncodeBase64(GetRandomBytes(32))
   filename = string.gsub(filename, "[\\/]", "")

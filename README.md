@@ -67,7 +67,7 @@ Running migrations ...
 [PASS] utilities | table.contains
 [PASS] utilities | table.merge
 [PASS] utilities | string.split
-[PASS] utilities | string.to_slug
+[PASS] utilities | Slugify
 [PASS] utilities | Pluralize
 [PASS] utilities | Singularize
 [PASS] utilities | Capitalize

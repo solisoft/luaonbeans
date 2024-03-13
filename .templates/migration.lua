@@ -3,13 +3,15 @@ return {
     local transaction = Adb.BeginTransaction({
       collections = {
         writes = { "some", "tables" },
-        reads = { "some", "tables" }
-      }
+        reads = { "some", "tables" },
+      },
     })
-    if (pcall(function()
+    if
+        pcall(function()
           assert(transaction.code == 201, "Transaction is not created")
           -- do something
-        end)) then
+        end)
+    then
       Adb.CommitTransaction(transaction.result.id)
       return true
     else
@@ -22,18 +24,20 @@ return {
     local transaction = Adb.BeginTransaction({
       collections = {
         writes = { "some", "tables" },
-        reads = { "some", "tables" }
-      }
+        reads = { "some", "tables" },
+      },
     })
-    if (pcall(function()
+    if
+        pcall(function()
           assert(transaction.code == 201, "Transaction is not created")
           -- do something
-        end)) then
+        end)
+    then
       Adb.CommitTransaction(transaction.result.id)
       return true
     else
       Adb.AbortTransaction(transaction.result.id)
       return false
     end
-  end
+  end,
 }

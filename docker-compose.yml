@@ -5,6 +5,8 @@ services:
     build: .
     ports:
       - 7000:8080
+    environment:
+      BEANS_ENV: production
 
   arangodb:
     image: arangodb:latest

@@ -35,4 +35,4 @@ jobs:
           sleep 1
 
       - name: Run tests
-        run: ./luaonbeans.org -i beans specs
+        run: ./luaonbeans.org -i beans.lua specs

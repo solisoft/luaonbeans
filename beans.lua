@@ -66,6 +66,8 @@ CreateController = function(controller_name)
   template = ProcessTemplate(template, words)
   Barf("app/controllers/" .. words.plural .. "_controller.lua", template)
   Barf("specs/controllers/" .. words.plural .. "_spec.lua", spec)
+  print("✅ app/controller/" .. words.plural .. "_controller.lua created")
+  print("✅ specs/controllers/" .. words.plural .. "_spec.lua created")
 end
 
 CreateMigration = function(name)
@@ -73,6 +75,7 @@ CreateMigration = function(name)
   local template = Slurp(".templates/migration.lua")
   template = ProcessTemplate(template, words)
   Barf("migrations/" .. os.date("%Y%m%d-%H%I%S_") .. Slugify(name) .. ".lua", template)
+  print("✅ migrations/" .. os.date("%Y%m%d-%H%I%S_") .. Slugify(name) .. ".lua created")
 end
 
 CreateModel = function(model_name)
@@ -83,6 +86,8 @@ CreateModel = function(model_name)
   Barf("app/models/" .. words.singular .. ".lua", template)
   Barf("specs/models/" .. words.singular .. "_spec.lua", spec)
   CreateMigration("create " .. words.plural .. " table")
+  print("✅ app/models/" .. words.singular .. ".lua created")
+  print("✅ specs/models/" .. words.singular .. "_spec.lua created")
 end
 
 if arg[1] == "create" then
@@ -100,7 +105,6 @@ if arg[1] == "create" then
 
   if arg[2] == "scaffold" then
     singular = Singularize(arg[3])
-
     CreateController(singular)
     CreateView(singular)
     CreateModel(singular)

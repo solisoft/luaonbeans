@@ -10,7 +10,7 @@ function Page(view, layout, bindVarsView, bindVarsLayout)
   if etag == GetHeader("If-None-Match") then
     SetStatus(304)
   else
-    SetHeader('Etag', etag)
+    SetHeader("Etag", etag)
     Write(content)
   end
 end
@@ -52,7 +52,7 @@ function Resource(name, options)
 
   Params["controller"] = name
 
-  if (#extractedPatterns > 0) then
+  if #extractedPatterns > 0 then
     parser = Re.compile(options.root)
     matcher = { parser:search(path) }
     for i, match in ipairs(matcher) do
@@ -146,7 +146,7 @@ function CustomRoute(method, url, options)
     url = url:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
   end
 
-  if (#extractedPatterns > 0) then
+  if #extractedPatterns > 0 then
     local parser = Re.compile(url)
     local matcher = { parser:search(path) }
     for i, match in ipairs(matcher) do
@@ -170,7 +170,9 @@ end
 function GetBodyParams()
   local body_Params = {}
   for i, data in pairs(Params) do
-    if type(data) == "table" then body_Params[data[1]] = data[2] end
+    if type(data) == "table" then
+      body_Params[data[1]] = data[2]
+    end
   end
 
   return body_Params
@@ -183,14 +185,14 @@ function RedirectTo(path, status)
 end
 
 function WriteJSON(object)
-  SetHeader('Content-Type', 'application/json; charset=utf-8')
+  SetHeader("Content-Type", "application/json; charset=utf-8")
   local json = EncodeJson(object)
   local etag = EncodeBase64(Md5(json))
 
   if etag == GetHeader("If-None-Match") then
     SetStatus(304)
   else
-    SetHeader('Etag', etag)
+    SetHeader("Etag", etag)
     Write(json)
   end
 end

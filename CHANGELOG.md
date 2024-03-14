@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.3](https://github.com/solisoft/luaonbeans/compare/v0.2.2...v0.2.3) (2024-03-14)
+
+
+### Bug Fixes
+
+* add context to files created ([a4b2049](https://github.com/solisoft/luaonbeans/commit/a4b20495d166132f7666b37cabd33dda5f2cd458))
+* fix specs ([c6d63d9](https://github.com/solisoft/luaonbeans/commit/c6d63d9b169405c52386a46baa0d747a95f43863))
+* remove debug print ([fe797f3](https://github.com/solisoft/luaonbeans/commit/fe797f34ff4293862930d79bfbb80df43397f2bd))
+* rename beans to beans.lua ([b560026](https://github.com/solisoft/luaonbeans/commit/b560026a724d1767f394ed921de34bbdf010a1e5))
+* rename beans to beans.lua ([94a4a52](https://github.com/solisoft/luaonbeans/commit/94a4a52747a4f81c270f212f5a181e5799cdfbbb))
+
 ## [0.2.2](https://github.com/solisoft/luaonbeans/compare/v0.2.1...v0.2.2) (2024-03-10)
 
 

@@ -91,7 +91,6 @@ CreateModel = function(model_name)
 end
 
 if arg[1] == "create" then
-  print("create")
   if arg[2] == "migration" then
     CreateMigration(arg[3])
   end
@@ -105,9 +104,7 @@ if arg[1] == "create" then
   end
 
   if arg[2] == "scaffold" then
-    print("scaffold")
     singular = Singularize(arg[3])
-    print(singular)
     CreateController(singular)
     CreateView(singular)
     CreateModel(singular)

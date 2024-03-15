@@ -142,7 +142,7 @@ DBMigrate = function()
   print("Running migrations ...")
   assert(Adb.Auth(DBConfig[BeansEnv]) ~= nil)
   local latest_version = Adb.Aql(
-    "FOR m IN migrations SORT m._key DESC LIMIT 1 RETURN m.filename"
+    "FOR m IN migrations SORT m.filename DESC LIMIT 1 RETURN m.filename"
   ).result[1]
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. "/migrations")) do
     if name ~= '.' and name ~= '..' then

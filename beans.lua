@@ -2,7 +2,13 @@ package.path = package.path .. ";.lua/?.lua;migrations/?.lua;specs/?.lua"
 require("utilities")
 lester = require("lester")
 
-BeansEnv = unix.environ()['BEANS_ENV'] or "development"
+ENV = {}
+for _, var in pairs(unix.environ()) do
+  var = string.split(var, "=")
+  ENV[var[1]] = var[2]
+end
+
+BeansEnv = ENV['BEANS_ENV'] or "development"
 
 DBConfig = DecodeJson(Slurp("config/database.json"))
 Adb = require "arango"

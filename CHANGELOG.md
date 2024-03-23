@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/solisoft/luaonbeans/compare/v0.2.3...v0.3.0) (2024-03-23)
+
+
+### Features
+
+* docker compose healthy check ([bf7770b](https://github.com/solisoft/luaonbeans/commit/bf7770b293df16a516161b77cef3426f5d9c48df))
+
+
+### Bug Fixes
+
+* filter migrations by filename ([e6eebb3](https://github.com/solisoft/luaonbeans/commit/e6eebb3bd6d7225ea7e5bd6b46a0a0b9f284222c))
+* fix specs env ([6893eb7](https://github.com/solisoft/luaonbeans/commit/6893eb7f264421f1acc870791467b8cbae3a7453))
+
 ## [0.2.3](https://github.com/solisoft/luaonbeans/compare/v0.2.2...v0.2.3) (2024-03-14)
 
 

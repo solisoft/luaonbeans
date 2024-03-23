@@ -7,12 +7,19 @@ services:
       - 7000:8080
     environment:
       BEANS_ENV: production
+    depends_on:
+      arangodb:
+        condition: service_healthy
 
   arangodb:
     image: arangodb:latest
-    restart: always
     environment:
       ARANGO_ROOT_PASSWORD: password
+    healthcheck:
+      test: wget -qO- http://localhost:8529
+      interval: 100ms
+      timeout: 1s
+      retries: 2
     ports:
       - 8529:8529
     volumes:

@@ -17,6 +17,13 @@ end
 
 BeansEnv = ENV['BEANS_ENV'] or "development"
 
+UuidV4 = function()
+  return string.format(
+    '%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x',
+    string.byte(GetRandomBytes(14), 1, 14)
+  )
+end
+
 GenerateTempFilename = function()
   local filename = EncodeBase64(GetRandomBytes(32))
   filename = string.gsub(filename, "[\\/]", "")

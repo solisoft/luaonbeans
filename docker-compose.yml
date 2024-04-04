@@ -12,14 +12,15 @@ services:
         condition: service_healthy
 
   arangodb:
-    image: arangodb:latest
+    image: arangodb/arangodb:latest
     environment:
       ARANGO_ROOT_PASSWORD: password
     healthcheck:
       test: wget -qO- http://localhost:8529
-      interval: 100ms
-      timeout: 1s
-      retries: 2
+      interval: 1s
+      start_interval: 1s
+      timeout: 10s
+      retries: 25
     ports:
       - 8529:8529
     volumes:

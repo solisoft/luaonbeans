@@ -17,11 +17,14 @@ end
 
 BeansEnv = ENV['BEANS_ENV'] or "development"
 
+local random = math.random
 UuidV4 = function()
-  return string.format(
-    '%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x',
-    string.byte(GetRandomBytes(14), 1, 14)
-  )
+  local template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+  local uuidString = string.gsub(template, '[xy]', function(c)
+    local v = (c == 'x') and random(0, 0xf) or random(8, 0xb)
+    return string.format('%x', v)
+  end)
+  return uuidString
 end
 
 GenerateTempFilename = function()

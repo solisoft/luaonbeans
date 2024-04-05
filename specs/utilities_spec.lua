@@ -87,6 +87,10 @@ return {
       it('UuidV4', function()
         expect.equal(#UuidV4(), 36)
       end)
+
+      it('Uuid', function()
+        expect.equal(#Uuid(), 36)
+      end)
     end)
   end
 }

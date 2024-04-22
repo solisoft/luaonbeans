@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0](https://github.com/solisoft/luaonbeans/compare/v0.3.0...v0.4.0) (2024-04-22)
+
+
+### Features
+
+* implement sqlite3 support ([53c6644](https://github.com/solisoft/luaonbeans/commit/53c664450b55eea0981dbf8759dd51a3f6faf863))
+* new Uuid() method which is just random ([fb9cd1e](https://github.com/solisoft/luaonbeans/commit/fb9cd1e0bd9453ea2578cf7ae404109157688080))
+* Remove Lua UuidV4 because redbean has it natively ([29a1908](https://github.com/solisoft/luaonbeans/commit/29a1908d14d9a0e455dec07e2a09b5edc3298505))
+* UuidV4() Lua function ([bdfbbab](https://github.com/solisoft/luaonbeans/commit/bdfbbabe3a058860978d321c2ea8841f1fa6a02a))
+* UuidV4() Lua function ([d16201a](https://github.com/solisoft/luaonbeans/commit/d16201a866348da5dcff52d220e28be711b2ae88))
+
 ## [0.3.0](https://github.com/solisoft/luaonbeans/compare/v0.2.3...v0.3.0) (2024-03-23)
 
 

@@ -3,7 +3,6 @@ package.path = package.path .. ";models/?.lua;/zip/models/?.lua"
 package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 
 require("utilities")
-print("Running " .. BeansEnv .. " mode on http://localhost:8080")
 
 Routes = require("routes")
 

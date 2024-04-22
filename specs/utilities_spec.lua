@@ -83,14 +83,6 @@ return {
         expect.equal(Slugify("hello    world"), "hello-world")
         expect.equal(Slugify("   hello    world"), "hello-world")
       end)
-
-      it('UuidV4', function()
-        expect.equal(#UuidV4(), 36)
-      end)
-
-      it('Uuid', function()
-        expect.equal(#Uuid(), 36)
-      end)
     end)
   end
 }

@@ -8,7 +8,7 @@ for _, var in pairs(unix.environ()) do
   ENV[var[1]] = var[2]
 end
 
-BeansEnv = ENV['BEANS_ENV'] or "development"
+BeansEnv = ENV["BEANS_ENV"] or "development"
 
 DBConfig = DecodeJson(Slurp("config/database.json"))
 Adb = require "arango"
@@ -16,11 +16,11 @@ Adb = require "arango"
 RecursiveFiles = function(dir, files_found)
   files_found = files_found or {}
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. dir)) do
-    if name ~= '.' and name ~= '..' then
+    if name ~= "." and name ~= ".." then
       if path.isdir(dir:sub(2) .. "/" .. name) then
         files_found = RecursiveFiles(dir .. "/" .. name, files_found)
       else
-        files_found = table.append(files_found, { dir .. "/" .. name })
+        files_found = table.append(files_found, {dir .. "/" .. name})
       end
     end
   end
@@ -126,12 +126,12 @@ SetupDB = function(env)
   Adb.CreateDatabase(DBConfig[env].db_name)
   assert(Adb.Auth(DBConfig[env]) ~= nil)
   Adb.CreateCollection("migrations")
-  Adb.CreateIndex("migrations", { type = "persistent", unique = true, fields = { "filename" } })
-  Adb.CreateDocument("migrations", { filename = "0" })
+  Adb.CreateIndex("migrations", {type = "persistent", unique = true, fields = {"filename"}})
+  Adb.CreateDocument("migrations", {filename = "0"})
 end
 
 if arg[1] == "db:setup" then
-  if DBConfig["engine"] == "arngodb" then
+  if DBConfig["engine"] == "arangodb" then
     SetupDB(BeansEnv)
   end
 end
@@ -139,16 +139,14 @@ end
 ArangoDB_DBMigrate = function()
   print("Running migrations ...")
   assert(Adb.Auth(DBConfig[BeansEnv]) ~= nil)
-  local latest_version = Adb.Aql(
-    "FOR m IN migrations SORT m.filename DESC LIMIT 1 RETURN m.filename"
-  ).result[1]
+  local latest_version = Adb.Aql("FOR m IN migrations SORT m.filename DESC LIMIT 1 RETURN m.filename").result[1]
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. "/migrations")) do
-    if name ~= '.' and name ~= '..' then
+    if name ~= "." and name ~= ".." then
       if name > latest_version then
         print("Processing " .. name)
         local migration = require(string.gsub(name, ".lua", ""))
         if migration.up() then
-          Adb.CreateDocument("migrations", { filename = name })
+          Adb.CreateDocument("migrations", {filename = name})
         end
       end
     end
@@ -157,17 +155,17 @@ end
 
 Sqlite_DBMigrate = function()
   print("Running migrations ...")
-  local sqlite3 = require 'lsqlite3'
-  local db = sqlite3.open(DBConfig[BeansEnv]["db_name"] .. '.sqlite3')
+  local sqlite3 = require "lsqlite3"
+  local db = sqlite3.open(DBConfig[BeansEnv]["db_name"] .. ".sqlite3")
   local latest_version = ""
   for row in db:nrows([[
   SELECT filename FROM migrations ORDER BY migrations.filename DESC LIMIT 1
 ]]) do
-    latest_version = row['filename']
+    latest_version = row["filename"]
   end
 
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. "/migrations")) do
-    if name ~= '.' and name ~= '..' and name ~= '.keep' then
+    if name ~= "." and name ~= ".." and name ~= ".keep" then
       if name > latest_version then
         print("Processing " .. name)
         local migration = require(string.gsub(name, ".lua", ""))
@@ -176,7 +174,9 @@ Sqlite_DBMigrate = function()
           INSERT INTO migrations (filename) VALUES (?)
         ]]
           stm:bind_values(name)
-          for r in stm:nrows() do return r end
+          for r in stm:nrows() do
+            return r
+          end
         end
       end
     end
@@ -194,9 +194,7 @@ end
 if arg[1] == "db:rollback" then
   if DBConfig["engine"] == "arangodb" then
     assert(Adb.Auth(DBConfig[BeansEnv]) ~= nil)
-    local latest_version = Adb.Aql(
-      "FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m"
-    ).result[1]
+    local latest_version = Adb.Aql("FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m").result[1]
     if latest_version.filename ~= "0" then
       print("Processing " .. latest_version.filename)
       local migration = require(string.gsub(latest_version.filename, ".lua", ""))
@@ -207,14 +205,14 @@ if arg[1] == "db:rollback" then
       print("Nothing to rollback!")
     end
   elseif DBConfig["engine"] == "sqlite" then
-    local sqlite3 = require 'lsqlite3'
-    local db = sqlite3.open(DBConfig[BeansEnv]["db_name"] .. '.sqlite3')
+    local sqlite3 = require "lsqlite3"
+    local db = sqlite3.open(DBConfig[BeansEnv]["db_name"] .. ".sqlite3")
     local latest_version = ""
 
     for row in db:nrows([[
       SELECT filename FROM migrations ORDER BY migrations.filename DESC LIMIT 1
     ]]) do
-      latest_version = row['filename']
+      latest_version = row["filename"]
     end
 
     print("Processing " .. latest_version)
@@ -225,7 +223,9 @@ if arg[1] == "db:rollback" then
           DELETE FROM migrations WHERE filename = ?
         ]])
         stm:bind_values(latest_version)
-        for r in stm:nrows() do return print(EncodeJson(r)) end
+        for r in stm:nrows() do
+          return print(EncodeJson(r))
+        end
       end
     end
   end

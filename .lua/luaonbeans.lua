@@ -147,7 +147,7 @@ function Resource(name, options)
 end
 
 function CustomRoute(method, url, options)
-  if RouteFound then return end
+  if RouteFound or method ~= GetMethod() then return end
   local extractedPatterns = extractPatterns(url)
   local path = GetPath()
 
@@ -167,7 +167,7 @@ function CustomRoute(method, url, options)
 
   local parser = Re.compile("^" .. url .. "$")
   local matcher = parser:search(path)
-  if matcher and GetMethod() == method then
+  if matcher then
     Params.controller = options.controller
     Params.action = options.action
 

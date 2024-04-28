@@ -10,9 +10,12 @@ local function routes()
   -- })
   ---- define root route
 
+  RouteFound = false
   if GetPath() == "/" then
     Params.action = "index"
     RoutePath("/app/controllers/welcome_controller.lua")
+    RouteFound = true
+    return
   end
 
   -- if GetPath() == "/upload" and GetMethod() == "POST" then

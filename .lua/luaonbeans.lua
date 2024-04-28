@@ -35,6 +35,7 @@ function extractPatterns(inputStr)
 end
 
 function Resource(name, options)
+  if RouteFound then return end
   options = options or { root = "" }
   options.root = options.root or ""
   options.root = options.root .. "/"
@@ -77,6 +78,7 @@ function Resource(name, options)
     if matcher and table.contains(routes, "new") then
       Params["action"] = "new"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
+      RouteFound = true
       return
     end
 
@@ -86,6 +88,7 @@ function Resource(name, options)
       Params["action"] = "show"
 
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
+      RouteFound = true
       return
     end
 
@@ -94,6 +97,7 @@ function Resource(name, options)
     if matcher and table.contains(routes, "edit") then
       Params["action"] = "edit"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
+      RouteFound = true
       return
     end
   end
@@ -104,6 +108,7 @@ function Resource(name, options)
     if matcher and table.contains(routes, "create") then
       Params["action"] = "create"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
+      RouteFound = true
       return
     end
 
@@ -113,6 +118,7 @@ function Resource(name, options)
     if matcher and table.contains(routes, "update") then
       Params["action"] = "update"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
+      RouteFound = true
       return
     end
   end
@@ -123,6 +129,7 @@ function Resource(name, options)
     if matcher and table.contains(routes, "update") then
       Params["action"] = "update"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
+      RouteFound = true
       return
     end
   end
@@ -133,12 +140,14 @@ function Resource(name, options)
     if matcher and table.contains(routes, "delete") then
       Params["action"] = "delete"
       RoutePath("/app/controllers/" .. name .. "_controller.lua")
+      RouteFound = true
       return
     end
   end
 end
 
 function CustomRoute(method, url, options)
+  if RouteFound then return end
   local extractedPatterns = extractPatterns(url)
   local path = GetPath()
 
@@ -163,6 +172,7 @@ function CustomRoute(method, url, options)
     Params.action = options.action
 
     RoutePath("/app/controllers/" .. options.controller .. "_controller.lua")
+    RouteFound = true
     return
   end
 end

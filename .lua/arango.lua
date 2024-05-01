@@ -6,27 +6,31 @@ local function Api_url(path)
   return ApiURL .. path
 end
 
-local function Api_run(path, method, Params, headers)
-  Params = Params or {}
+local function Api_run(path, method, params, headers)
+  params = params or {}
   headers = headers or {}
-  local ok, h, body = Fetch(
-    Api_url(path), {
-      method = method,
-      body = EncodeJson(Params),
-      headers = table.append({ ["Authorization"] = "bearer " .. ArangoJWT }, headers)
-    }
-  )
+  local ok, h, body =
+      Fetch(
+        Api_url(path),
+        {
+          method = method,
+          body = EncodeJson(params),
+          headers = table.append({ ["Authorization"] = "bearer " .. ArangoJWT }, headers)
+        }
+      )
 
   return DecodeJson(body), ok, h
 end
 
 local function Auth(db_config)
-  local ok, headers, body = Fetch(
-    db_config.url .. "/_open/auth", {
-      method = "POST",
-      body = "{ \"username\": \"" .. db_config.username .. "\", \"password\": \"" .. db_config.password .. "\" }"
-    }
-  )
+  local ok, headers, body =
+      Fetch(
+        db_config.url .. "/_open/auth",
+        {
+          method = "POST",
+          body = '{ "username": "' .. db_config.username .. '", "password": "' .. db_config.password .. '" }'
+        }
+      )
 
   ApiURL = db_config.url .. "/_db/" .. db_config.db_name .. "/_api"
 
@@ -68,9 +72,9 @@ local function Aql(str, bindvars, options)
   return request
 end
 
-local function with_Params(endpoint, method, handle, Params)
-  Params = Params or {}
-  return Api_run(endpoint .. handle, method, Params)
+local function with_Params(endpoint, method, handle, params)
+  params = params or {}
+  return Api_run(endpoint .. handle, method, params)
 end
 
 local function without_Params(endpoint, method, handle)
@@ -79,12 +83,12 @@ end
 
 -- Documents
 
-local function UpdateDocument(handle, Params)
-  return with_Params("/document/", "PATCH", handle, Params)
+local function UpdateDocument(handle, params)
+  return with_Params("/document/", "PATCH", handle, params)
 end
 
-local function CreateDocument(handle, Params)
-  return with_Params("/document/", "POST", handle, Params)
+local function CreateDocument(handle, params)
+  return with_Params("/document/", "POST", handle, params)
 end
 
 local function GetDocument(handle)
@@ -97,19 +101,43 @@ end
 
 ---Collections
 
-local function UpdateCollection(collection, Params)
-  return with_Params("/collection/", "PUT", collection .. "/properties", Params)
+local function UpdateCollection(collection, params)
+  return with_Params("/collection/", "PUT", collection .. "/properties", params)
 end
 
-local function RenameCollection(collection, Params)
-  return with_Params("/collection/", "PUT", collection .. "/rename", Params)
+local function RenameCollection(collection, params)
+  return with_Params("/collection/", "PUT", collection .. "/rename", params)
 end
 
 local function CreateCollection(collection, options)
   options = options or {}
-  local Params = { name = collection }
-  Params = table.merge(Params, options)
-  return with_Params("/collection/", "POST", "", Params)
+  local params = { name = collection }
+  params = table.merge(params, options)
+  return with_Params("/collection/", "POST", "", params)
+end
+
+local function CreateCollectionWithTimestamps(collection, options)
+  options = options or {}
+  local params = { name = collection }
+  params = table.merge(params, options)
+  params = table.merge(params, {
+    ["computedValues"] = {
+      {
+        ["computeOn"] = { "insert" },
+        expression = "RETURN DATE_NOW()",
+        name = "c_at",
+        overwrite = true
+      },
+      {
+        ["computeOn"] = { "insert", "update" },
+        expression = "RETURN DATE_NOW()",
+        name = "u_at",
+        overwrite = true
+      }
+    }
+  })
+
+  return with_Params("/collection/", "POST", "", params)
 end
 
 local function GetCollection(collection)
@@ -120,11 +148,15 @@ local function DeleteCollection(collection)
   return without_Params("/collection/", "DELETE", collection)
 end
 
+local function TruncateCollection(collection, params)
+  return with_Params("/collection/", "PUT", collection .. "/truncate", params)
+end
+
 -- Databases
 
 local function CreateDatabase(name, options)
-  local Params = { name = name, options = (options or {}) }
-  return with_Params("/database", "POST", "", Params)
+  local params = { name = name, options = (options or {}) }
+  return with_Params("/database", "POST", "", params)
 end
 
 local function DeleteDatabase(name)
@@ -137,8 +169,8 @@ local function GetAllIndexes(collection)
   return without_Params("/index?collection=" .. collection, "GET", "")
 end
 
-local function CreateIndex(handle, Params)
-  return with_Params("/index?collection=" .. handle, "POST", "", Params)
+local function CreateIndex(handle, params)
+  return with_Params("/index?collection=" .. handle, "POST", "", params)
 end
 
 local function DeleteIndex(handle)
@@ -155,8 +187,8 @@ local function GetQueryCacheConfiguration()
   return without_Params("/query-cache/properties", "GET", "")
 end
 
-local function UpdateCacheConfiguration(Params)
-  return with_Params("/query-cache/properties", "PUT", "", Params)
+local function UpdateCacheConfiguration(params)
+  return with_Params("/query-cache/properties", "PUT", "", params)
 end
 
 local function DeleteQueryCache()
@@ -165,8 +197,8 @@ end
 
 -- Stream transactions
 -- POST /_api/transaction/begin
-local function BeginTransaction(Params)
-  return with_Params("/transaction/begin", "POST", "", Params)
+local function BeginTransaction(params)
+  return with_Params("/transaction/begin", "POST", "", params)
 end
 
 local function CommitTransaction(transaction_id)
@@ -192,29 +224,25 @@ return {
   CreateDocument = CreateDocument,
   DeleteDocument = DeleteDocument,
   PatchDocument = UpdateDocument,
-
   GetCollection = GetCollection,
   UpdateCollection = UpdateCollection,
   RenameCollection = RenameCollection,
   CreateCollection = CreateCollection,
+  CreateCollectionWithTimestamps = CreateCollectionWithTimestamps,
   DeleteCollection = DeleteCollection,
   PatchCollection = UpdateCollection,
-
+  TruncateCollection = TruncateCollection,
   GetAllIndexes = GetAllIndexes,
   CreateIndex = CreateIndex,
   DeleteIndex = DeleteIndex,
-
   CreateDatabase = CreateDatabase,
   DeleteDatabase = DeleteDatabase,
-
   BeginTransaction = BeginTransaction,
   CommitTransaction = CommitTransaction,
   AbortTransaction = AbortTransaction,
-
   GetQueryCacheEntries = GetQueryCacheEntries,
   GetQueryCacheConfiguration = GetQueryCacheConfiguration,
   UpdateCacheConfiguration = UpdateCacheConfiguration,
   DeleteQueryCache = DeleteQueryCache,
-
-  RefreshToken = RefreshToken,
+  RefreshToken = RefreshToken
 }

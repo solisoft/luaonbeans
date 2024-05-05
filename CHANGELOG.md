@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.0](https://github.com/solisoft/luaonbeans/compare/v0.4.0...v0.5.0) (2024-05-05)
+
+
+### Features
+
+* latest redbean version (including UuidV4 method) ([c77b862](https://github.com/solisoft/luaonbeans/commit/c77b862a08fcf705d40a872476c466fa50097e95))
+
+
+### Bug Fixes
+
+* increase router performances ([75b713b](https://github.com/solisoft/luaonbeans/commit/75b713b059b8b128123ba0b68dbdd9d6f368b06b))
+* increase router performances ([1970e48](https://github.com/solisoft/luaonbeans/commit/1970e48f06578051426eaa2541c6af336a4e51d1))
+* typo ([6c75790](https://github.com/solisoft/luaonbeans/commit/6c75790fbac823e9644cb9f531b155abde791d47))
+* update default route definition ([fbde67d](https://github.com/solisoft/luaonbeans/commit/fbde67d1c416d0ca25ca2c10413e6c4f8bc2b242))
+
 ## [0.4.0](https://github.com/solisoft/luaonbeans/compare/v0.3.0...v0.4.0) (2024-04-22)
 
 

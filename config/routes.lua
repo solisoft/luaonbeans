@@ -11,10 +11,9 @@ local function routes()
   ---- define root route
 
   RouteFound = false
-  if GetPath() == "/" then
+  if GetPath() == "/" and GetMethod() == "GET" then
     Params.action = "index"
     RoutePath("/app/controllers/welcome_controller.lua")
-    RouteFound = true
     return
   end
 

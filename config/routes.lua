@@ -1,5 +1,7 @@
 Routes = { ["GET"] = { [""] = "welcome#index" } } --define root
 
+-- CustomRoute("GET", "ban*", "welcome#ban") -- use splat
+
 -- Resource("customers", {
 --   var_name = "customer_id", -- default value is "id"
 --   var_regex = "([0-9a-zA-Z_\\-]+)", -- default value

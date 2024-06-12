@@ -34,7 +34,7 @@ function extractPatterns(inputStr)
   return patterns
 end
 
-function assignRoute(method, name, options, value)
+local function assignRoute(method, name, options, value)
   local current = Routes[method]
   options["parent"] = options["parent"] or {}
 
@@ -65,13 +65,13 @@ function Resource(name, options)
 
   local get = {}
   if table.contains(only, "index") then get[""] = name .. "#index" end
-  if table.contains(only, "new") then  get["new"] = name .. "#new" end
+  if table.contains(only, "new") then get["new"] = name .. "#new" end
   get[":var"] = {
     [":name"] = options["var_name"] or "id",
     [":regex"] = options["var_regex"] or "([0-9a-zA-Z_\\-]+)"
   }
-  if table.contains(only, "edit")  then get[":var"]["edit"] = name .. "#edit" end
-  if table.contains(only, "show")  then get[":var"][""] = name .. "#show" end
+  if table.contains(only, "edit") then get[":var"]["edit"] = name .. "#edit" end
+  if table.contains(only, "show") then get[":var"][""] = name .. "#show" end
   assignRoute("GET", name, options, get)
 
   local post = {}
@@ -105,39 +105,67 @@ function CustomRoute(method, name, endpoint, options)
   assignRoute(method, name, options, endpoint)
 end
 
+local function tableSplat(input_list)
+  local output_table = {}
+  for i = 1, #input_list, 2 do
+    local key = input_list[i]
+    local value = input_list[i + 1]
+
+    -- Convert the value to a number if possible
+    local numeric_value = tonumber(value)
+    if numeric_value then
+      output_table[key] = numeric_value
+    else
+      output_table[key] = value
+    end
+  end
+  return output_table
+end
+
 function DefineRoutes(path, method)
   if method == "PATCH" then method = "PUT" end
 
   local recognized_route = Routes[method]
 
   local route_found = false
+  local final_route = false
 
+  Splat = {}
   if path == "/" then
     recognized_route = recognized_route[""]
   else
     for _, value in pairs(string.split(path, "/")) do
-      if recognized_route[value] then
-        recognized_route = recognized_route[value]
-        route_found = true
-      else
-        if recognized_route[":var"] then
-          recognized_route = recognized_route[":var"]
-          local parser = Re.compile(recognized_route[":regex"])
-          local matcher = { parser:search(value) }
-          for i, match in ipairs(matcher) do
-            if i > 1 then
-              Params[recognized_route[":name"]] = match
+      if final_route == false then
+        if recognized_route[value] or recognized_route[value .. "*"] then
+          if recognized_route[value .. "*"] then final_route = true end
+          recognized_route = recognized_route[value] or recognized_route[value .. "*"]
+          route_found = true
+        else
+          route_found = false
+          if recognized_route[":var"] then
+            recognized_route = recognized_route[":var"]
+            local parser = Re.compile(recognized_route[":regex"])
+            local matcher = { parser:search(value) }
+            for i, match in ipairs(matcher) do
+              if i > 1 then
+                route_found = true
+                Params[recognized_route[":name"]] = match
+              end
             end
           end
         end
+      else
+        table.append(Splat, { value })
+      end
+      if type(recognized_route) == "table" and route_found then
+        recognized_route = recognized_route[""]
+      else
+        if route_found == false then recognized_route = nil end
       end
     end
-    if type(recognized_route) == "table" and route_found then
-      recognized_route = recognized_route[""]
-    else
-      if route_found == false then recognized_route = nil end
-    end
   end
+
+  Splat = tableSplat(Splat)
 
   if recognized_route ~= nil then
     recognized_route = string.split(recognized_route, "#")
@@ -158,7 +186,6 @@ function DefineRoutes(path, method)
     return
   end
 end
-
 
 function GetBodyParams()
   local body_Params = {}

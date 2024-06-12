@@ -3,8 +3,7 @@ package.path = package.path .. ";models/?.lua;/zip/models/?.lua"
 package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 
 require("utilities")
-
-Routes = require("routes")
+require("routes")
 
 -- ArangoDB connection
 local db_config = DecodeJson(LoadAsset("config/database.json"))
@@ -60,5 +59,5 @@ function OnHttpRequest()
     Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
   end
 
-  Routes()
+  DefineRoutes(GetPath(), GetMethod())
 end

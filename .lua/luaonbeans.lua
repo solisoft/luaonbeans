@@ -34,148 +34,131 @@ function extractPatterns(inputStr)
   return patterns
 end
 
-function Resource(name, options)
-  if RouteFound then return end
-  options = options or { root = "" }
-  options.root = options.root or ""
-  options.root = options.root .. "/"
-  local routes = options.only or { "index", "new", "show", "create", "update", "edit", "delete" }
+function assignRoute(method, name, options, value)
+  local current = Routes[method]
+  options["parent"] = options["parent"] or {}
 
-  local path = GetPath()
-  local parser = nil
-  local matcher = nil
+  for i = 1, #options["parent"] do
+    local parent = options["parent"][i]
 
-  local extractedPatterns = extractPatterns(options.root)
-
-  for _, pattern in ipairs(extractedPatterns) do
-    options.root = options.root:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
-  end
-
-  Params["controller"] = name
-
-  if #extractedPatterns > 0 then
-    parser = Re.compile(options.root)
-    matcher = { parser:search(path) }
-    for i, match in ipairs(matcher) do
-      if i > 1 then
-        Params[extractedPatterns[i - 1]:gsub(":", "")] = match
-      end
+    current[parent] = current[parent] or {}
+    current[parent][":var"] = current[parent][":var"] or {}
+    if options["type"] == "member" and i == #options["parent"] then
+      current = current[parent][":var"]
+    else
+      current = current[parent]
     end
   end
 
-  if GetMethod() == "GET" then
-    parser = Re.compile("^" .. options.root .. name .. "$")
-    matcher = parser:search(path)
-
-    if matcher and table.contains(routes, "index") then
-      Params["action"] = "index"
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      return
-    end
-
-    parser = Re.compile("^" .. options.root .. name .. "/new$")
-    matcher = parser:search(path)
-    if matcher and table.contains(routes, "new") then
-      Params["action"] = "new"
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      RouteFound = true
-      return
-    end
-
-    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, Params["id"] = parser:search(path)
-    if matcher and table.contains(routes, "show") then
-      Params["action"] = "show"
-
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      RouteFound = true
-      return
-    end
-
-    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)/edit$")
-    matcher, Params["id"] = parser:search(path)
-    if matcher and table.contains(routes, "edit") then
-      Params["action"] = "edit"
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      RouteFound = true
-      return
-    end
-  end
-
-  if GetMethod() == "POST" then
-    parser = Re.compile("^" .. options.root .. name .. "$")
-    matcher = parser:search(path)
-    if matcher and table.contains(routes, "create") then
-      Params["action"] = "create"
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      RouteFound = true
-      return
-    end
-
-    -- Use POST instead of PUT if needed
-    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, Params["id"] = parser:search(path)
-    if matcher and table.contains(routes, "update") then
-      Params["action"] = "update"
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      RouteFound = true
-      return
-    end
-  end
-
-  if GetMethod() == "PUT" or GetMethod() == "PATCH" then
-    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, Params["id"] = parser:search(path)
-    if matcher and table.contains(routes, "update") then
-      Params["action"] = "update"
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      RouteFound = true
-      return
-    end
-  end
-
-  if GetMethod() == "DELETE" then
-    parser = Re.compile(name .. "/([0-9a-zA-Z_\\-]+)$")
-    matcher, Params["id"] = parser:search(path)
-    if matcher and table.contains(routes, "delete") then
-      Params["action"] = "delete"
-      RoutePath("/app/controllers/" .. name .. "_controller.lua")
-      RouteFound = true
-      return
-    end
-  end
+  current[name] = value
 end
 
-function CustomRoute(method, url, options)
-  if RouteFound or method ~= GetMethod() then return end
-  local extractedPatterns = extractPatterns(url)
-  local path = GetPath()
+function Resource(name, options)
+  options = options or {}
+  options["parent"] = options["parent"] or {}
+  options["only"] = options["only"] or { "index", "show", "new", "create", "edit", "update", "delete" }
+  local only = options["only"]
+  Routes["GET"] = Routes["GET"] or {}
+  Routes["POST"] = Routes["POST"] or {}
+  Routes["PUT"] = Routes["PUT"] or {}
+  Routes["DELETE"] = Routes["DELETE"] or {}
 
-  for _, pattern in ipairs(extractedPatterns) do
-    url = url:gsub(pattern, (options[pattern:gsub(":", "")] or "([0-9a-zA-Z_\\-]+)"))
-  end
+  local get = {}
+  if table.contains(only, "index") then get[""] = name .. "#index" end
+  if table.contains(only, "new") then  get["new"] = name .. "#new" end
+  get[":var"] = {
+    [":name"] = options["var_name"] or "id",
+    [":regex"] = options["var_regex"] or "([0-9a-zA-Z_\\-]+)"
+  }
+  if table.contains(only, "edit")  then get[":var"]["edit"] = name .. "#edit" end
+  if table.contains(only, "show")  then get[":var"][""] = name .. "#show" end
+  assignRoute("GET", name, options, get)
 
-  if #extractedPatterns > 0 then
-    local parser = Re.compile(url)
-    local matcher = { parser:search(path) }
-    for i, match in ipairs(matcher) do
-      if i > 1 then
-        Params[extractedPatterns[i - 1]:gsub(":", "")] = match
+  local post = {}
+  if table.contains(only, "create") then post[""] = name .. "#create" end
+  post[":var"] = {
+    [":name"] = options["var_name"] or "id",
+    [":regex"] = options["var_regex"] or "([0-9a-zA-Z_\\-]+)"
+  }
+  assignRoute("POST", name, options, post)
+
+  local put = {}
+  if table.contains(only, "update") then put[""] = name .. "#update" end
+  put[":var"] = {
+    [":name"] = options["var_name"] or "id",
+    [":regex"] = options["var_regex"] or "([0-9a-zA-Z_\\-]+)"
+  }
+  assignRoute("PUT", name, options, put)
+
+  local delete = {}
+  delete[":var"] = {
+    [":name"] = options["var_name"] or "id",
+    [":regex"] = options["var_regex"] or "([0-9a-zA-Z_\\-]+)"
+  }
+  if table.contains(only, "delete") then delete[""] = name .. "#delete" end
+  assignRoute("DELETE", name, options, delete)
+end
+
+function CustomRoute(method, name, endpoint, options)
+  options = options or {}
+
+  assignRoute(method, name, options, endpoint)
+end
+
+function DefineRoutes(path, method)
+  if method == "PATCH" then method = "PUT" end
+
+  local recognized_route = Routes[method]
+
+  local route_found = false
+
+  if path == "/" then
+    recognized_route = recognized_route[""]
+  else
+    for _, value in pairs(string.split(path, "/")) do
+      if recognized_route[value] then
+        recognized_route = recognized_route[value]
+        route_found = true
+      else
+        if recognized_route[":var"] then
+          recognized_route = recognized_route[":var"]
+          local parser = Re.compile(recognized_route[":regex"])
+          local matcher = { parser:search(value) }
+          for i, match in ipairs(matcher) do
+            if i > 1 then
+              Params[recognized_route[":name"]] = match
+            end
+          end
+        end
       end
+    end
+    if type(recognized_route) == "table" and route_found then
+      recognized_route = recognized_route[""]
+    else
+      if route_found == false then recognized_route = nil end
     end
   end
 
-  local parser = Re.compile("^" .. url .. "$")
-  local matcher = parser:search(path)
-  if matcher then
-    Params.controller = options.controller
-    Params.action = options.action
+  if recognized_route ~= nil then
+    recognized_route = string.split(recognized_route, "#")
+    Params = table.merge(
+      Params,
+      { controller = recognized_route[1], action = recognized_route[2] }
+    )
+  end
 
-    RoutePath("/app/controllers/" .. options.controller .. "_controller.lua")
-    RouteFound = true
+  if Params.action == nil then
+    if RoutePath("/public" .. GetPath()) == false then
+      SetStatus(404)
+      Page("404", "app")
+      return
+    end
+  else
+    RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
     return
   end
 end
+
 
 function GetBodyParams()
   local body_Params = {}

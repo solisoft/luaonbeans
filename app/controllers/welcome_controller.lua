@@ -1,5 +1,5 @@
 local app = {
-  -- GET welcome#index => /
+  -- GET customers#index => /
   index = function()
     Page('welcome/index', 'app')
   end

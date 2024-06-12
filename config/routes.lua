@@ -1,33 +1,30 @@
-local function routes()
-  -- Routes
-  ---- Basic CRUD
-  -- Resource("posts")
-  ---- Nested CRUD
-  -- Resource("comments", { root = "/posts/:post_id", post_id = "([0-9]+)" })
-  ---- Custom Route
-  -- CustomRoute("GET", "/posts/:post_id/offline", {
-  -- 	post_id = "([0-9]+)", controller = "posts", action = "offline"
-  -- })
-  ---- define root route
+Routes = { ["GET"] = { [""] = "welcome#index" }} --define root
 
-  RouteFound = false
-  if GetPath() == "/" and GetMethod() == "GET" then
-    Params.action = "index"
-    RoutePath("/app/controllers/welcome_controller.lua")
-    return
-  end
+Resource("customers", {
+  only = { "index", "new", "create", "edit", "update", "show", "delete" },
+  var_name = "customer_id", -- default value is "id"
+  var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
+})
 
-  -- if GetPath() == "/upload" and GetMethod() == "POST" then
-  --   Params.action = "create"
-  --   RoutePath("/controllers/welcome_controller.lua")
-  -- end
-
-  if Params.action == nil then
-    if RoutePath("/public" .. GetPath()) == false then
-      SetStatus(404)
-      Page("404", "app")
-    end
-  end
-end
-
-return routes
+-- Resource("customers", {
+--   var_name = "customer_id", -- default value is "id"
+--   var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
+-- })
+--
+-- CustomRoute("GET", "ban", "customers#ban", {
+--   parent = { "customers" },
+--   type = "member", -- collection or member
+-- })
+--
+-- Resource("comments", {
+--   var_name = "comment_id", -- default value is "id"
+--   var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
+--   parent = { "customers" }
+-- })
+--
+-- Resource("likes", {
+--   var_name = "comment_id", -- default value is "id"
+--   var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
+--   parent = { "customers", "comments" }
+-- })
+--

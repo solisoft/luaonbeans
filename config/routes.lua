@@ -1,10 +1,4 @@
-Routes = { ["GET"] = { [""] = "welcome#index" }} --define root
-
-Resource("customers", {
-  only = { "index", "new", "create", "edit", "update", "show", "delete" },
-  var_name = "customer_id", -- default value is "id"
-  var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
-})
+Routes = { ["GET"] = { [""] = "welcome#index" } } --define root
 
 -- Resource("customers", {
 --   var_name = "customer_id", -- default value is "id"

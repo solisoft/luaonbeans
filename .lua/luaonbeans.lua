@@ -43,20 +43,39 @@ local function assignRoute(method, name, options, value)
 
     current[parent] = current[parent] or {}
     current[parent][":var"] = current[parent][":var"] or {}
-    if options["type"] == "member" and i == #options["parent"] then
+    if options["type"] == "member" then
       current = current[parent][":var"]
     else
       current = current[parent]
     end
   end
 
-  current[name] = value
+  local path = string.split(name, "/")
+  for i = 1, #path do
+    local v = path[i]
+
+    if v:sub(1, 1) == ":" then
+      current[":var"] = {
+        [":name"] = v:sub(2),
+        [":regex"] = options[v] or "([0-9a-zA-Z_\\-]+)"
+      }
+      if i == #path then current[":var"][""] = value end
+      current = current[":var"]
+    else
+      current[v] = current[v] or {}
+      if i == #path then
+        current[v] = value
+      end
+      current = current[v]
+    end
+  end
 end
 
 function Resource(name, options)
   options = options or {}
   options["parent"] = options["parent"] or {}
   options["only"] = options["only"] or { "index", "show", "new", "create", "edit", "update", "delete" }
+  options["type"] = "member"
   local only = options["only"]
   Routes["GET"] = Routes["GET"] or {}
   Routes["POST"] = Routes["POST"] or {}
@@ -95,7 +114,7 @@ function Resource(name, options)
     [":name"] = options["var_name"] or "id",
     [":regex"] = options["var_regex"] or "([0-9a-zA-Z_\\-]+)"
   }
-  if table.contains(only, "delete") then delete[""] = name .. "#delete" end
+  if table.contains(only, "delete") then delete[":var"][""] = name .. "#delete" end
   assignRoute("DELETE", name, options, delete)
 end
 
@@ -157,11 +176,12 @@ function DefineRoutes(path, method)
       else
         table.append(Splat, { value })
       end
-      if type(recognized_route) == "table" and route_found then
-        recognized_route = recognized_route[""]
-      else
-        if route_found == false then recognized_route = nil end
-      end
+    end
+
+    if type(recognized_route) == "table" and route_found then
+      recognized_route = recognized_route[""]
+    else
+      if route_found == false then recognized_route = nil end
     end
   end
 

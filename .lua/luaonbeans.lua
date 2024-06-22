@@ -1,8 +1,20 @@
 Routes = {}
+Views = {}
+Layouts = {}
+Partials = {}
 
 function Page(view, layout, bindVarsView, bindVarsLayout)
-  layout = Etlua.compile(LoadAsset("app/views/layouts/" .. layout .. "/index.html.etlua"))(bindVarsLayout or {})
-  view = Etlua.compile(LoadAsset("app/views/" .. view .. ".etlua"))(bindVarsView or {})
+  if (BeansEnv == "dev" or Layouts["app/views/layouts/" .. layout .. "/index.html.etlua"] == nil) then
+    Layouts["app/views/layouts/" .. layout .. "/index.html.etlua"] = LoadAsset("app/views/layouts/" ..
+      layout .. "/index.html.etlua")
+  end
+
+  if (BeansEnv == "dev" or Views["app/views/" .. view .. ".etlua"] == nil) then
+    Views["app/views/" .. view .. ".etlua"] = LoadAsset("app/views/" .. view .. ".etlua")
+  end
+
+  layout = Etlua.compile(Layouts["app/views/layouts/" .. layout .. "/index.html.etlua"])(bindVarsLayout or {})
+  view = Etlua.compile(Views["app/views/" .. view .. ".etlua"])(bindVarsView or {})
 
   local content = layout:gsub("@yield", view)
   local etag = EncodeBase64(Md5(content))
@@ -23,7 +35,12 @@ function Partial(partial, bindVars)
     bindVars.extras = req["extras"]
   end
 
-  return Etlua.compile(LoadAsset("app/views/partials/" .. partial .. ".html.etlua"))(bindVars)
+  if (BeansEnv == "dev" or Partials["app/views/partials/" .. partial .. ".html.etlua"] == nil) then
+    Partials["app/views/partials/" .. partial .. ".html.etlua"] = LoadAsset("app/views/partials/" ..
+      partial .. ".html.etlua")
+  end
+
+  return Etlua.compile(Partials["app/views/partials/" .. partial .. ".html.etlua"])(bindVars)
 end
 
 function extractPatterns(inputStr)

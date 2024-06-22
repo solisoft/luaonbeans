@@ -1,5 +1,5 @@
 <div class="container mx-auto py-10 px-2">
-  <h1>Welcome aboard</h1>
+  <h1>Welcome aboard!!</h1>
 
   <p>Lua on Beans is a simple <a href="https://redbean.dev" target="_blank">redbean.dev</a> tool for creating fast, testable MVC applications using Lua and ArangoDB.</p>
 

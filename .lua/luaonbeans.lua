@@ -236,3 +236,36 @@ function WriteJSON(object)
     Write(json)
   end
 end
+
+function InitDB(db_config)
+  if (db_config["engine"] == "arangodb") then
+    Adb = require("arango")
+    Adb.Auth(db_config[BeansEnv])
+    Adb.UpdateCacheConfiguration({ mode = "on" })
+  elseif (db_config["engine"] == "sqlite") then
+    local sqlite3 = require 'lsqlite3'
+    local sqlite = sqlite3.open(db_config[BeansEnv]["db_name"] .. '.sqlite3')
+    sqlite:busy_timeout(1000)
+    sqlite:exec [[PRAGMA journal_mode=WAL]]
+    sqlite:exec [[PRAGMA synchronous=NORMAL]]
+    sqlite:exec [[
+      CREATE TABLE IF NOT EXISTS "migrations"
+      (
+        id integer PRIMARY KEY,
+        filename VARCHAR
+      );
+
+      CREATE UNIQUE INDEX idx_migrations_filename ON migrations (filename);
+    ]]
+  end
+end
+
+function HandleSqliteFork(db_config)
+  if db_config["engine"] == "sqlite" then
+    Sqlite3 = require 'lsqlite3'
+    Sqlite = Sqlite3.open('delupay-shop.sqlite3')
+    Sqlite:busy_timeout(1000)
+    Sqlite:exec [[PRAGMA journal_mode=WAL]]
+    Sqlite:exec [[PRAGMA synchronous=NORMAL]]
+  end
+end

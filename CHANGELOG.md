@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.6.0](https://github.com/solisoft/luaonbeans/compare/v0.5.0...v0.6.0) (2024-06-22)
+
+
+### Features
+
+* add splat support on GET routes ([15a7fb7](https://github.com/solisoft/luaonbeans/commit/15a7fb72dafafdd644f511afb098e75ca347f084))
+
+
+### Bug Fixes
+
+* add specs for router + fix router ([d6ed140](https://github.com/solisoft/luaonbeans/commit/d6ed1407b2a64ee349772dc5d1940de877991329))
+* remove useless code ([6625497](https://github.com/solisoft/luaonbeans/commit/6625497de4e813c1e933d5a1ad6ccfab85cbfc25))
+* small refactor of .init.lua file ([cc7aec5](https://github.com/solisoft/luaonbeans/commit/cc7aec5153be82fd71ee0c02903e48e00d2578e8))
+
 ## [0.5.0](https://github.com/solisoft/luaonbeans/compare/v0.4.0...v0.5.0) (2024-05-05)
 
 

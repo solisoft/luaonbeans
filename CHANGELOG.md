@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.6.1](https://github.com/solisoft/luaonbeans/compare/v0.6.0...v0.6.1) (2024-06-23)
+
+
+### Bug Fixes
+
+* improve performance for loading layouts, partials & views ([4481931](https://github.com/solisoft/luaonbeans/commit/44819313366a9df1e15759b0e62de294b20adbb5))
+* Remove useless routes (debug) ([bfa09b9](https://github.com/solisoft/luaonbeans/commit/bfa09b964f964dccf7cbcdfe766a211f6acbe59a))
+* update documentation ([1a6c5d9](https://github.com/solisoft/luaonbeans/commit/1a6c5d91c6c83c02b8ea9f2c0ddcd029aa6e29d0))
+
 ## [0.6.0](https://github.com/solisoft/luaonbeans/compare/v0.5.0...v0.6.0) (2024-06-22)
 
 

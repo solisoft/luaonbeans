@@ -1,10 +1,10 @@
 Routes = { ["GET"] = { [""] = "welcome#index" } } --define root
 
-CustomRoute("GET", "demo/with/:id/nested/:demo/route", "welcome#ban", {
-  [":demo"] = "([0-9]+)" -- you can define regex per params
-})
+-- CustomRoute("GET", "demo/with/:id/nested/:demo/route", "welcome#ban", {
+--  [":demo"] = "([0-9]+)" -- you can define regex per params
+-- })
 
-CustomRoute("GET", "ban*", "welcome#ban") -- use splat
+-- CustomRoute("GET", "ban*", "welcome#ban") -- use splat
 
 -- Resource("customers", {
 --   var_name = "customer_id",         -- default value is "id"

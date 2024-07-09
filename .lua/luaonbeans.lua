@@ -274,6 +274,9 @@ function InitDB(db_config)
 
       CREATE UNIQUE INDEX idx_migrations_filename ON migrations (filename);
     ]]
+  elseif (db_config["engine"] == "surrealdb") then
+    Surreal = require("surrealdb")
+    Surreal.auth(db_config[BeansEnv])
   end
 end
 

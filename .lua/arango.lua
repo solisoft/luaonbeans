@@ -1,9 +1,9 @@
-ApiURL = ""
+ArangoAPI = ""
 ArangoJWT = ""
 LastDBConnect = GetTime()
 
 local function Api_url(path)
-  return ApiURL .. path
+  return ArangoAPI .. path
 end
 
 local function Api_run(path, method, params, headers)
@@ -32,7 +32,7 @@ local function Auth(db_config)
         }
       )
 
-  ApiURL = db_config.url .. "/_db/" .. db_config.db_name .. "/_api"
+  ArangoAPI = db_config.url .. "/_db/" .. db_config.db_name .. "/_api"
 
   if ok == 200 then
     ArangoJWT = DecodeJson(body)["jwt"]

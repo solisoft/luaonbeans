@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0](https://github.com/solisoft/luaonbeans/compare/v0.6.0...v0.7.0) (2024-07-09)
+
+
+### Features
+
+* wrapper for surrealdb ([16ad4eb](https://github.com/solisoft/luaonbeans/commit/16ad4ebd9eb3b80fd545a6468093a26322c05cf3))
+* wrapper for surrealdb ([d9abc8b](https://github.com/solisoft/luaonbeans/commit/d9abc8ba3024e675d0d11592a89903ac78f618a2))
+
+
+### Bug Fixes
+
+* improve performance for loading layouts, partials & views ([4481931](https://github.com/solisoft/luaonbeans/commit/44819313366a9df1e15759b0e62de294b20adbb5))
+* remove unused controller action ([81a56cd](https://github.com/solisoft/luaonbeans/commit/81a56cd76223f40541149489b7a296dc9e5ba975))
+* Remove useless routes (debug) ([bfa09b9](https://github.com/solisoft/luaonbeans/commit/bfa09b964f964dccf7cbcdfe766a211f6acbe59a))
+* update documentation ([1a6c5d9](https://github.com/solisoft/luaonbeans/commit/1a6c5d91c6c83c02b8ea9f2c0ddcd029aa6e29d0))
+
 ## [0.6.0](https://github.com/solisoft/luaonbeans/compare/v0.5.0...v0.6.0) (2024-06-22)
 
 

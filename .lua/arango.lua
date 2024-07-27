@@ -14,7 +14,7 @@ local function Api_run(path, method, params, headers)
         Api_url(path),
         {
           method = method,
-          body = EncodeJson(params),
+          body = EncodeJson(params) or "",
           headers = table.append({ ["Authorization"] = "bearer " .. ArangoJWT }, headers)
         }
       )

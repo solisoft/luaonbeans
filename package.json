@@ -1,0 +1,10 @@
+{
+  "name": "luaonbeans",
+  "version": "1.0.0",
+  "description": "A tiny [redbean](https://redbean.dev/) MVC Lua framework",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "tailwindcss": "^3.4.7"
+  }
+}

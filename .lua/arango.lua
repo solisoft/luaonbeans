@@ -18,7 +18,6 @@ local function Api_run(path, method, params, headers)
           headers = table.append({ ["Authorization"] = "bearer " .. ArangoJWT }, headers)
         }
       )
-
   return DecodeJson(body), ok, h
 end
 

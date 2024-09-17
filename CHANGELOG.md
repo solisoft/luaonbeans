@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.8.0](https://github.com/solisoft/luaonbeans/compare/v0.7.0...v0.8.0) (2024-09-03)
+
+
+### Features
+
+* add tailwindcss as local dependency ([e91fe52](https://github.com/solisoft/luaonbeans/commit/e91fe52d55a37dd2aadd990ceaefd7e17e9b448a))
+* add tailwindcss as local dependency ([f3183ed](https://github.com/solisoft/luaonbeans/commit/f3183edd8be9ba198f2b30d9fcc362b1db659a92))
+
+
+### Bug Fixes
+
+* remove a warning in linter ([b593f82](https://github.com/solisoft/luaonbeans/commit/b593f82b970b90f5f3bfa84f78f57b756f9b78e4))
+
 ## [0.7.0](https://github.com/solisoft/luaonbeans/compare/v0.6.0...v0.7.0) (2024-07-09)
 
 

@@ -31,6 +31,10 @@ return {
           type = "collection", -- collection or member -- customers#ban
         })
 
+        Resource("books", {
+          only = { "index" },
+        })
+
         -- print(EncodeJson(Routes))
         expect.equal(Routes["GET"]["customers"][""], "customers#index")
         expect.equal(Routes["GET"]["customers"]["new"], "customers#new")
@@ -57,6 +61,9 @@ return {
         expect.equal(Routes["GET"]["customers"][":var"]["comments"][":var"]["likes"][":var"]["edit"], "likes#edit")
         expect.equal(Routes["POST"]["customers"][":var"]["comments"][":var"]["likes"][""], "likes#create")
         expect.equal(Routes["DELETE"]["customers"][":var"]["comments"][":var"]["likes"][":var"][""], "likes#delete")
+
+        expect.equal(Routes["GET"]["books"][""], "books#index")
+        expect.equal(Routes["GET"]["books"][":var"][""], nil)
       end)
     end)
   end

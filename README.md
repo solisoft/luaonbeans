@@ -18,27 +18,13 @@ Then configure the `config/database.json` file
 
 Then run `./luaonbeans.org -D .` ; You should be able to open : [http://localhost:8080](http://localhost:8080)
 
-Create a `beans` alias for your favorite shell
-
-```sh
-alias beans="./luaonbeans.org -i beans"
-```
-
 ## Running tests
-
-First you need to launch the server in test mode
-
-```sh
-BEANS_ENV=test ./luaonbeans.org -D .
-```
-
-Then simply run
 
 ```sh
 beans specs
 ```
 
-Shoud return somthing similar
+Shoud return something similar
 
 ```text
 Setup test DB

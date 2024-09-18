@@ -53,3 +53,13 @@ Routes = { ["GET"] = { [""] = "welcome#index" } } --define root
 -- -- GET /customers/:customer_id/comments/:comment_id/likes/:like_id/edit  -- likes#edit
 -- -- PUT /customers/:customer_id/comments/:comment_id/likes/:like_id       -- likes#update
 -- -- DELETE /customers/:customer_id/comments/:comment_id/likes/:like_id    -- likes#delete
+
+-- Resource("books", {
+--   var_name = "book_id",
+--   var_regex = "([0-9a-zA-Z_\\-]+)",
+--   parent = { "customers" },
+--   only = { "index", "show" },
+-- })
+-- -- Will generate :
+-- -- GET /customers/:customer_id/books                   -- books#index
+-- -- GET /customers/:customer_id/books/:book_id       -- books#show

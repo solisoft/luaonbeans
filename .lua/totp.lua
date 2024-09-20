@@ -2,7 +2,7 @@
 
 local alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
 
-function getTimeCounter(offset)
+local function getTimeCounter(offset)
     local current_time = os.time() + (offset or 0)
     return math.floor(current_time / 30)
 end
@@ -43,6 +43,24 @@ local function generateTOTP(secret, digits, time_counter)
   return string.format("%0" .. digits .. "d", otp)
 end
 
+-- Function to generate OTP recovery codes
+function GenerateOTPRecoveryCodes(secret, count)
+  -- Set default count to 10 if not provided
+  count = count or 10
+  -- Initialize an empty table to store recovery codes
+  local codes = {}
+  -- Generate 'count' number of recovery codes
+  for i = 1, count do
+    -- Generate a TOTP code for each recovery code
+    -- Uses a time offset to ensure uniqueness:
+    -- Starts from (0 - count * 60) seconds in the past
+    -- and moves forward by 30 seconds for each code
+    codes[i] = generateTOTP(secret, 6, getTimeCounter(0 - count * 60 + i * 30))
+  end
+  -- Return the generated recovery codes
+  return codes
+end
+
 -- Function to validate a user-provided TOTP
 function ValidateTOTP(secret, user_otp, digits)
   local time_steps = {-1, 0, 1}  -- Time windows to check (previous, current, next)
@@ -59,8 +77,11 @@ function ValidateTOTP(secret, user_otp, digits)
   return false  -- Invalid TOTP
 end
 
+-- Function to generate an OTP Auth URI
 function OTPAuth(secret, issuer, account)
+  -- Encode the secret in Base32
   local base32_secret = EncodeBase32(secret, alphabet)
+  -- Return the formatted OTP Auth URI
   return string.format(
     "otpauth://totp/%s:%s?secret=%s&issuer=%s&digits=6&period=30",
     issuer, account, base32_secret, issuer

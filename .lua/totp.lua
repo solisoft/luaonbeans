@@ -44,7 +44,7 @@ local function generateTOTP(secret, digits, time_counter)
 end
 
 -- Function to generate OTP recovery codes
-function GenerateOTPRecoveryCodes(secret, count)
+local function GenerateOTPRecoveryCodes(secret, count)
   -- Set default count to 10 if not provided
   count = count or 10
   -- Initialize an empty table to store recovery codes
@@ -62,7 +62,7 @@ function GenerateOTPRecoveryCodes(secret, count)
 end
 
 -- Function to validate a user-provided TOTP
-function ValidateTOTP(secret, user_otp, digits)
+local function ValidateTOTP(secret, user_otp, digits)
   local time_steps = {-1, 0, 1}  -- Time windows to check (previous, current, next)
 
   for _, step in ipairs(time_steps) do
@@ -78,7 +78,7 @@ function ValidateTOTP(secret, user_otp, digits)
 end
 
 -- Function to generate an OTP Auth URI
-function OTPAuth(secret, issuer, account)
+local function OTPAuth(secret, issuer, account)
   -- Encode the secret in Base32
   local base32_secret = EncodeBase32(secret, alphabet)
   -- Return the formatted OTP Auth URI
@@ -87,6 +87,12 @@ function OTPAuth(secret, issuer, account)
     issuer, account, base32_secret, issuer
   )
 end
+
+return {
+  GenerateOTPRecoveryCodes = GenerateOTPRecoveryCodes,
+  ValidateTOTP = ValidateTOTP,
+  OTPAuth = OTPAuth,
+}
 
 -- Example usage:
 -- local secret = "JBSWY3DPEHPK3PXP"  -- Example Base32 secret (replace with your own)

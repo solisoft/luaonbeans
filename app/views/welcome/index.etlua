@@ -2,12 +2,12 @@
 <h1 class="mb-5">A new blazing fast MVC framework for Lua, <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a></h1>
 
 <p>
-  Welcome to Lua on Beans, a cutting-edge MVC framework designed for Lua and redbean.dev! This powerful yet lightweight framework combines the simplicity of Lua with the robustness of redbean.dev to deliver an exceptional development experience.
+  Welcome to Lua on Beans, a cutting-edge MVC framework designed for Lua and <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>! This powerful yet lightweight framework combines the simplicity of Lua with the robustness of redbean.dev to deliver an exceptional development experience.
 </p>
 
 <h2 class="text-xl font-semibold mt-4 mb-2">Key Features:</h2>
 <ul class="list-disc list-inside mb-4">
-  <li><strong>Blazing Fast Performance:</strong> Built on Lua and redbean.dev for optimal speed</li>
+  <li><strong>Blazing Fast Performance:</strong> Built on Lua and <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a> for optimal speed</li>
   <li><strong>Easy Deployment:</strong> Single-file distribution makes deployment a breeze</li>
   <li><strong>Scalability:</strong> Create complex applications with ease</li>
   <li><strong>Intuitive MVC Architecture:</strong> Organize your code efficiently</li>
@@ -15,7 +15,7 @@
 </ul>
 
 <p class="mb-4">
-  Whether you're building a simple website or a complex web application, Lua on Beans provides the tools and structure you need to bring your ideas to life. With its seamless integration of Lua's simplicity and redbean.dev's power, you'll be able to develop and deploy your projects faster than ever before.
+  Whether you're building a simple website or a complex web application, Lua on Beans provides the tools and structure you need to bring your ideas to life. With its seamless integration of Lua's simplicity and <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>'s power, you'll be able to develop and deploy your projects faster than ever before.
 </p>
 
 
@@ -37,10 +37,10 @@
 
 <div class="flex flex-col md:flex-row gap-6 mt-10">
   <div class="md:w-1/2">
-    <h2 class="text-xl font-semibold mb-3">Why We Chose redbean.dev</h2>
+    <h2 class="text-xl font-semibold mb-3">Why We Chose <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a></h2>
 
     <p class="mb-4">
-      At the core of Lua on Beans lies redbean.dev, a remarkable web server that brings numerous advantages to our framework. Here's why we chose redbean.dev:
+      At the core of Lua on Beans lies <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>, a remarkable web server that brings numerous advantages to our framework. Here's why we chose redbean.dev:
     </p>
 
     <ul class="list-disc list-inside mb-4">
@@ -58,7 +58,7 @@
     </ul>
 
     <p class="mb-4">
-      By leveraging redbean.dev, Lua on Beans inherits these powerful features, enabling developers to create efficient, secure, and easily deployable web applications. The synergy between Lua's simplicity and redbean.dev's capabilities forms the foundation of our framework's strength and flexibility.
+      By leveraging <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>, Lua on Beans inherits these powerful features, enabling developers to create efficient, secure, and easily deployable web applications. The synergy between Lua's simplicity and redbean.dev's capabilities forms the foundation of our framework's strength and flexibility.
     </p>
   </div>
 </div>

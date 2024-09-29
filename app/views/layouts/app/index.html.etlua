@@ -70,7 +70,7 @@
 
 
 <body class="min-h-screen flex flex-col">
-	<div class="container mx-auto px-10">
+	<div class="container mx-auto">
 		<%- Partial("header") %>
 		<div class="grow mb-10 bg-white shadow rounded p-5 text-black">@yield</div>
 		<%- Partial("footer") %>

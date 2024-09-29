@@ -16,7 +16,12 @@ function Page(view, layout, bindVarsView, bindVarsLayout)
   layout = Etlua.compile(Layouts["app/views/layouts/" .. layout .. "/index.html.etlua"])(bindVarsLayout or {})
   view = Etlua.compile(Views["app/views/" .. view .. ".etlua"])(bindVarsView or {})
 
-  local content = layout:gsub("@yield", view)
+  local content
+  if view:find("%%") then
+    content = layout:gsub("@yield", view:gsub("%%", "%%%%"))
+  else
+    content = layout:gsub("@yield", view)
+  end
   local etag = EncodeBase64(Md5(content))
 
   if etag == GetHeader("If-None-Match") then

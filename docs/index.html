@@ -12,14 +12,71 @@
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 </head>
+
+<style>
+  .starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+
+  }
+
+  .star {
+    position: absolute;
+    background-color: #fff;
+    width: 8px;
+    height: 8px;
+    opacity: 0;
+		border-radius: 50%;
+    animation: starTravel 5s linear infinite;
+  }
+
+  @keyframes starTravel {
+    0% {
+      transform: translateZ(0) scale(0.1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateZ(1000px) scale(1);
+      opacity: 0;
+    }
+  }
+</style>
+
+<div class="starfield"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const starfield = document.querySelector('.starfield');
+    const numStars = 800; // Increased number of stars
+
+    for (let i = 0; i < numStars; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.animationDuration = `${Math.random() * 3 + 2}s`; // Varied animation duration
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      starfield.appendChild(star);
+    }
+  });
+</script>
+
+
 <body class="min-h-screen flex flex-col">
 	<div class="container mx-auto px-10">
 		<header class="py-6">
 	<h1 class="text-4xl p-0">Lua on Beans</h1>
 </header>
 
-		<div class="grow mb-10 bg-white shadow rounded p-5 text-black">
-<h1 class="mb-5">A new blazing fast MVC framework for Lua, <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a></h1>
+		<div class="grow mb-10 bg-white shadow rounded p-5 text-black"><h1 class="mb-5">A new blazing fast MVC framework for Lua, <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a></h1>
 
 <p>
   Welcome to Lua on Beans, a cutting-edge MVC framework designed for Lua and <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>! This powerful yet lightweight framework combines the simplicity of Lua with the robustness of redbean.dev to deliver an exceptional development experience.

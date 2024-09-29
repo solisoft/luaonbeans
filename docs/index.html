@@ -1,1169 +1,281 @@
-<!doctype html>
+
+<!DOCTYPE HTML>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>
-      [Lua on Beans] micro MVC framework for redbean.dev &amp; arangodb
-    </title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="a New MVC framework based on redbean.dev and arangoDB"
-    />
-    <script
-      src="https://unpkg.com/htmx.org@1.9.10"
-      integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
-      crossorigin="anonymous"
-    ></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&family=Open+Sans:wght@400;700&family=Rubik+Doodle+Shadow&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/layouts/app/css.css?1706137666" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-    <script>
-      hljs.initHighlightingOnLoad();
-    </script>
-    <style>
-      /*
-    ! tailwindcss v3.4.0 | MIT License | https://tailwindcss.com
-    */
-
-      /*
-    1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
-    2. Allow adding a border to an element by just adding a border-width. (https://github.com/tailwindcss/tailwindcss/pull/116)
-    */
-
-      *,
-      ::before,
-      ::after {
-        box-sizing: border-box;
-        /* 1 */
-        border-width: 0;
-        /* 2 */
-        border-style: solid;
-        /* 2 */
-        border-color: #e5e7eb;
-        /* 2 */
-      }
-
-      ::before,
-      ::after {
-        --tw-content: "";
-      }
-
-      /*
-    1. Use a consistent sensible line-height in all browsers.
-    2. Prevent adjustments of font size after orientation changes in iOS.
-    3. Use a more readable tab size.
-    4. Use the user's configured `sans` font-family by default.
-    5. Use the user's configured `sans` font-feature-settings by default.
-    6. Use the user's configured `sans` font-variation-settings by default.
-    7. Disable tap highlights on iOS
-    */
-
-      html,
-      :host {
-        line-height: 1.5;
-        /* 1 */
-        -webkit-text-size-adjust: 100%;
-        /* 2 */
-        -moz-tab-size: 4;
-        /* 3 */
-        -o-tab-size: 4;
-        tab-size: 4;
-        /* 3 */
-        font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-          "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-        /* 4 */
-        font-feature-settings: normal;
-        /* 5 */
-        font-variation-settings: normal;
-        /* 6 */
-        -webkit-tap-highlight-color: transparent;
-        /* 7 */
-      }
-
-      /*
-    1. Remove the margin in all browsers.
-    2. Inherit line-height from `html` so users can set them as a class directly on the `html` element.
-    */
-
-      body {
-        margin: 0;
-        /* 1 */
-        line-height: inherit;
-        /* 2 */
-      }
-
-      /*
-    1. Add the correct height in Firefox.
-    2. Correct the inheritance of border color in Firefox. (https://bugzilla.mozilla.org/show_bug.cgi?id=190655)
-    3. Ensure horizontal rules are visible by default.
-    */
-
-      hr {
-        height: 0;
-        /* 1 */
-        color: inherit;
-        /* 2 */
-        border-top-width: 1px;
-        /* 3 */
-      }
-
-      /*
-    Add the correct text decoration in Chrome, Edge, and Safari.
-    */
-
-      abbr:where([title]) {
-        -webkit-text-decoration: underline dotted;
-        text-decoration: underline dotted;
-      }
-
-      /*
-    Remove the default font size and weight for headings.
-    */
-
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        font-size: inherit;
-        font-weight: inherit;
-      }
-
-      /*
-    Reset links to optimize for opt-in styling instead of opt-out.
-    */
-
-      a {
-        color: inherit;
-        text-decoration: inherit;
-      }
-
-      /*
-    Add the correct font weight in Edge and Safari.
-    */
-
-      b,
-      strong {
-        font-weight: bolder;
-      }
-
-      /*
-    1. Use the user's configured `mono` font-family by default.
-    2. Use the user's configured `mono` font-feature-settings by default.
-    3. Use the user's configured `mono` font-variation-settings by default.
-    4. Correct the odd `em` font sizing in all browsers.
-    */
-
-      code,
-      kbd,
-      samp,
-      pre {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-          "Liberation Mono", "Courier New", monospace;
-        /* 1 */
-        font-feature-settings: normal;
-        /* 2 */
-        font-variation-settings: normal;
-        /* 3 */
-        font-size: 1em;
-        /* 4 */
-      }
-
-      /*
-    Add the correct font size in all browsers.
-    */
-
-      small {
-        font-size: 80%;
-      }
-
-      /*
-    Prevent `sub` and `sup` elements from affecting the line height in all browsers.
-    */
-
-      sub,
-      sup {
-        font-size: 75%;
-        line-height: 0;
-        position: relative;
-        vertical-align: baseline;
-      }
-
-      sub {
-        bottom: -0.25em;
-      }
-
-      sup {
-        top: -0.5em;
-      }
-
-      /*
-    1. Remove text indentation from table contents in Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=999088, https://bugs.webkit.org/show_bug.cgi?id=201297)
-    2. Correct table border color inheritance in all Chrome and Safari. (https://bugs.chromium.org/p/chromium/issues/detail?id=935729, https://bugs.webkit.org/show_bug.cgi?id=195016)
-    3. Remove gaps between table borders by default.
-    */
-
-      table {
-        text-indent: 0;
-        /* 1 */
-        border-color: inherit;
-        /* 2 */
-        border-collapse: collapse;
-        /* 3 */
-      }
-
-      /*
-    1. Change the font styles in all browsers.
-    2. Remove the margin in Firefox and Safari.
-    3. Remove default padding in all browsers.
-    */
-
-      button,
-      input,
-      optgroup,
-      select,
-      textarea {
-        font-family: inherit;
-        /* 1 */
-        font-feature-settings: inherit;
-        /* 1 */
-        font-variation-settings: inherit;
-        /* 1 */
-        font-size: 100%;
-        /* 1 */
-        font-weight: inherit;
-        /* 1 */
-        line-height: inherit;
-        /* 1 */
-        color: inherit;
-        /* 1 */
-        margin: 0;
-        /* 2 */
-        padding: 0;
-        /* 3 */
-      }
-
-      /*
-    Remove the inheritance of text transform in Edge and Firefox.
-    */
-
-      button,
-      select {
-        text-transform: none;
-      }
-
-      /*
-    1. Correct the inability to style clickable types in iOS and Safari.
-    2. Remove default button styles.
-    */
-
-      button,
-      [type="button"],
-      [type="reset"],
-      [type="submit"] {
-        -webkit-appearance: button;
-        /* 1 */
-        background-color: transparent;
-        /* 2 */
-        background-image: none;
-        /* 2 */
-      }
-
-      /*
-    Use the modern Firefox focus style for all focusable elements.
-    */
-
-      :-moz-focusring {
-        outline: auto;
-      }
-
-      /*
-    Remove the additional `:invalid` styles in Firefox. (https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737)
-    */
-
-      :-moz-ui-invalid {
-        box-shadow: none;
-      }
-
-      /*
-    Add the correct vertical alignment in Chrome and Firefox.
-    */
-
-      progress {
-        vertical-align: baseline;
-      }
-
-      /*
-    Correct the cursor style of increment and decrement buttons in Safari.
-    */
-
-      ::-webkit-inner-spin-button,
-      ::-webkit-outer-spin-button {
-        height: auto;
-      }
-
-      /*
-    1. Correct the odd appearance in Chrome and Safari.
-    2. Correct the outline style in Safari.
-    */
-
-      [type="search"] {
-        -webkit-appearance: textfield;
-        /* 1 */
-        outline-offset: -2px;
-        /* 2 */
-      }
-
-      /*
-    Remove the inner padding in Chrome and Safari on macOS.
-    */
-
-      ::-webkit-search-decoration {
-        -webkit-appearance: none;
-      }
-
-      /*
-    1. Correct the inability to style clickable types in iOS and Safari.
-    2. Change font properties to `inherit` in Safari.
-    */
-
-      ::-webkit-file-upload-button {
-        -webkit-appearance: button;
-        /* 1 */
-        font: inherit;
-        /* 2 */
-      }
-
-      /*
-    Add the correct display in Chrome and Safari.
-    */
-
-      summary {
-        display: list-item;
-      }
-
-      /*
-    Removes the default spacing and border for appropriate elements.
-    */
-
-      blockquote,
-      dl,
-      dd,
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6,
-      hr,
-      figure,
-      p,
-      pre {
-        margin: 0;
-      }
-
-      fieldset {
-        margin: 0;
-        padding: 0;
-      }
-
-      legend {
-        padding: 0;
-      }
-
-      ol,
-      ul,
-      menu {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      /*
-    Reset default styling for dialogs.
-    */
-
-      dialog {
-        padding: 0;
-      }
-
-      /*
-    Prevent resizing textareas horizontally by default.
-    */
-
-      textarea {
-        resize: vertical;
-      }
-
-      /*
-    1. Reset the default placeholder opacity in Firefox. (https://github.com/tailwindlabs/tailwindcss/issues/3300)
-    2. Set the default placeholder color to the user's configured gray 400 color.
-    */
-
-      input::-moz-placeholder,
-      textarea::-moz-placeholder {
-        opacity: 1;
-        /* 1 */
-        color: #9ca3af;
-        /* 2 */
-      }
-
-      input::placeholder,
-      textarea::placeholder {
-        opacity: 1;
-        /* 1 */
-        color: #9ca3af;
-        /* 2 */
-      }
-
-      /*
-    Set the default cursor for buttons.
-    */
-
-      button,
-      [role="button"] {
-        cursor: pointer;
-      }
-
-      /*
-    Make sure disabled buttons don't get the pointer cursor.
-    */
-
-      :disabled {
-        cursor: default;
-      }
-
-      /*
-    1. Make replaced elements `display: block` by default. (https://github.com/mozdevs/cssremedy/issues/14)
-    2. Add `vertical-align: middle` to align replaced elements more sensibly by default. (https://github.com/jensimmons/cssremedy/issues/14#issuecomment-634934210)
-       This can trigger a poorly considered lint error in some tools but is included by design.
-    */
-
-      img,
-      svg,
-      video,
-      canvas,
-      audio,
-      iframe,
-      embed,
-      object {
-        display: block;
-        /* 1 */
-        vertical-align: middle;
-        /* 2 */
-      }
-
-      /*
-    Constrain images and videos to the parent width and preserve their intrinsic aspect ratio. (https://github.com/mozdevs/cssremedy/issues/14)
-    */
-
-      img,
-      video {
-        max-width: 100%;
-        height: auto;
-      }
-
-      /* Make elements with the HTML hidden attribute stay hidden by default */
-
-      [hidden] {
-        display: none;
-      }
-
-      *,
-      ::before,
-      ::after {
-        --tw-border-spacing-x: 0;
-        --tw-border-spacing-y: 0;
-        --tw-translate-x: 0;
-        --tw-translate-y: 0;
-        --tw-rotate: 0;
-        --tw-skew-x: 0;
-        --tw-skew-y: 0;
-        --tw-scale-x: 1;
-        --tw-scale-y: 1;
-        --tw-pan-x:  ;
-        --tw-pan-y:  ;
-        --tw-pinch-zoom:  ;
-        --tw-scroll-snap-strictness: proximity;
-        --tw-gradient-from-position:  ;
-        --tw-gradient-via-position:  ;
-        --tw-gradient-to-position:  ;
-        --tw-ordinal:  ;
-        --tw-slashed-zero:  ;
-        --tw-numeric-figure:  ;
-        --tw-numeric-spacing:  ;
-        --tw-numeric-fraction:  ;
-        --tw-ring-inset:  ;
-        --tw-ring-offset-width: 0px;
-        --tw-ring-offset-color: #fff;
-        --tw-ring-color: rgb(59 130 246 / 0.5);
-        --tw-ring-offset-shadow: 0 0 #0000;
-        --tw-ring-shadow: 0 0 #0000;
-        --tw-shadow: 0 0 #0000;
-        --tw-shadow-colored: 0 0 #0000;
-        --tw-blur:  ;
-        --tw-brightness:  ;
-        --tw-contrast:  ;
-        --tw-grayscale:  ;
-        --tw-hue-rotate:  ;
-        --tw-invert:  ;
-        --tw-saturate:  ;
-        --tw-sepia:  ;
-        --tw-drop-shadow:  ;
-        --tw-backdrop-blur:  ;
-        --tw-backdrop-brightness:  ;
-        --tw-backdrop-contrast:  ;
-        --tw-backdrop-grayscale:  ;
-        --tw-backdrop-hue-rotate:  ;
-        --tw-backdrop-invert:  ;
-        --tw-backdrop-opacity:  ;
-        --tw-backdrop-saturate:  ;
-        --tw-backdrop-sepia:  ;
-      }
-
-      ::backdrop {
-        --tw-border-spacing-x: 0;
-        --tw-border-spacing-y: 0;
-        --tw-translate-x: 0;
-        --tw-translate-y: 0;
-        --tw-rotate: 0;
-        --tw-skew-x: 0;
-        --tw-skew-y: 0;
-        --tw-scale-x: 1;
-        --tw-scale-y: 1;
-        --tw-pan-x:  ;
-        --tw-pan-y:  ;
-        --tw-pinch-zoom:  ;
-        --tw-scroll-snap-strictness: proximity;
-        --tw-gradient-from-position:  ;
-        --tw-gradient-via-position:  ;
-        --tw-gradient-to-position:  ;
-        --tw-ordinal:  ;
-        --tw-slashed-zero:  ;
-        --tw-numeric-figure:  ;
-        --tw-numeric-spacing:  ;
-        --tw-numeric-fraction:  ;
-        --tw-ring-inset:  ;
-        --tw-ring-offset-width: 0px;
-        --tw-ring-offset-color: #fff;
-        --tw-ring-color: rgb(59 130 246 / 0.5);
-        --tw-ring-offset-shadow: 0 0 #0000;
-        --tw-ring-shadow: 0 0 #0000;
-        --tw-shadow: 0 0 #0000;
-        --tw-shadow-colored: 0 0 #0000;
-        --tw-blur:  ;
-        --tw-brightness:  ;
-        --tw-contrast:  ;
-        --tw-grayscale:  ;
-        --tw-hue-rotate:  ;
-        --tw-invert:  ;
-        --tw-saturate:  ;
-        --tw-sepia:  ;
-        --tw-drop-shadow:  ;
-        --tw-backdrop-blur:  ;
-        --tw-backdrop-brightness:  ;
-        --tw-backdrop-contrast:  ;
-        --tw-backdrop-grayscale:  ;
-        --tw-backdrop-hue-rotate:  ;
-        --tw-backdrop-invert:  ;
-        --tw-backdrop-opacity:  ;
-        --tw-backdrop-saturate:  ;
-        --tw-backdrop-sepia:  ;
-      }
-
-      .container {
-        width: 100%;
-      }
-
-      @media (min-width: 640px) {
-        .container {
-          max-width: 640px;
-        }
-      }
-
-      @media (min-width: 768px) {
-        .container {
-          max-width: 768px;
-        }
-      }
-
-      @media (min-width: 1024px) {
-        .container {
-          max-width: 1024px;
-        }
-      }
-
-      @media (min-width: 1280px) {
-        .container {
-          max-width: 1280px;
-        }
-      }
-
-      @media (min-width: 1536px) {
-        .container {
-          max-width: 1536px;
-        }
-      }
-
-      .mx-auto {
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      .my-5 {
-        margin-top: 1.25rem;
-        margin-bottom: 1.25rem;
-      }
-
-      .flex {
-        display: flex;
-      }
-
-      .table {
-        display: table;
-      }
-
-      .grid {
-        display: grid;
-      }
-
-      .min-h-screen {
-        min-height: 100vh;
-      }
-
-      .w-full {
-        width: 100%;
-      }
-
-      .grow {
-        flex-grow: 1;
-      }
-
-      .grid-cols-2 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .flex-col {
-        flex-direction: column;
-      }
-
-      .items-center {
-        align-items: center;
-      }
-
-      .justify-center {
-        justify-content: center;
-      }
-
-      .gap-10 {
-        gap: 2.5rem;
-      }
-
-      .gap-2 {
-        gap: 0.5rem;
-      }
-
-      .gap-4 {
-        gap: 1rem;
-      }
-
-      .gap-5 {
-        gap: 1.25rem;
-      }
-
-      .rounded {
-        border-radius: 0.25rem;
-      }
-
-      .bg-black {
-        --tw-bg-opacity: 1;
-        background-color: rgb(0 0 0 / var(--tw-bg-opacity));
-      }
-
-      .bg-red-200 {
-        --tw-bg-opacity: 1;
-        background-color: rgb(254 202 202 / var(--tw-bg-opacity));
-      }
-
-      .p-3 {
-        padding: 0.75rem;
-      }
-
-      .px-2 {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-      }
-
-      .py-10 {
-        padding-top: 2.5rem;
-        padding-bottom: 2.5rem;
-      }
-
-      .py-2 {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-      }
-
-      .py-5 {
-        padding-top: 1.25rem;
-        padding-bottom: 1.25rem;
-      }
-
-      .pt-10 {
-        padding-top: 2.5rem;
-      }
-
-      .pt-5 {
-        padding-top: 1.25rem;
-      }
-
-      .text-left {
-        text-align: left;
-      }
-
-      .text-4xl {
-        font-size: 2.25rem;
-        line-height: 2.5rem;
-      }
-
-      .text-red-700 {
-        --tw-text-opacity: 1;
-        color: rgb(185 28 28 / var(--tw-text-opacity));
-      }
-
-      .text-white {
-        --tw-text-opacity: 1;
-        color: rgb(255 255 255 / var(--tw-text-opacity));
-      }
-
-      .shadow {
-        --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1),
-          0 1px 2px -1px rgb(0 0 0 / 0.1);
-        --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color),
-          0 1px 2px -1px var(--tw-shadow-color);
-        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
-          var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-      }
-
-      input[type="text"],
-      textarea {
-        width: 100%;
-        border-width: 1px;
-        --tw-border-opacity: 1;
-        border-color: rgb(58 104 126 / var(--tw-border-opacity));
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-      }
-
-      html {
-        background: #633d7d;
-        background: linear-gradient(to bottom right, #633d7d, #2867ab);
-        color: white;
-      }
-
-      input[type="submit"] {
-        border-radius: 0.25rem;
-        --tw-bg-opacity: 1;
-        background-color: rgb(0 0 0 / var(--tw-bg-opacity));
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-        padding-left: 1.25rem;
-        padding-right: 1.25rem;
-        --tw-text-opacity: 1;
-        color: rgb(255 255 255 / var(--tw-text-opacity));
-      }
-
-      h1 {
-        padding-bottom: 1.25rem;
-        font-size: 1.25rem;
-        line-height: 1.75rem;
-        font-weight: 700;
-      }
-
-      a {
-        cursor: pointer;
-        --tw-text-opacity: 1;
-        color: rgb(153 193 208 / var(--tw-text-opacity));
-      }
-
-      a:hover {
-        cursor: pointer;
-        --tw-text-opacity: 1;
-        color: rgb(58 104 126 / var(--tw-text-opacity));
-        text-decoration-line: underline;
-      }
-
-      .rubik {
-        font-family: "Jost", sans-serif;
-        font-family: "Open Sans", sans-serif;
-        font-family: "Rubik Doodle Shadow", system-ui;
-      }
-
-      code {
-        border-radius: 0.25rem;
-        --tw-bg-opacity: 1;
-        background-color: rgb(0 0 0 / var(--tw-bg-opacity));
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        padding-top: 0.25rem;
-        padding-bottom: 0.25rem;
-      }
-
-      a {
-        --tw-text-opacity: 1;
-        color: rgb(253 224 71 / var(--tw-text-opacity));
-      }
-
-      a:hover {
-        --tw-text-opacity: 1;
-        color: rgb(254 249 195 / var(--tw-text-opacity));
-      }
-
-      @media (min-width: 640px) {
-        .sm\:text-6xl {
-          font-size: 3.75rem;
-          line-height: 1;
-        }
-      }
-    </style>
-  </head>
-  <body class="flex min-h-screen flex-col">
-    <header class="my-5">
-      <div class="container mx-auto flex justify-center px-2">
-        <h1 class="rubik xs:text-5xl text-4xl sm:text-6xl">Lua on Beans</h1>
-      </div>
-    </header>
-
-    <div class="grow">
-      <div class="container mx-auto px-2 py-10">
-        <h1>Welcome aboard</h1>
-
-        <p>
-          Lua on Beans is a simple
-          <a href="https://redbean.dev" target="_blank">redbean.dev</a> tool for
-          creating fast, testable MVC applications using Lua and ArangoDB. Check
-          source code on our github repository :
-          <a href="https://github.com/solisoft/luaonbeans"
-            >https://github.com/solisoft/luaonbeans</a
-          >
-        </p>
-
-        <h1 class="pt-10">Requirements</h1>
-        <p>You just need ArangoDB running.</p>
-        <pre
-          class="py-2 shadow"
-        ><code class="language-sh">docker run -e ARANGO_RANDOM_ROOT_PASSWORD=1 -p 8529:8529 -d arangodb
-</code></pre>
-
-        <p>
-          You have to create an alias
-          <code>alias beans="./luaonbeans.org -i beans"</code> and put it in you
-          favorite shell config file.
-        </p>
-
-        <h1 class="pt-5">Getting started</h1>
-
-        <pre
-          class="py-2 shadow"
-        ><code class="language-sh">git clone https://github.com/solisoft/luaonbeans --depth=1
-cd luaonbeans
-</code></pre>
-        <p>
-          You need then to create a <code>config/database.json</code> file based
-          on <code>config/database.json.sample</code>
-        </p>
-        <p>Then create the DB</p>
-        <pre class="py-2 shadow"><code class="language-sh">beans db:setup
-</code></pre>
-        <p>You can start then the server :</p>
-        <pre class="py-2 shadow"><code class="language-sh">./luaonbeans -D .
-</code></pre>
-
-        <p>
-          You should create the server on
-          <a href="http://localhost:8080" target="_blank"
-            >http://localhost:8080</a
-          >
-        </p>
-
-        <h1 class="pt-5">Running specs</h1>
-        <pre class="py-2 shadow"><code class="language-sh">beans specs
-</code></pre>
-
-        <h1 class="pt-5">Commands</h1>
-
-        <pre
-          class="py-2 shadow"
-        ><code class="language-sh">beans create controller posts
-beans create model post
-beans create scaffold posts
-beans create migration add_indexes_to_posts
-
-beans db:setup
-beans db:migrate
-beans db:rollback
-
-beans specs</code></pre>
-
-        <h1 class="pt-5">Routes</h1>
-        <p>
-          Routes are defined in the <code>.init.lua</code> file (inside the
-          <code>OnHttpRequest()</code> method)
-        </p>
-        <pre
-          class="py-2 shadow"
-        ><code class="language-lua">-- Define a resource and create REST default routes
-Resource(&quot;posts&quot;)
--- It will create index, new, create, update, edit, show and delete routes using the right HTTP verbs
-
--- Nested CRUD
-Resource(&quot;comments&quot;, { root = &quot;/posts/:post_id&quot;, post_id = &quot;([0-9]+)&quot; })
-
--- Custom Route
-CustomRoute(&quot;GET&quot;, &quot;/posts/:post_id/offline&quot;, {
- 	post_id = &quot;([0-9]+)&quot;, controller = &quot;posts&quot;, action = &quot;offline&quot;
-})
-
--- The Root url
-if GetPath() == &quot;/&quot; then
-  Params.action = &quot;index&quot;
-  RoutePath(&quot;/controllers/welcome_controller.lua&quot;)
-end
-</code></pre>
-
-        <h1 class="pt-5">Controller</h1>
-        <p>Here a CRUD sample : controllers/posts_controller.lua</p>
-        <pre class="py-2 shadow"><code class="language-lua">post = {}
-Post = require(&quot;post&quot;)
-
-CheckCSRFToken()
-
--- A kind of before_each only: %w(edit update show) :)
-if table.contains({ &quot;edit&quot;, &quot;update&quot;, &quot;show&quot; }, Params.action) then
-  post = Post.get(Params.id)
-end
-
--- Here a method to be more DRI
-local function load_index()
-  local posts = Post.all()
-  Page(&quot;posts/index&quot;, &quot;app&quot;, { posts = posts })
-end
-
-local app = {
-  -- GET posts#index =&gt; /posts
-  index = function() load_index() end,
-
-  -- GET posts#new =&gt; /posts/new
-  new = function() Page(&quot;posts/new&quot;, &quot;app&quot;) end,
-
-  -- GET posts#show =&gt; /posts/:id
-  show = function() Page(&quot;posts/show&quot;, &quot;app&quot;, { post = post }) end,
-
-  -- GET posts#edit =&gt; /posts/:id/edit
-  edit = function() Page(&quot;posts/edit&quot;, &quot;app&quot;, { post = post }) end,
-
-  -- PUT posts#update =&gt; posts/:id
-  update = function()
-    local bodyParams = GetBodyParams()
-    local record = Post.update(Params.id, bodyParams)
-
-    if record.error then
-      Page(&quot;posts/edit&quot;, &quot;app&quot;, { post = table.merge(bodyParams, { _key = Params.id }), record = record })
-      return
-    end
-
-    RedirectTo(&quot;/posts&quot;)
-  end,
-
-  -- POST posts#create =&gt; /posts
-  create = function()
-    local bodyParams = GetBodyParams()
-    local created_post = Post.create(bodyParams)
-
-    if created_post.error then
-      SetStatus(400)
-      Page(&quot;posts/new&quot;, &quot;app&quot;, { post = bodyParams })
-      return
-    end
-
-    RedirectTo(&quot;/posts&quot;)
-  end,
-
-  -- DELETE posts#delete =&gt; /posts/:id
-  delete = function()
-    Post.destroy(Params.id)
-    load_index()
-  end,
-
-  -- GET posts#offlice =&gt; /posts/:id/offline (see custom route)
-  offline = function()
-    Write(&quot;Offline&quot;)
-  end
-}
-
-assert(app[Params.action] ~= nil, &quot;Missing method &#039;&quot; .. Params.action .. &quot;&#039;!&quot;)
-app[Params.action]()</code></pre>
-
-        <h1 class="pt-5">Views</h1>
-        <p>
-          Notice that we use <a href="https://htmx.org/">HTMx</a> but you could
-          use anything else.
-        </p>
-        <div class="grid grid-cols-2 gap-5">
-          <div>
-            views/posts/index.etlua
-            <pre
-              class="py-2 shadow"
-            ><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
-  &lt;h1&gt;##model_plural_capitalized##&lt;/h1&gt;
-
-  &lt;table class=&quot;w-full&quot;&gt;
-    &lt;thead&gt;
-      &lt;tr&gt;
-        &lt;th class=&quot;text-left&quot;&gt;Key&lt;/th&gt;
-        &lt;th class=&quot;text-left&quot;&gt;Title&lt;/th&gt;
-      &lt;/tr&gt;
-    &lt;/thead&gt;
-    &lt;tbody&gt;
-      &lt;% for _, doc in pairs(posts) do %&gt;
-        &lt;% if doc then %&gt;
-        &lt;tr&gt;
-          &lt;td&gt;&lt;%= doc._key %&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;%= doc.title %&gt;&lt;/td&gt;
-          &lt;td&gt;&lt;%= doc.text %&gt;&lt;/td&gt;
-          &lt;td&gt;
-            &lt;a href=&quot;/posts/&lt;%= doc._key %&gt;&quot;&gt;Show&lt;/a&gt; ||
-            &lt;a href=&quot;/posts/&lt;%= doc._key %&gt;/edit&quot;&gt;Edit&lt;/a&gt; ||
-            &lt;a href=&quot;#&quot; hx-target=&quot;body&quot;
-               hx-confirm=&quot;Are you sure ?&quot;
-               hx-delete=&quot;/posts/&lt;%= doc._key %&gt;&quot;&gt;
-               Destroy
-            &lt;/a&gt;
-          &lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;% end %&gt;
-      &lt;% end %&gt;
-    &lt;/tbody&gt;
-  &lt;/table&gt;
-
-  &lt;div class=&quot;pt-10&quot;&gt;
-    &lt;a href=&quot;/posts/new&quot;&gt;Create a new Post&lt;/a&gt;
-  &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-            <div>
-              views/posts/show.etlua
-              <pre
-                class="py-2 shadow"
-              ><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
-  &lt;h1&gt;Showing Post&lt;/h1&gt;
-
-  &lt;%= EncodeJson(post) %&gt;
-
-  &lt;div&gt;&lt;a href=&quot;/posts&quot;&gt;Back&lt;/a&gt;&lt;/div&gt;
-&lt;/div&gt;</code></pre>
-            </div>
-          </div>
-          <div>
-            views/posts/new.etlua
-            <pre
-              class="py-2 shadow"
-            ><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
-  &lt;h1&gt;New Post&lt;/h1&gt;
-  &lt;form action=&quot;/posts&quot; method=&quot;POST&quot;
-        class=&quot;flex flex-col gap-2&quot;&gt;
-    &lt;div class=&quot;flex gap-4 items-center&quot;&gt;
-      &lt;label for=&quot;title&quot;&gt;Title&lt;/label&gt;
-      &lt;input type=&quot;text&quot; name=&quot;title&quot; required
-             value=&quot;&lt;%= post.title or &quot;&quot; %&gt;&quot; /&gt;
-    &lt;/div&gt;
-
-    &lt;div class=&quot;pt-10 flex gap-5 items-center&quot;&gt;
-      &lt;input type=&quot;submit&quot; value=&quot;Create&quot;&gt;
-      &lt;a href=&quot;/posts&quot;&gt;Back&lt;/a&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
-&lt;/div&gt;</code></pre>
-
-            <div>
-              views/posts/edit.etlua
-              <pre
-                class="py-2 shadow"
-              ><code class="language-html">&lt;div class=&quot;container mx-auto py-10&quot;&gt;
-  &lt;h1&gt;Editing Post :&lt;/h1&gt;
-
-  &lt;form
-    action=&quot;/posts/&lt;%= post._key %&gt;&quot;
-    method=&quot;POST&quot;
-    class=&quot;flex flex-col gap-2&quot;
-    &gt;
-    &lt;div class=&quot;flex gap-4 items-center&quot;&gt;
-      &lt;label for=&quot;title&quot;&gt;Title&lt;/label&gt;
-      &lt;input type=&quot;text&quot; name=&quot;title&quot;
-             required value=&quot;&lt;%= post.title %&gt;&quot; /&gt;
-    &lt;/div&gt;
-
-    &lt;% if record then %&gt;
-      &lt;div class=&quot;bg-red-200  p-3 text-red-700 rounded&quot;&gt;
-        &lt;strong&gt;
-          Something went wrong while updating
-          the record !!
-        &lt;/strong&gt; &lt;br&gt;  &lt;%= EncodeJson(record) %&gt;
-      &lt;/div&gt;
-    &lt;% end %&gt;
-
-    &lt;div class=&quot;pt-10 flex gap-5 items-center&quot;&gt;
-      &lt;input type=&quot;submit&quot; value=&quot;Update&quot;&gt;
-      &lt;a href=&quot;/posts&quot;&gt;Back&lt;/a&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
-
-&lt;/div&gt;</code></pre>
-            </div>
-          </div>
+<head>
+	<meta charset="UTF-8">
+	<title>[Lua on Beans] micro MVC framework for redbean.dev &amp; arangodb</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="a New MVC framework based on redbean.dev and arangoDB" />
+	<link rel="stylesheet" href="/app.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body class="min-h-screen flex flex-col">
+	<div class="container mx-auto px-10">
+		<header class="py-6">
+	<h1 class="text-4xl p-0">Lua on Beans</h1>
+</header>
+
+		<div class="grow mb-10 bg-white shadow rounded p-5 text-black">
+<h1 class="mb-5">A new blazing fast MVC framework for Lua, <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a></h1>
+
+<p>
+  Welcome to Lua on Beans, a cutting-edge MVC framework designed for Lua and <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>! This powerful yet lightweight framework combines the simplicity of Lua with the robustness of redbean.dev to deliver an exceptional development experience.
+</p>
+
+<h2 class="text-xl font-semibold mt-4 mb-2">Key Features:</h2>
+<ul class="list-disc list-inside mb-4">
+  <li><strong>Blazing Fast Performance:</strong> Built on Lua and <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a> for optimal speed</li>
+  <li><strong>Easy Deployment:</strong> Single-file distribution makes deployment a breeze</li>
+  <li><strong>Scalability:</strong> Create complex applications with ease</li>
+  <li><strong>Intuitive MVC Architecture:</strong> Organize your code efficiently</li>
+  <li><strong>Extensive Documentation:</strong> Get started quickly with comprehensive guides</li>
+</ul>
+
+<p class="mb-4">
+  Whether you're building a simple website or a complex web application, Lua on Beans provides the tools and structure you need to bring your ideas to life. With its seamless integration of Lua's simplicity and <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>'s power, you'll be able to develop and deploy your projects faster than ever before.
+</p>
+
+
+<div class="bg-purple-900 border border-purple-300 rounded-lg p-4 mt-6 text-white">
+  <h3 class="text-lg font-semibold mb-2">Stay Tuned!</h3>
+  <p class="mb-3">Exciting updates and new features are coming soon. Don't miss out on the latest developments in Lua on Beans!</p>
+  <form class="flex flex-col sm:flex-row gap-2">
+    <input type="email" placeholder="Enter your email" class="flex-grow px-3 py-2 rounded text-purple-900" required>
+    <button type="submit" class="bg-gray-400 text-gray-600 font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+      Subscribe
+    </button>
+  </form>
+  <p class="text-sm italic mt-2">
+    Note: Our newsletter subscription feature is not yet active. We're working hard to bring you this functionality soon. Stay tuned for updates!
+  </p>
+
+</div>
+
+
+<div class="flex flex-col md:flex-row gap-6 mt-10">
+  <div class="md:w-1/2">
+    <h2 class="text-xl font-semibold mb-3">Why We Chose <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a></h2>
+
+    <p class="mb-4">
+      At the core of Lua on Beans lies <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>, a remarkable web server that brings numerous advantages to our framework. Here's why we chose redbean.dev:
+    </p>
+
+    <ul class="list-disc list-inside mb-4">
+      <li><strong>Single-file distribution:</strong> Simplifies deployment and reduces complexity</li>
+      <li><strong>Embedded Lua support:</strong> Allows seamless integration with our Lua-based framework</li>
+      <li><strong>High performance:</strong> Delivers exceptional speed for web applications</li>
+    </ul>
+  </div>
+
+  <div class="md:w-1/2">
+    <ul class="list-disc list-inside mb-4">
+      <li><strong>Cross-platform compatibility:</strong> Runs on various operating systems without modification</li>
+      <li><strong>Built-in security features:</strong> Provides robust protection out of the box</li>
+      <li><strong>Low resource consumption:</strong> Ideal for both small projects and large-scale applications</li>
+    </ul>
+
+    <p class="mb-4">
+      By leveraging <a href="https://redbean.dev" target="_blank" rel="noopener noreferrer">redbean.dev</a>, Lua on Beans inherits these powerful features, enabling developers to create efficient, secure, and easily deployable web applications. The synergy between Lua's simplicity and redbean.dev's capabilities forms the foundation of our framework's strength and flexibility.
+    </p>
+  </div>
+</div>
+
+<div class="mt-10 bg-purple-900 border border-purple-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Frontend Technologies: TailwindCSS and Riot.js</h2>
+
+  <div class="flex flex-col md:flex-row gap-6">
+    <div class="md:w-1/2">
+      <h3 class="text-lg font-semibold mb-2">TailwindCSS</h3>
+      <p class="mb-4">
+        Lua on Beans leverages TailwindCSS for rapid and flexible UI development:
+      </p>
+      <ul class="list-disc list-inside mb-4">
+        <li>Utility-first approach for quick styling</li>
+        <li>Highly customizable design system</li>
+        <li>Responsive layouts with ease</li>
+        <li>Optimized production builds</li>
+      </ul>
+    </div>
+
+    <div class="md:w-1/2">
+      <h3 class="text-lg font-semibold mb-2">Riot.js</h3>
+      <p class="mb-4">
+        We've integrated Riot.js for component-based frontend development:
+      </p>
+      <ul class="list-disc list-inside mb-4">
+        <li>Simple and lightweight component syntax</li>
+        <li>Seamless integration with Lua backend</li>
+        <li>Virtual DOM for efficient updates</li>
+        <li>Small learning curve for rapid development</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="mt-4">
+    The combination of TailwindCSS and Riot.js empowers developers to create responsive, component-driven user interfaces that integrate smoothly with Lua on Beans' backend capabilities. This tech stack ensures a modern, efficient, and enjoyable development experience for both frontend and backend aspects of your web applications.
+  </p>
+</div>
+
+<div class="mt-10">
+  <h2 class="text-xl font-semibold mb-3">Supported Databases</h2>
+
+  <p class="mb-4">
+    Lua on Beans offers versatile database support, allowing developers to choose the best solution for their project needs:
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">ArangoDB</h3>
+          <p>Multi-model database for document, graph, and key-value data.</p>
         </div>
-
-        <h1 class="pt-5">Model</h1>
-        models/post.lua
-        <pre class="py-2 shadow"><code class="language-lua">return {
-  all = function()
-    return Adb.Aql(&quot;FOR post IN posts SORT post._key ASC RETURN post&quot;).result
-  end,
-
-  get = function(key)
-    return Adb.GetDocument(&quot;posts/&quot; .. key)
-  end,
-
-  create = function(dataset)
-    return Adb.CreateDocument(&quot;posts&quot;, dataset)
-  end,
-
-  update = function(key, dataset)
-    return Adb.UpdateDocument(&quot;posts/&quot; .. key, dataset)
-  end,
-
-  destroy = function(key)
-    return Adb.DeleteDocument(&quot;posts/&quot; .. key)
-  end
-}</code></pre>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/arangodb-logo.svg" alt="ArangoDB Logo" class="w-32 h-auto p-2">
+        </div>
       </div>
     </div>
-    <footer class="bg-black py-5 text-white">
-      <div class="container mx-auto flex justify-center">
-        Lua on Beans - Licence MIT -
+
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">Redis</h3>
+          <p>In-memory data structure store, used as a database, cache, and message broker.</p>
+        </div>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/redis-logo.svg" alt="Redis Logo" class="w-32 h-auto p-2">
+        </div>
       </div>
-    </footer>
-  </body>
+    </div>
+
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">SQLite</h3>
+          <p>Lightweight, serverless, and self-contained SQL database engine.</p>
+        </div>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/sqlite-logo.webp" alt="SQLite Logo" class="w-32 h-auto p-2">
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">SurrealDB</h3>
+          <p>Multi-model database with support for document, graph, and relational data.</p>
+        </div>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/surrealdb-logo.png" alt="SurrealDB Logo" class="w-32 h-auto">
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-semibold mb-2">DB2REST</h3>
+      <p>REST API provider for:</p>
+      <ul class="list-disc list-inside">
+        <li>MongoDB</li>
+        <li>PostgreSQL</li>
+        <li>MySQL/MariaDB</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="mt-4">
+    This wide range of database options ensures that Lua on Beans can adapt to various project requirements, from simple applications to complex, data-intensive systems.
+  </p>
+</div>
+
+<div class="mt-10 bg-purple-900 border border-purple-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Trusted by Industry Giants*</h2>
+
+  <p class="mb-4 italic text-sm">*Well, not really... yet!</p>
+
+  <p class="mt-6 text-center text-sm">
+    Okay, we admit it. These tech giants aren't using Lua on Beans... yet! But hey, a framework can dream, right?
+    In the meantime, why not be the trailblazer and add your logo here by building something awesome with Lua on Beans?
+  </p>
+</div>
+
+<div class="mt-10 bg-blue-900 border border-blue-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Built-in Features</h2>
+
+  <p class="mb-4">Lua on Beans comes packed with powerful features to accelerate your development:</p>
+
+  <ul class="list-disc list-inside space-y-2">
+    <li>
+      <span class="font-semibold">Two-Factor Authentication (2FA):</span>
+      Enhance security with built-in Google Authenticator TOTP support.
+    </li>
+    <li>
+      <span class="font-semibold">Dynamic Views with eTLua:</span>
+      Create flexible and efficient templates using embedded Lua.
+    </li>
+    <li>
+      <span class="font-semibold">Scalable Routing:</span>
+      Handle millions of route definitions effortlessly for large-scale applications.
+    </li>
+    <li>
+      <span class="font-semibold">Automatic Swagger Documentation:</span>
+      Generate API documentation automatically based on comments before actions.
+    </li>
+    <li>
+      <span class="font-semibold">Easy REST API Creation:</span>
+      Quickly build and deploy RESTful APIs with minimal configuration.
+    </li>
+  </ul>
+
+  <p class="mt-4">
+    These features are designed to streamline your development process, enhance security, and improve the overall quality of your applications.
+  </p>
+</div>
+<div class="mt-10 bg-gray-900 border border-gray-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Open Source and Community-Driven</h2>
+
+  <p class="mb-4">Lua on Beans is an open-source project, and we believe in the power of community collaboration. We welcome contributions, feedback, and ideas from developers around the world.</p>
+
+  <p class="mb-4">Visit our GitHub repository to explore the code, report issues, or contribute to the project:</p>
+
+  <div class="flex flex-col items-center justify-center">
+    <a href="https://github.com/solisoft/luaonbeans" target="_blank" rel="noopener noreferrer" class="inline-block bg-white text-gray-900 font-semibold py-2 px-4 rounded hover:bg-gray-200 transition duration-300 mb-4">
+      <i class="fab fa-github mr-2"></i>Lua on Beans on GitHub
+    </a>
+    <div>
+      <a href="https://github.com/solisoft/luaonbeans/stargazers" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded hover:bg-yellow-300 transition duration-300">
+        <i class="fas fa-star mr-2"></i>
+        <span id="github-stars">Loading...</span> Stars
+      </a>
+    </div>
+
+    <script>
+      fetch('https://api.github.com/repos/solisoft/luaonbeans')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('github-stars').textContent = data.stargazers_count;
+        })
+        .catch(error => {
+          console.error('Error fetching GitHub stars:', error);
+          document.getElementById('github-stars').textContent = 'N/A';
+        });
+    </script>
+  </div>
+
+  <p class="mt-4">
+    By participating in the Lua on Beans community, you can help shape the future of this framework and contribute to its growth. Whether you're a seasoned developer or just starting out, your input is valuable to us!
+  </p>
+</div>
+</div>
+		<footer class="bg-black text-white py-5 rounded-lg">
+	<div class="container mx-auto flex justify-center">
+		Lua on Beans - Licence MIT -
+	</div>
+</footer>
+
+	</div>
+</body>
 </html>

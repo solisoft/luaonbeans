@@ -29,14 +29,10 @@ h1 {
   @apply text-xl font-bold;
 }
 
-a {
-  @apply cursor-pointer text-[#99C1D0] hover:cursor-pointer hover:text-[#3A687E] hover:underline;
-}
-
 code {
   @apply rounded bg-slate-800 px-2 py-1 text-white;
 }
 
 a {
-  @apply text-purple-300 hover:text-yellow-100;
+  @apply text-purple-400 hover:text-blue-900;
 }

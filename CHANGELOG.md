@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.9.0](https://github.com/solisoft/luaonbeans/compare/v0.8.0...v0.9.0) (2024-09-29)
+
+
+### Features
+
+* add totp feature ([c49b4f9](https://github.com/solisoft/luaonbeans/commit/c49b4f9e75c2c140817224dae4e9fd5169b240c5))
+* OTP ([a743a7e](https://github.com/solisoft/luaonbeans/commit/a743a7ee31c3d13b7fddb202d4d588237c749599))
+* OTP =&gt; Generate recoverable codes ([8c084ab](https://github.com/solisoft/luaonbeans/commit/8c084ab52b5bc5cba6d5e5c80d0b0e76df9c7b42))
+
 ## [0.8.0](https://github.com/solisoft/luaonbeans/compare/v0.7.0...v0.8.0) (2024-09-03)
 
 

@@ -1,0 +1,21 @@
+{
+	"development": {
+		"db_name": "luaonbeans_dev",
+		"url": "http://127.0.0.1:8529",
+		"username": "root",
+		"password": "password"
+	},
+	"production": {
+		"db_name": "luaonbeans",
+		"url": "http://127.0.0.1:8529",
+		"username": "root",
+		"password": "password"
+	},
+	"test": {
+		"db_name": "luaonbeans_test",
+		"url": "http://127.0.0.1:8529",
+		"username": "root",
+		"password": "password"
+	},
+	"engine": "surrealdb"
+}

@@ -27,5 +27,12 @@ services:
       - arangodb-data:/var/lib/arangodb3
       - ./foxx:/var/lib/arangodb3-apps
 
+  db2rest:
+    env_file:
+      - .env
+    image: kdhrubo/db2rest:latest
+    ports:
+      - 7070:8080
+
 volumes:
   arangodb-data:

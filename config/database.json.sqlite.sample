@@ -1,0 +1,12 @@
+{
+	"development": {
+		"db_file": "luaonbeans_dev.sqlite3"
+	},
+	"production": {
+		"db_file": "luaonbeans_production.sqlite3"
+	},
+	"test": {
+		"db_file": "luaonbeans_test.sqlite3"
+	},
+	"engine": "sqlite"
+}

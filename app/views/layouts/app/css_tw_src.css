@@ -26,23 +26,17 @@ input[type="submit"] {
 }
 
 h1 {
-  @apply pb-5 text-xl font-bold;
+  @apply text-xl font-bold;
 }
 
 a {
   @apply cursor-pointer text-[#99C1D0] hover:cursor-pointer hover:text-[#3A687E] hover:underline;
 }
 
-.rubik {
-  font-family: "Jost", sans-serif;
-  font-family: "Open Sans", sans-serif;
-  font-family: "Rubik Doodle Shadow", system-ui;
-}
-
 code {
-  @apply rounded bg-black px-2 py-1;
+  @apply rounded bg-slate-800 px-2 py-1 text-white;
 }
 
 a {
-  @apply text-yellow-300 hover:text-yellow-100;
+  @apply text-purple-300 hover:text-yellow-100;
 }

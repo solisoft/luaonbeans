@@ -259,6 +259,9 @@ function InitDB(db_config)
     Adb = require("arango")
     Adb.Auth(db_config[BeansEnv])
     Adb.UpdateCacheConfiguration({ mode = "on" })
+  elseif (db_config["engine"] == "db2rest") then
+    Rest = require("db2rest")
+    Rest.init(db_config[BeansEnv])
   elseif (db_config["engine"] == "sqlite") then
     local sqlite3 = require 'lsqlite3'
     local sqlite = sqlite3.open(db_config[BeansEnv]["db_name"] .. '.sqlite3')
@@ -283,7 +286,7 @@ end
 function HandleSqliteFork(db_config)
   if db_config["engine"] == "sqlite" then
     Sqlite3 = require 'lsqlite3'
-    Sqlite = Sqlite3.open('delupay-shop.sqlite3')
+    Sqlite = Sqlite3.open(db_config['db_file'])
     Sqlite:busy_timeout(1000)
     Sqlite:exec [[PRAGMA journal_mode=WAL]]
     Sqlite:exec [[PRAGMA synchronous=NORMAL]]

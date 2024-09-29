@@ -5,18 +5,17 @@
 	<title><%= title or "[Lua on Beans] micro MVC framework for redbean.dev & arangodb" %></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="a New MVC framework based on redbean.dev and arangoDB" />
-	<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;600;700&family=Open+Sans:wght@400;700&family=Rubik+Doodle+Shadow&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="/app.css" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 </head>
 <body class="min-h-screen flex flex-col">
-	<%- Partial("header") %>
-	<div class="grow">@yield</div>
-	<%- Partial("footer") %>
+	<div class="container mx-auto px-10">
+		<%- Partial("header") %>
+		<div class="grow mb-10 bg-white shadow rounded p-5 text-black">@yield</div>
+		<%- Partial("footer") %>
+	</div>
 </body>
 </html>

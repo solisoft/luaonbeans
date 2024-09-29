@@ -1,342 +1,251 @@
-<div class="container mx-auto py-10 px-2">
-  <h1>Welcome aboard!!</h1>
 
-  <p>Lua on Beans is a simple <a href="https://redbean.dev" target="_blank">redbean.dev</a> tool for creating fast, testable MVC applications using Lua and ArangoDB.</p>
+<h1 class="mb-5">A new blazing fast MVC framework for Lua, redbean.dev</h1>
 
-  <h1 class="pt-10">Why ?</h1>
-  <p>You can find very great tools out there. So why the hell are we creating a new framework?
-  The answer is pretty simple : We want an easy and performant tool to build an app.</p>
+<p>
+  Welcome to Lua on Beans, a cutting-edge MVC framework designed for Lua and redbean.dev! This powerful yet lightweight framework combines the simplicity of Lua with the robustness of redbean.dev to deliver an exceptional development experience.
+</p>
 
-  <p>By example, Ruby on Rails is a great framework but it's slow and heavy.</p>
-  <p>Phoenix looks nice and fast but it's not that easy to start with.</p>
-  <p>&nbsp;</p>
-  <p>Lua is a small language easy to learn and it seems very fast when embedded in redbean.dev</p>
-  <p>ArangoDB is a multi model document database very powerful and fast.</p>
+<h2 class="text-xl font-semibold mt-4 mb-2">Key Features:</h2>
+<ul class="list-disc list-inside mb-4">
+  <li>Blazing Fast Performance: Built on Lua and redbean.dev for optimal speed</li>
+  <li>Easy Deployment: Single-file distribution makes deployment a breeze</li>
+  <li>Scalability: Create complex applications with ease</li>
+  <li>Intuitive MVC Architecture: Organize your code efficiently</li>
+  <li>Extensive Documentation: Get started quickly with comprehensive guides</li>
+</ul>
 
-  <h1 class="pt-10">Requirements</h1>
-  <p>You just need ArangoDB running.</p>
-  <pre class="py-2 shadow"><code class="language-sh"><%= [[
-docker run -e ARANGO_RANDOM_ROOT_PASSWORD=1 -p 8529:8529 -d arangodb
-]] %></code></pre>
-
-  <p>You have to create an alias <code>alias beans="./luaonbeans.org -i beans"</code> and put it in you favorite shell config file.</p>
-
-  <h1 class="pt-5">Getting started</h1>
-
-  <pre class="py-2 shadow"><code class="language-sh"><%= [[
-git clone https://github.com/solisoft/luaonbeans --depth=1
-cd luaonbeans
-]] %></code></pre>
-  <p>You need then to create a <code>config/database.json</code> file based on <code>config/database.json.sample</code></p>
-  <p>Then create the DB</p>
-  <pre class="py-2 shadow"><code class="language-sh"><%= [[
-beans db:setup
-]] %></code></pre>
-  <p>You can start then the server :</p>
-  <pre class="py-2 shadow"><code class="language-sh"><%= [[
-./luaonbeans -D .
-]] %></code></pre>
-
-  <p>You should create the server on <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></p>
-
-  <h1 class="pt-5">Running specs</h1>
-  <pre class="py-2 shadow"><code class="language-sh"><%= [[
-beans specs
-]] %></code></pre>
+<p class="mb-4">
+  Whether you're building a simple website or a complex web application, Lua on Beans provides the tools and structure you need to bring your ideas to life. With its seamless integration of Lua's simplicity and redbean.dev's power, you'll be able to develop and deploy your projects faster than ever before.
+</p>
 
 
-  <h1 class="pt-5">Commands</h1>
-
-<pre class="py-2 shadow"><code class="language-sh"><%= [[
-beans create controller posts
-beans create model post
-beans create scaffold posts
-beans create migration add_indexes_to_posts
-
-beans db:setup
-beans db:migrate
-beans db:rollback
-
-beans specs]] %></code></pre>
-
-  <h1 class="pt-5">Routes</h1>
-  <p>Routes are defined in the <code>config/routes.lua</code>
-<pre class="py-2 shadow"><code class="language-lua"><%= [[
-Routes = { ["GET"] = { [""] = "welcome#index" } } --define root
-
--- Resource("customers", {
---   var_name = "customer_id",         -- default value is "id"
---   var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
--- })
--- -- Will generate :
--- -- GET /customers                    -- customers#index
--- -- GET /customers/new                -- customers#new
--- -- GET /customers/:customer_id       -- customers#show
--- -- POST /customers                   -- customers#create
--- -- GET /customers/:customer_id/edit  -- customers#edit
--- -- PUT /customers/:customer_id       -- customers#update
--- -- DELETE /customers/:customer_id    -- customers#delete
---
--- CustomRoute("GET", "ban", "customers#ban", {
---   parent = { "customers" },
---   type = "member", -- collection or member -- customers#ban
--- })
--- -- Will generate :
--- -- GET /customers/:id/ban
---
--- Resource("comments", {
---   var_name = "comment_id",          -- default value is "id"
---   var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
---   parent = { "customers" }
--- })
--- -- Will generate :
--- -- GET /customers/:customer_id/comments                   -- comments#index
--- -- GET /customers/:customer_id/comments/new               -- comments#new
--- -- GET /customers/:customer_id/comments/:comment_id       -- comments#show
--- -- POST /customers/:customer_id/comments                  -- comments#create
--- -- GET /customers/:customer_id/comments/:comment_id/edit  -- comments#edit
--- -- PUT /customers/:customer_id/comments/:comment_id       -- comments#update
--- -- DELETE /customers/:customer_id/comments/:comment_id    -- comments#delete
-
--- Resource("likes", {
---   var_name = "like_id",          -- default value is "id"
---   var_regex = "([0-9a-zA-Z_\\-]+)", -- default value
---   parent = { "customers", "comments" }
--- })
--- -- Will generate :
--- -- GET /customers/:customer_id/comments/:comment_id/likes                -- likes#index
--- -- GET /customers/:customer_id/comments/:comment_id/likes/new            -- likes#new
--- -- GET /customers/:customer_id/comments/:comment_id/likes/:like_id       -- likes#show
--- -- POST /customers/:customer_id/comments/:comment_id/likes               -- likes#create
--- -- GET /customers/:customer_id/comments/:comment_id/likes/:like_id/edit  -- likes#edit
--- -- PUT /customers/:customer_id/comments/:comment_id/likes/:like_id       -- likes#update
--- -- DELETE /customers/:customer_id/comments/:comment_id/likes/:like_id    -- likes#delete
-
--- CustomRoute("GET", "demo/with/:id/nested/:demo/route", "welcome#ban", {
---  [":demo"] = "([0-9]+)" -- you can define regex per params
--- })
--- -- Will generate :
--- -- GET /demo/with/:id/nested/:demo/route # welcome#ban
-
--- CustomRoute("GET", "ban*", "welcome#ban") -- use splat
--- -- Will generate :
--- -- GET /ban* # welcome#ban
--- -- GET /ban/this/is/a/demo # welcome#ban splat == { this = "is", a = "demo" }
-
-
-
-
-]] %></code></pre>
-
-
-
-  <h1 class="pt-5">Controller</h1>
-  <p>Here a CRUD sample : controllers/posts_controller.lua</p>
-<pre class="py-2 shadow"><code class="language-lua"><%= [[
-post = {}
-Post = require("post")
-
-CheckCSRFToken()
-
--- A kind of before_each only: %%w(edit update show) :)
-if table.contains({ "edit", "update", "show" }, Params.action) then
-  post = Post.get(Params.id)
-end
-
--- Here a method to be more DRI
-local function load_index()
-  local posts = Post.all()
-  Page("posts/index", "app", { posts = posts })
-end
-
-local app = {
-  -- GET posts#index => /posts
-  index = function() load_index() end,
-
-  -- GET posts#new => /posts/new
-  new = function() Page("posts/new", "app") end,
-
-  -- GET posts#show => /posts/:id
-  show = function() Page("posts/show", "app", { post = post }) end,
-
-  -- GET posts#edit => /posts/:id/edit
-  edit = function() Page("posts/edit", "app", { post = post }) end,
-
-  -- PUT posts#update => posts/:id
-  update = function()
-    local bodyParams = GetBodyParams()
-    local record = Post.update(Params.id, bodyParams)
-
-    if record.error then
-      Page("posts/edit", "app", { post = table.merge(bodyParams, { _key = Params.id }), record = record })
-      return
-    end
-
-    RedirectTo("/posts")
-  end,
-
-  -- POST posts#create => /posts
-  create = function()
-    local bodyParams = GetBodyParams()
-    local created_post = Post.create(bodyParams)
-
-    if created_post.error then
-      SetStatus(400)
-      Page("posts/new", "app", { post = bodyParams })
-      return
-    end
-
-    RedirectTo("/posts")
-  end,
-
-  -- DELETE posts#delete => /posts/:id
-  delete = function()
-    Post.destroy(Params.id)
-    load_index()
-  end,
-
-  -- GET posts#offlice => /posts/:id/offline (see custom route)
-  offline = function()
-    Write("Offline")
-  end
-}
-
-assert(app[Params.action] ~= nil, "Missing method '" .. Params.action .. "'!")
-app[Params.action]()]] %></code></pre>
-
-
-
-  <h1 class="pt-5">Views</h1>
-  <p>Notice that we use <a href="https://htmx.org/">HTMx</a> but you could use anything else.</p>
-  <div class="grid grid-cols-2 gap-5">
-    <div>views/posts/index.etlua
-    <pre class="py-2 shadow"><code class="language-html"><%= [[<div class="container mx-auto py-10">
-  <h1>##model_plural_capitalized##</h1>
-
-  <table class="w-full">
-    <thead>
-      <tr>
-        <th class="text-left">Key</th>
-        <th class="text-left">Title</th>
-      </tr>
-    </thead>
-    <tbody>
-      <%% for _, doc in pairs(posts) do %%>
-        <%% if doc then %%>
-        <tr>
-          <td><%%= doc._key %%></td>
-          <td><%%= doc.title %%></td>
-          <td><%%= doc.text %%></td>
-          <td>
-            <a href="/posts/<%%= doc._key %%>">Show</a> ||
-            <a href="/posts/<%%= doc._key %%>/edit">Edit</a> ||
-            <a href="#" hx-target="body"
-               hx-confirm="Are you sure ?"
-               hx-delete="/posts/<%%= doc._key %%>">
-               Destroy
-            </a>
-          </td>
-        </tr>
-        <%% end %%>
-      <%% end %%>
-    </tbody>
-  </table>
-
-  <div class="pt-10">
-    <a href="/posts/new">Create a new Post</a>
-  </div>
-</div>]] %></code></pre>
-<div>views/posts/show.etlua
-<pre class="py-2 shadow"><code class="language-html"><%= [[
-<div class="container mx-auto py-10">
-  <h1>Showing Post</h1>
-
-  <%%= EncodeJson(post) %%>
-
-  <div><a href="/posts">Back</a></div>
-</div>]] %></code></pre>
-    </div>
-    </div>
-    <div>views/posts/new.etlua
-<pre class="py-2 shadow"><code class="language-html"><%= [[
-<div class="container mx-auto py-10">
-  <h1>New Post</h1>
-  <form action="/posts" method="POST"
-        class="flex flex-col gap-2">
-    <div class="flex gap-4 items-center">
-      <label for="title">Title</label>
-      <input type="text" name="title" required
-             value="<%%= post.title or "" %%>" />
-    </div>
-
-    <div class="pt-10 flex gap-5 items-center">
-      <input type="submit" value="Create">
-      <a href="/posts">Back</a>
-    </div>
+<div class="bg-purple-900 border border-purple-300 rounded-lg p-4 mt-6 text-white">
+  <h3 class="text-lg font-semibold mb-2">Stay Tuned!</h3>
+  <p class="mb-3">Exciting updates and new features are coming soon. Don't miss out on the latest developments in Lua on Beans!</p>
+  <form class="flex flex-col sm:flex-row gap-2">
+    <input type="email" placeholder="Enter your email" class="flex-grow px-3 py-2 rounded text-purple-900" required>
+    <button type="submit" class="bg-gray-400 text-gray-600 font-bold py-2 px-4 rounded cursor-not-allowed" disabled>
+      Subscribe
+    </button>
   </form>
-</div>]] %></code></pre>
+  <p class="text-sm italic mt-2">
+    Note: Our newsletter subscription feature is not yet active. We're working hard to bring you this functionality soon. Stay tuned for updates!
+  </p>
 
-<div>views/posts/edit.etlua
-<pre class="py-2 shadow"><code class="language-html"><%= [[
-<div class="container mx-auto py-10">
-  <h1>Editing Post :</h1>
+</div>
 
-  <form
-    action="/posts/<%%= post._key %%>"
-    method="POST"
-    class="flex flex-col gap-2"
-    >
-    <div class="flex gap-4 items-center">
-      <label for="title">Title</label>
-      <input type="text" name="title"
-             required value="<%%= post.title %%>" />
+
+<div class="flex flex-col md:flex-row gap-6 mt-10">
+  <div class="md:w-1/2">
+    <h2 class="text-xl font-semibold mb-3">Why We Chose redbean.dev</h2>
+
+    <p class="mb-4">
+      At the core of Lua on Beans lies redbean.dev, a remarkable web server that brings numerous advantages to our framework. Here's why we chose redbean.dev:
+    </p>
+
+    <ul class="list-disc list-inside mb-4">
+      <li>Single-file distribution: Simplifies deployment and reduces complexity</li>
+      <li>Embedded Lua support: Allows seamless integration with our Lua-based framework</li>
+      <li>High performance: Delivers exceptional speed for web applications</li>
+    </ul>
+  </div>
+
+  <div class="md:w-1/2">
+    <ul class="list-disc list-inside mb-4">
+      <li>Cross-platform compatibility: Runs on various operating systems without modification</li>
+      <li>Built-in security features: Provides robust protection out of the box</li>
+      <li>Low resource consumption: Ideal for both small projects and large-scale applications</li>
+    </ul>
+
+    <p class="mb-4">
+      By leveraging redbean.dev, Lua on Beans inherits these powerful features, enabling developers to create efficient, secure, and easily deployable web applications. The synergy between Lua's simplicity and redbean.dev's capabilities forms the foundation of our framework's strength and flexibility.
+    </p>
+  </div>
+</div>
+
+<div class="mt-10 bg-purple-900 border border-purple-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Frontend Technologies: TailwindCSS and Riot.js</h2>
+
+  <div class="flex flex-col md:flex-row gap-6">
+    <div class="md:w-1/2">
+      <h3 class="text-lg font-semibold mb-2">TailwindCSS</h3>
+      <p class="mb-4">
+        Lua on Beans leverages TailwindCSS for rapid and flexible UI development:
+      </p>
+      <ul class="list-disc list-inside mb-4">
+        <li>Utility-first approach for quick styling</li>
+        <li>Highly customizable design system</li>
+        <li>Responsive layouts with ease</li>
+        <li>Optimized production builds</li>
+      </ul>
     </div>
 
-    <%% if record then %%>
-      <div class="bg-red-200  p-3 text-red-700 rounded">
-        <strong>
-          Something went wrong while updating
-          the record !!
-        </strong> <br>  <%%= EncodeJson(record) %%>
+    <div class="md:w-1/2">
+      <h3 class="text-lg font-semibold mb-2">Riot.js</h3>
+      <p class="mb-4">
+        We've integrated Riot.js for component-based frontend development:
+      </p>
+      <ul class="list-disc list-inside mb-4">
+        <li>Simple and lightweight component syntax</li>
+        <li>Seamless integration with Lua backend</li>
+        <li>Virtual DOM for efficient updates</li>
+        <li>Small learning curve for rapid development</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="mt-4">
+    The combination of TailwindCSS and Riot.js empowers developers to create responsive, component-driven user interfaces that integrate smoothly with Lua on Beans' backend capabilities. This tech stack ensures a modern, efficient, and enjoyable development experience for both frontend and backend aspects of your web applications.
+  </p>
+</div>
+
+<div class="mt-10">
+  <h2 class="text-xl font-semibold mb-3">Supported Databases</h2>
+
+  <p class="mb-4">
+    Lua on Beans offers versatile database support, allowing developers to choose the best solution for their project needs:
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">ArangoDB</h3>
+          <p>Multi-model database for document, graph, and key-value data.</p>
+        </div>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/arangodb-logo.svg" alt="ArangoDB Logo" class="w-32 h-auto p-2">
+        </div>
       </div>
-    <%% end %%>
-
-    <div class="pt-10 flex gap-5 items-center">
-      <input type="submit" value="Update">
-      <a href="/posts">Back</a>
-    </div>
-  </form>
-
-</div>]] %></code></pre>
-    </div>
     </div>
 
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">Redis</h3>
+          <p>In-memory data structure store, used as a database, cache, and message broker.</p>
+        </div>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/redis-logo.svg" alt="Redis Logo" class="w-32 h-auto p-2">
+        </div>
+      </div>
+    </div>
 
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">SQLite</h3>
+          <p>Lightweight, serverless, and self-contained SQL database engine.</p>
+        </div>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/sqlite-logo.webp" alt="SQLite Logo" class="w-32 h-auto p-2">
+        </div>
+      </div>
+    </div>
 
+    <div>
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2">
+          <h3 class="text-lg font-semibold mb-2">SurrealDB</h3>
+          <p>Multi-model database with support for document, graph, and relational data.</p>
+        </div>
+        <div class="md:w-1/2 mt-4 md:mt-0 flex justify-center">
+          <img src="/surrealdb-logo.png" alt="SurrealDB Logo" class="w-32 h-auto">
+        </div>
+      </div>
+    </div>
 
+    <div>
+      <h3 class="text-lg font-semibold mb-2">DB2REST</h3>
+      <p>REST API provider for:</p>
+      <ul class="list-disc list-inside">
+        <li>MongoDB</li>
+        <li>PostgreSQL</li>
+        <li>MySQL/MariaDB</li>
+      </ul>
+    </div>
   </div>
 
-  <h1 class="pt-5">Model</h1>
-models/post.lua<pre class="py-2 shadow"><code class="language-lua"><%= [[
-return {
-  all = function()
-    return Adb.Aql("FOR post IN posts SORT post._key ASC RETURN post").result
-  end,
+  <p class="mt-4">
+    This wide range of database options ensures that Lua on Beans can adapt to various project requirements, from simple applications to complex, data-intensive systems.
+  </p>
+</div>
 
-  get = function(key)
-    return Adb.GetDocument("posts/" .. key)
-  end,
+<div class="mt-10 bg-purple-900 border border-purple-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Trusted by Industry Giants*</h2>
 
-  create = function(dataset)
-    return Adb.CreateDocument("posts", dataset)
-  end,
+  <p class="mb-4 italic text-sm">*Well, not really... yet!</p>
 
-  update = function(key, dataset)
-    return Adb.UpdateDocument("posts/" .. key, dataset)
-  end,
+  <p class="mt-6 text-center text-sm">
+    Okay, we admit it. These tech giants aren't using Lua on Beans... yet! But hey, a framework can dream, right?
+    In the meantime, why not be the trailblazer and add your logo here by building something awesome with Lua on Beans?
+  </p>
+</div>
 
-  destroy = function(key)
-    return Adb.DeleteDocument("posts/" .. key)
-  end
-}]] %></code></pre>
+<div class="mt-10 bg-blue-900 border border-blue-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Built-in Features</h2>
+
+  <p class="mb-4">Lua on Beans comes packed with powerful features to accelerate your development:</p>
+
+  <ul class="list-disc list-inside space-y-2">
+    <li>
+      <span class="font-semibold">Two-Factor Authentication (2FA):</span>
+      Enhance security with built-in Google Authenticator TOTP support.
+    </li>
+    <li>
+      <span class="font-semibold">Dynamic Views with eTLua:</span>
+      Create flexible and efficient templates using embedded Lua.
+    </li>
+    <li>
+      <span class="font-semibold">Scalable Routing:</span>
+      Handle millions of route definitions effortlessly for large-scale applications.
+    </li>
+    <li>
+      <span class="font-semibold">Automatic Swagger Documentation:</span>
+      Generate API documentation automatically based on comments before actions.
+    </li>
+    <li>
+      <span class="font-semibold">Easy REST API Creation:</span>
+      Quickly build and deploy RESTful APIs with minimal configuration.
+    </li>
+  </ul>
+
+  <p class="mt-4">
+    These features are designed to streamline your development process, enhance security, and improve the overall quality of your applications.
+  </p>
+</div>
+<div class="mt-10 bg-gray-900 border border-gray-300 rounded-lg p-4 mt-6 text-white">
+  <h2 class="text-xl font-semibold mb-3">Open Source and Community-Driven</h2>
+
+  <p class="mb-4">Lua on Beans is an open-source project, and we believe in the power of community collaboration. We welcome contributions, feedback, and ideas from developers around the world.</p>
+
+  <p class="mb-4">Visit our GitHub repository to explore the code, report issues, or contribute to the project:</p>
+
+  <div class="flex flex-col items-center justify-center">
+    <a href="https://github.com/solisoft/luaonbeans" target="_blank" rel="noopener noreferrer" class="inline-block bg-white text-gray-900 font-semibold py-2 px-4 rounded hover:bg-gray-200 transition duration-300 mb-4">
+      <i class="fab fa-github mr-2"></i>Lua on Beans on GitHub
+    </a>
+    <div>
+      <a href="https://github.com/solisoft/luaonbeans/stargazers" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-yellow-400 text-gray-900 font-semibold py-2 px-4 rounded hover:bg-yellow-300 transition duration-300">
+        <i class="fas fa-star mr-2"></i>
+        <span id="github-stars">Loading...</span> Stars
+      </a>
+    </div>
+
+    <script>
+      fetch('https://api.github.com/repos/solisoft/luaonbeans')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('github-stars').textContent = data.stargazers_count;
+        })
+        .catch(error => {
+          console.error('Error fetching GitHub stars:', error);
+          document.getElementById('github-stars').textContent = 'N/A';
+        });
+    </script>
+  </div>
+
+  <p class="mt-4">
+    By participating in the Lua on Beans community, you can help shape the future of this framework and contribute to its growth. Whether you're a seasoned developer or just starting out, your input is valuable to us!
+  </p>
 </div>

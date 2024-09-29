@@ -38,7 +38,7 @@ function OnHttpRequest()
 
   -- Remove code if you do not use surrealdb
   if (db_config ~= nil and db_config["engine"] == "surrealdb") then
-    Surreal.refresh_token(db_config[BeansEnv]) -- reconnect to arangoDB if needed
+    Surreal.refresh_token(db_config[BeansEnv]) -- reconnect to surrealdb if needed
   end
 
   DefineRoutes(GetPath(), GetMethod())

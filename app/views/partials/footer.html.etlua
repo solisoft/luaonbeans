@@ -1,4 +1,4 @@
-<footer class="bg-black text-white py-5">
+<footer class="bg-black text-white py-5 rounded-lg">
 	<div class="container mx-auto flex justify-center">
 		Lua on Beans - Licence MIT -
 	</div>

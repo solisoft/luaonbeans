@@ -7,11 +7,11 @@
 
 <h2 class="text-xl font-semibold mt-4 mb-2">Key Features:</h2>
 <ul class="list-disc list-inside mb-4">
-  <li>Blazing Fast Performance: Built on Lua and redbean.dev for optimal speed</li>
-  <li>Easy Deployment: Single-file distribution makes deployment a breeze</li>
-  <li>Scalability: Create complex applications with ease</li>
-  <li>Intuitive MVC Architecture: Organize your code efficiently</li>
-  <li>Extensive Documentation: Get started quickly with comprehensive guides</li>
+  <li><strong>Blazing Fast Performance:</strong> Built on Lua and redbean.dev for optimal speed</li>
+  <li><strong>Easy Deployment:</strong> Single-file distribution makes deployment a breeze</li>
+  <li><strong>Scalability:</strong> Create complex applications with ease</li>
+  <li><strong>Intuitive MVC Architecture:</strong> Organize your code efficiently</li>
+  <li><strong>Extensive Documentation:</strong> Get started quickly with comprehensive guides</li>
 </ul>
 
 <p class="mb-4">
@@ -44,17 +44,17 @@
     </p>
 
     <ul class="list-disc list-inside mb-4">
-      <li>Single-file distribution: Simplifies deployment and reduces complexity</li>
-      <li>Embedded Lua support: Allows seamless integration with our Lua-based framework</li>
-      <li>High performance: Delivers exceptional speed for web applications</li>
+      <li><strong>Single-file distribution:</strong> Simplifies deployment and reduces complexity</li>
+      <li><strong>Embedded Lua support:</strong> Allows seamless integration with our Lua-based framework</li>
+      <li><strong>High performance:</strong> Delivers exceptional speed for web applications</li>
     </ul>
   </div>
 
   <div class="md:w-1/2">
     <ul class="list-disc list-inside mb-4">
-      <li>Cross-platform compatibility: Runs on various operating systems without modification</li>
-      <li>Built-in security features: Provides robust protection out of the box</li>
-      <li>Low resource consumption: Ideal for both small projects and large-scale applications</li>
+      <li><strong>Cross-platform compatibility:</strong> Runs on various operating systems without modification</li>
+      <li><strong>Built-in security features:</strong> Provides robust protection out of the box</li>
+      <li><strong>Low resource consumption:</strong> Ideal for both small projects and large-scale applications</li>
     </ul>
 
     <p class="mb-4">

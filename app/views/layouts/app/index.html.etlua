@@ -54,9 +54,9 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const starfield = document.querySelector('.starfield');
-    const numStars = 800; // Increased number of stars
-
-    for (let i = 0; i < numStars; i++) {
+		let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+		const numStars = vw * 100 / 600; // Increased number of stars
+		for (let i = 0; i < numStars; i++) {
       const star = document.createElement('div');
       star.classList.add('star');
       star.style.left = `${Math.random() * 100}%`;

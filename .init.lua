@@ -2,14 +2,13 @@ package.path = package.path .. ";.lua/?.lua"
 package.path = package.path .. ";app/models/?.lua;/zip/app/models/?.lua"
 package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 
-function OnServerStart()
-  -- OTP = require("otp") -- OTP functions
-  require("utilities")
-  require("routes")
-  -- ArangoDB connection
-  local db_config = DecodeJson(LoadAsset("config/database.json"))
-  InitDB(db_config)
-end
+-- OTP = require("otp") -- OTP functions
+require("utilities")
+require("routes")
+
+-- ArangoDB connection
+local db_config = DecodeJson(LoadAsset("config/database.json"))
+InitDB(db_config)
 
 function OnServerReload()
   require("utilities")

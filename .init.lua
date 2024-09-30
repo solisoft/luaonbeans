@@ -1,5 +1,5 @@
 package.path = package.path .. ";.lua/?.lua"
-package.path = package.path .. ";models/?.lua;/zip/models/?.lua"
+package.path = package.path .. ";app/models/?.lua;/zip/app/models/?.lua"
 package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 
 -- OTP = require("otp") -- OTP functions

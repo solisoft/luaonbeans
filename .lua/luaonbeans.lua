@@ -57,6 +57,7 @@ function extractPatterns(inputStr)
 end
 
 local function assignRoute(method, name, options, value)
+  Routes[method] = Routes[method] or {}
   local current = Routes[method]
   options["parent"] = options["parent"] or {}
 

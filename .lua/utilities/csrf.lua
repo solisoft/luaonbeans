@@ -1,4 +1,7 @@
+CSRFToken = EncodeBase64(GetRandomBytes(64))
+
 GenerateCSRFToken = function()
+  CSRFToken = EncodeBase64(GetRandomBytes(64))
   if GetCookie("_authenticity_token") == nil then
     SetCookie(
       "_authenticity_token",
@@ -19,5 +22,5 @@ CheckCSRFToken = function()
 end
 
 AuthenticityTokenTag = function()
-  return '<input type="hidden" name="authenticity_token" value="' .. GetCookie("_authenticity_token") .. '" />'
+  return '<input type="hidden" name="authenticity_token" value="' .. CSRFToken .. '" />'
 end

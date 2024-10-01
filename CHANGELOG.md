@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.10.0](https://github.com/solisoft/luaonbeans/compare/v0.9.0...v0.10.0) (2024-10-01)
+
+
+### Features
+
+* add specs for CustomRoute with POST method ([53de711](https://github.com/solisoft/luaonbeans/commit/53de711e039728cf3c9573095cbe2600732679d3))
+
+
+### Bug Fixes
+
+* CSRF token ([e891f79](https://github.com/solisoft/luaonbeans/commit/e891f79ccf1f47fec88e8eb9386e757dbef81188))
+* CSRF token =&gt; encrypt session ([43927b0](https://github.com/solisoft/luaonbeans/commit/43927b0bd6696be56f64dc0417617e250b5d326c))
+* method for assignroutes ([b4f07e5](https://github.com/solisoft/luaonbeans/commit/b4f07e5664d69fdcd451ff0c5ba0bbd4e2c6685d))
+* update package path ([3da86bb](https://github.com/solisoft/luaonbeans/commit/3da86bb72d242bb2b0943d25c109da0766dbcc26))
+* use hook properly ([04aea63](https://github.com/solisoft/luaonbeans/commit/04aea63d12f0d5153e3ded184aefb4a2bce12b5e))
+
 ## [0.9.0](https://github.com/solisoft/luaonbeans/compare/v0.8.0...v0.9.0) (2024-09-29)
 
 

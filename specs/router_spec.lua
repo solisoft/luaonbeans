@@ -31,6 +31,8 @@ return {
           type = "collection", -- collection or member -- customers#ban
         })
 
+        CustomRoute("POST", "ban", "customers#ban")
+
         Resource("books", {
           only = { "index" },
         })
@@ -61,6 +63,8 @@ return {
         expect.equal(Routes["GET"]["customers"][":var"]["comments"][":var"]["likes"][":var"]["edit"], "likes#edit")
         expect.equal(Routes["POST"]["customers"][":var"]["comments"][":var"]["likes"][""], "likes#create")
         expect.equal(Routes["DELETE"]["customers"][":var"]["comments"][":var"]["likes"][":var"][""], "likes#delete")
+
+        expect.equal(Routes["POST"]["ban"], "customers#ban")
 
         expect.equal(Routes["GET"]["books"][""], "books#index")
         expect.equal(Routes["GET"]["books"][":var"][""], nil)

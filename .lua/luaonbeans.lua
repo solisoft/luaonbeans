@@ -1,19 +1,40 @@
 Routes = {}
-Views = {}
-Layouts = {}
-Partials = {}
+
+function LoadViewsRecursively(path)
+  local dir = unix.opendir(path)
+
+  while true do
+    local file, kind = dir:read()
+    if kind == unix.DT_DIR and file ~= "." and file ~= ".." then
+      LoadViewsRecursively(path .. "/" .. file)
+    end
+    if kind == unix.DT_REG then
+      if string.match(file, "%.etlua$") then
+        Views[path .. "/" .. file] = LoadAsset(path .. "/" .. file)
+      end
+    end
+
+    if file == nil then
+      break
+    end
+
+  end
+  dir:close()
+
+  return layouts
+end
 
 function Page(view, layout, bindVarsView, bindVarsLayout)
-  if (BeansEnv == "development" or Layouts["app/views/layouts/" .. layout .. "/index.html.etlua"] == nil) then
-    Layouts["app/views/layouts/" .. layout .. "/index.html.etlua"] = LoadAsset("app/views/layouts/" ..
+  if (BeansEnv == "development") then
+    Views["app/views/layouts/" .. layout .. "/index.html.etlua"] = LoadAsset("app/views/layouts/" ..
       layout .. "/index.html.etlua")
   end
 
-  if (BeansEnv == "development" or Views["app/views/" .. view .. ".etlua"] == nil) then
+  if (BeansEnv == "development") then
     Views["app/views/" .. view .. ".etlua"] = LoadAsset("app/views/" .. view .. ".etlua")
   end
 
-  layout = Etlua.compile(Layouts["app/views/layouts/" .. layout .. "/index.html.etlua"])(bindVarsLayout or {})
+  layout = Etlua.compile(Views["app/views/layouts/" .. layout .. "/index.html.etlua"])(bindVarsLayout or {})
   view = Etlua.compile(Views["app/views/" .. view .. ".etlua"])(bindVarsView or {})
 
   local content
@@ -40,12 +61,12 @@ function Partial(partial, bindVars)
     bindVars.extras = req["extras"]
   end
 
-  if (BeansEnv == "development" or Partials["app/views/partials/" .. partial .. ".html.etlua"] == nil) then
-    Partials["app/views/partials/" .. partial .. ".html.etlua"] = LoadAsset("app/views/partials/" ..
+  if (BeansEnv == "development") then
+    Views["app/views/partials/" .. partial .. ".html.etlua"] = LoadAsset("app/views/partials/" ..
       partial .. ".html.etlua")
   end
 
-  return Etlua.compile(Partials["app/views/partials/" .. partial .. ".html.etlua"])(bindVars)
+  return Etlua.compile(Views["app/views/partials/" .. partial .. ".html.etlua"])(bindVars)
 end
 
 function extractPatterns(inputStr)
@@ -100,7 +121,6 @@ function Resource(name, options)
   options["only"] = options["only"] or { "index", "show", "new", "create", "edit", "update", "delete" }
   options["type"] = "member"
   local only = options["only"]
-  Routes["GET"] = Routes["GET"] or {}
   Routes["POST"] = Routes["POST"] or {}
   Routes["PUT"] = Routes["PUT"] or {}
   Routes["DELETE"] = Routes["DELETE"] or {}
@@ -166,7 +186,6 @@ end
 
 function DefineRoutes(path, method)
   if method == "PATCH" then method = "PUT" end
-
   local recognized_route = Routes[method]
 
   local route_found = false
@@ -206,9 +225,9 @@ function DefineRoutes(path, method)
     else
       if route_found == false then recognized_route = nil end
     end
-  end
 
-  Splat = tableSplat(Splat)
+    Splat = tableSplat(Splat)
+  end
 
   if recognized_route ~= nil then
     recognized_route = string.split(recognized_route, "#")

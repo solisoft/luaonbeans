@@ -10,6 +10,11 @@ require("routes")
 local db_config = DecodeJson(LoadAsset("config/database.json"))
 InitDB(db_config)
 
+Views = {}
+if BeansEnv == "production" then
+  LoadViewsRecursively("app/views")
+end
+
 function OnServerReload()
   require("utilities")
   require("routes")

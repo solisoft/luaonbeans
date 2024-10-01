@@ -34,7 +34,6 @@ end
 function OnHttpRequest()
   Params = GetParams()
   PrepareMultiPartParams() -- if you handle file uploads
-  GenerateCSRFToken()
 
   -- Remove code if you do not use arangodb
   if (db_config ~= nil and db_config["engine"] == "arangodb") then

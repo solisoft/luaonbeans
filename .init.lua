@@ -15,6 +15,15 @@ if BeansEnv == "production" then
   LoadViewsRecursively("app/views")
 end
 
+-- LastModifiedAt is used to cache the last modified time of the assets
+-- so that we can use it to send the correct last modified time to the client
+-- and avoid sending the whole file to the client
+LastModifiedAt = {}
+
+function OnServerStart()
+  LoadPublicAssetsRecursively("public")
+end
+
 function OnServerReload()
   require("utilities")
   require("routes")

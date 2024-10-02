@@ -317,3 +317,24 @@ function HandleSqliteFork(db_config)
     Sqlite:exec [[PRAGMA synchronous=NORMAL]]
   end
 end
+
+function PublicPath(path)
+  return path .. "?" .. LastModifiedAt[path]
+end
+
+function LoadPublicAssetsRecursively(path)
+  local dir = unix.opendir(path)
+  while true do
+    local file, kind = dir:read()
+    if file == nil then break end
+    if kind == unix.DT_DIR and file ~= "." and file ~= ".." then
+      -- Recursively process subdirectories
+      LoadPublicAssetsRecursively(path .. "/" .. file)
+    elseif kind == unix.DT_REG and not file:match("^%.") then
+      -- Process regular files (excluding hidden files)
+      local relativePath = path:gsub("^public", "") .. "/" .. file
+      LastModifiedAt[relativePath] = GetAssetLastModifiedTime(path .. "/" .. file)
+    end
+  end
+  dir:close()
+end

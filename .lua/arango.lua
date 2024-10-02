@@ -153,8 +153,8 @@ end
 
 -- Databases
 
-local function CreateDatabase(name, options)
-  local params = { name = name, options = (options or {}) }
+local function CreateDatabase(name, options, users)
+  local params = { name = name, options = (options or {}), users = (users or {}) }
   return with_Params("/database", "POST", "", params)
 end
 

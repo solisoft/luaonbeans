@@ -154,7 +154,9 @@ end
 -- Databases
 
 local function CreateDatabase(name, options, users)
-  local params = { name = name, options = (options or {}), users = (users or {}) }
+  local params = { name = name, options = (options or {}) }
+  if users then params.users = users end
+
   return with_Params("/database", "POST", "", params)
 end
 

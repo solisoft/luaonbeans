@@ -37,7 +37,11 @@ return {
           only = { "index" },
         })
 
-        -- print(EncodeJson(Routes))
+        Params = {}
+        DefineRoutes("/customers", "GET")
+        expect.equal(Params.controller, "customers")
+        expect.equal(Params.action, "index")
+
         expect.equal(Routes["GET"]["customers"][""], "customers#index")
         expect.equal(Routes["GET"]["customers"]["new"], "customers#new")
         expect.equal(Routes["GET"]["customers"]["refresh"], "customers#refresh")

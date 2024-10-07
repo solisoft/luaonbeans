@@ -127,6 +127,8 @@ SetupDB = function(env)
   assert(Adb.Auth(DBConfig[env]) ~= nil)
   Adb.CreateCollection("migrations")
   Adb.CreateIndex("migrations", {type = "persistent", unique = true, fields = {"filename"}})
+  Adb.CreateCollection("uploads")
+  Adb.CreateIndex("uploads", {type = "persistent", unique = true, fields = {"uuid"}})
   Adb.CreateDocument("migrations", {filename = "0"})
 end
 

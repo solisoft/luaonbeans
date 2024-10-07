@@ -6,3 +6,5 @@ _appbundles
 foxx
 node_modules
 .env
+uploads/*
+!uploads/.keep

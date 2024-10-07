@@ -2,7 +2,7 @@
 PrepareMultiPartParams = function()
   if GetHeader("Content-Type") ~= nil and string.find(GetHeader("Content-Type"), "multipart") ~= nil then
     local keys = {}
-    local multipart_data = multipart(GetBody(), GetHeader("Content-Type"))
+    local multipart_data = Multipart(GetBody(), GetHeader("Content-Type"))
 
     for k, _ in pairs(multipart_data:get_all_with_arrays()) do
       table.insert(keys, k)

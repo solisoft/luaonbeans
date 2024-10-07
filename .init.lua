@@ -5,15 +5,15 @@ package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 -- OTP = require("otp") -- OTP functions
 require("utilities")
 require("routes")
+print(EncodeJson(Routes))
+
+ProgramMaxPayloadSize(10485760) -- 10 MB
 
 -- ArangoDB connection
 local db_config = DecodeJson(LoadAsset("config/database.json"))
 InitDB(db_config)
 
 Views = {}
-if BeansEnv == "production" then
-  LoadViewsRecursively("app/views")
-end
 
 -- LastModifiedAt is used to cache the last modified time of the assets
 -- so that we can use it to send the correct last modified time to the client
@@ -22,6 +22,9 @@ LastModifiedAt = {}
 
 function OnServerStart()
   LoadPublicAssetsRecursively("public")
+  if BeansEnv == "production" then
+    LoadViewsRecursively("app/views")
+  end
 end
 
 function OnServerReload()

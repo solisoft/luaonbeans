@@ -69,15 +69,8 @@ function Partial(partial, bindVars)
   return Etlua.compile(Views["app/views/partials/" .. partial .. ".html.etlua"])(bindVars)
 end
 
-function extractPatterns(inputStr)
-  local patterns = {}
-  for pattern in string.gmatch(inputStr, "(:[%w_]+)") do
-    table.insert(patterns, pattern)
-  end
-  return patterns
-end
-
 local function assignRoute(method, name, options, value)
+  local path = string.split(name, "/")
   Routes[method] = Routes[method] or {}
   local current = Routes[method]
   options["parent"] = options["parent"] or {}
@@ -94,10 +87,8 @@ local function assignRoute(method, name, options, value)
     end
   end
 
-  local path = string.split(name, "/")
   for i = 1, #path do
     local v = path[i]
-
     if v:sub(1, 1) == ":" then
       current[":var"] = {
         [":name"] = v:sub(2),
@@ -187,7 +178,6 @@ end
 function DefineRoutes(path, method)
   if method == "PATCH" then method = "PUT" end
   local recognized_route = Routes[method]
-
   local route_found = false
   local final_route = false
 
@@ -237,15 +227,19 @@ function DefineRoutes(path, method)
     )
   end
 
-  if Params.action == nil then
-    if RoutePath("/public" .. GetPath()) == false then
-      SetStatus(404)
-      Page("404", "app")
+  if BeansEnv == "test" then
+    -- do nothing
+  else
+    if Params.action == nil then
+      if RoutePath("/public" .. GetPath()) == false then
+        SetStatus(404)
+        Page("404", "app")
+        return
+      end
+    else
+      RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
       return
     end
-  else
-    RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
-    return
   end
 end
 
@@ -319,7 +313,11 @@ function HandleSqliteFork(db_config)
 end
 
 function PublicPath(path)
-  return path .. "?" .. LastModifiedAt[path]
+  if BeansEnv == "production" then
+    return path .. "?" .. (LastModifiedAt[path] or 0)
+  else
+    return path .. "?" .. Rdtsc()
+  end
 end
 
 function LoadPublicAssetsRecursively(path)
@@ -337,4 +335,39 @@ function LoadPublicAssetsRecursively(path)
     end
   end
   dir:close()
+end
+
+RunCommand = function(command)
+  command = string.split(command)
+  local prog = assert(Unix.commandv(command[1]))
+
+  local output = ""
+  local reader, writer = assert(Unix.pipe())
+  if assert(Unix.fork()) == 0 then
+    Unix.close(1)
+    Unix.dup(writer)
+    Unix.close(writer)
+    Unix.close(reader)
+    Unix.execve(prog, command, { 'PATH=/bin' })
+    Unix.exit(127)
+  else
+    Unix.close(writer)
+    while true do
+      local data, err = Unix.read(reader)
+      if data then
+        if data ~= '' then
+          output = output .. data
+        else
+          break
+        end
+      elseif err:errno() ~= Unix.EINTR then
+        Log(kLogWarn, tostring(err))
+        break
+      end
+    end
+    assert(Unix.close(reader))
+    Unix.wait()
+  end
+
+  return output
 end

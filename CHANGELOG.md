@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.11.0](https://github.com/solisoft/luaonbeans/compare/v0.10.0...v0.11.0) (2024-10-07)
+
+
+### Features
+
+* add PublicPath method ([2c9e7f9](https://github.com/solisoft/luaonbeans/commit/2c9e7f93ace842df5447f825d2c5d795107443f4))
+* add users params to ArangoDB CreateDatabase ([92a5eb9](https://github.com/solisoft/luaonbeans/commit/92a5eb99ce8bb235c1e986d19cc21696c823dbc1))
+* preload views / layouts / partials ([c90605a](https://github.com/solisoft/luaonbeans/commit/c90605a21ea7700f770c3d104b7b6d5caa63203a))
+
+
+### Bug Fixes
+
+* arangodb create database ([4f250db](https://github.com/solisoft/luaonbeans/commit/4f250db7ce8ece0e19702759b10a5767496c627b))
+* routing ([4195d9b](https://github.com/solisoft/luaonbeans/commit/4195d9b1887edb8e59fcb80f7f7efb950136a574))
+* routing ([2fcf67e](https://github.com/solisoft/luaonbeans/commit/2fcf67e86fa76141dd5b9ca7239c5fa381c7b597))
+
 ## [0.10.0](https://github.com/solisoft/luaonbeans/compare/v0.9.0...v0.10.0) (2024-10-01)
 
 

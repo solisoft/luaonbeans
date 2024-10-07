@@ -5,7 +5,6 @@ package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 -- OTP = require("otp") -- OTP functions
 require("utilities")
 require("routes")
-print(EncodeJson(Routes))
 
 ProgramMaxPayloadSize(10485760) -- 10 MB
 

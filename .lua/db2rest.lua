@@ -1,7 +1,6 @@
 RestApiUrl = ""
 
 local function init(db_config)
-  print(EncodeJson(db_config))
   RestApiUrl = db_config["url"] .. db_config["db_name"] .. "/"
 end
 

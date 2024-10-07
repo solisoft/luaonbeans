@@ -181,20 +181,25 @@ function DefineRoutes(path, method)
   local route_found = false
   local final_route = false
 
+  local last_route_found = nil
+
   Splat = {}
   if path == "/" then
     recognized_route = recognized_route[""]
   else
     for _, value in pairs(string.split(path, "/")) do
+
       if final_route == false then
         if recognized_route[value] or recognized_route[value .. "*"] then
           if recognized_route[value .. "*"] then final_route = true end
           recognized_route = recognized_route[value] or recognized_route[value .. "*"]
+          if recognized_route[""] then last_route_found = recognized_route[""] end
           route_found = true
         else
           route_found = false
           if recognized_route[":var"] then
             recognized_route = recognized_route[":var"]
+            if recognized_route[""] then last_route_found = recognized_route[""] end
             local parser = Re.compile(recognized_route[":regex"])
             local matcher = { parser:search(value) }
             for i, match in ipairs(matcher) do
@@ -218,6 +223,8 @@ function DefineRoutes(path, method)
 
     Splat = tableSplat(Splat)
   end
+
+  if recognized_route == nil and last_route_found ~= nil then recognized_route = last_route_found end
 
   if recognized_route ~= nil then
     recognized_route = string.split(recognized_route, "#")

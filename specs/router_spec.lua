@@ -42,6 +42,79 @@ return {
         expect.equal(Params.controller, "customers")
         expect.equal(Params.action, "index")
 
+        Params = {}
+        DefineRoutes("/customers", "POST")
+        expect.equal(Params.controller, "customers")
+        expect.equal(Params.action, "create")
+
+        Params = {}
+        DefineRoutes("/customers/new", "GET")
+        expect.equal(Params.controller, "customers")
+        expect.equal(Params.action, "new")
+
+        Params = {}
+        DefineRoutes("/customers/1", "GET")
+        expect.equal(Params.controller, "customers")
+        expect.equal(Params.action, "show")
+        expect.equal(Params.customer_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1", "DELETE")
+        expect.equal(Params.controller, "customers")
+        expect.equal(Params.action, "delete")
+        expect.equal(Params.customer_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1/edit", "GET")
+        expect.equal(Params.controller, "customers")
+        expect.equal(Params.action, "edit")
+        expect.equal(Params.customer_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1", "PUT")
+        expect.equal(Params.controller, "customers")
+        expect.equal(Params.action, "update")
+        expect.equal(Params.customer_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1/comments", "GET")
+        expect.equal(Params.controller, "comments")
+        expect.equal(Params.action, "index")
+        expect.equal(Params.customer_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1/comments", "GET")
+        expect.equal(Params.controller, "comments")
+        expect.equal(Params.action, "index")
+        expect.equal(Params.customer_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1/comments/1", "GET")
+        expect.equal(Params.controller, "comments")
+        expect.equal(Params.action, "show")
+        expect.equal(Params.customer_id, "1")
+        expect.equal(Params.comment_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1/comments/1", "PUT")
+        expect.equal(Params.controller, "comments")
+        expect.equal(Params.action, "update")
+        expect.equal(Params.customer_id, "1")
+        expect.equal(Params.comment_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1/comments", "POST")
+        expect.equal(Params.controller, "comments")
+        expect.equal(Params.action, "create")
+        expect.equal(Params.customer_id, "1")
+
+        Params = {}
+        DefineRoutes("/customers/1/comments/1", "DELETE")
+        expect.equal(Params.controller, "comments")
+        expect.equal(Params.action, "delete")
+        expect.equal(Params.customer_id, "1")
+        expect.equal(Params.comment_id, "1")
+
         expect.equal(Routes["GET"]["customers"][""], "customers#index")
         expect.equal(Routes["GET"]["customers"]["new"], "customers#new")
         expect.equal(Routes["GET"]["customers"]["refresh"], "customers#refresh")

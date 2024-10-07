@@ -3,7 +3,7 @@ Routes = { ["GET"] = { [""] = "welcome#index" } } --define root
 CustomRoute("POST", "/upload/:collection/:key/:field", "uploads#upload")
 CustomRoute("GET", "/o/:uuid/:format", "uploads#original_image")
 CustomRoute("GET", "/r/:uuid/:width/:format", "uploads#resized_image_x", { [":width"] = "([0-9]+)" })
-CustomRoute("GET", "/r/:uuid/:width/:height/:format", "uploads#resized_image_x_y", { [":width"] = "([0-9]+)", [":height"] = "([0-9]+)" })
+CustomRoute("GET", "/xy/:uuid/:width/:height/:format", "uploads#resized_image_x_y", { [":width"] = "([0-9]+)", [":height"] = "([0-9]+)" })
 
 -- CustomRoute("GET", "demo/with/:id/nested/:demo/route", "welcome#ban", {
 --  [":demo"] = "([0-9]+)" -- you can define regex per params

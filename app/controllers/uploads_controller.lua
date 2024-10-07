@@ -58,7 +58,7 @@ local app = {
 
 	resized_image_x_y = function()
 		Params.width = tonumber(Params.width) > 1600 and 1600 or Params.width
-		Params.heigth = tonumber(Params.heigth) > 1600 and 1600 or Params.heigth
+		Params.height = tonumber(Params.height) > 1600 and 1600 or Params.height
 		if ServeAsset("uploads/" .. Params.uuid .. "-" .. Params.width .. "x" .. Params.height .. "." .. Params.format) then
 			return
 		else

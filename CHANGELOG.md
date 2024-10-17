@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/solisoft/luaonbeans/compare/v0.11.0...v0.12.0) (2024-10-17)
+
+
+### Features
+
+* cronjobs + fix database.json.sqlite.sampl ([88011f6](https://github.com/solisoft/luaonbeans/commit/88011f6ff25bc0d894c1d6f7fe182b11eb22bc7c))
+
+
+### Bug Fixes
+
+* HandleSqliteFork ([042ce81](https://github.com/solisoft/luaonbeans/commit/042ce812f6ac3ab6664dd5f7ef125dbd4bfc4d93))
+
 ## [0.11.0](https://github.com/solisoft/luaonbeans/compare/v0.10.0...v0.11.0) (2024-10-07)
 
 

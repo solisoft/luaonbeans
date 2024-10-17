@@ -4,10 +4,16 @@ Etlua = require "etlua"
 Multipart = require "multipart"
 JWT = require("jwt")
 
+ProgramHeartbeatInterval(1000) -- 1 second
+ProgramBrand("LuaOnBeans")
+
 require "utilities.table"
 require "utilities.string"
 require "utilities.multipart"
 require "utilities.csrf"
+
+HandleCronJob = require("utilities.cronjobs").HandleCronJob
+
 require "luaonbeans"
 
 ENV = {}

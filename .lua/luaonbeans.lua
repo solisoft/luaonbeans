@@ -378,3 +378,32 @@ RunCommand = function(command)
 
   return output
 end
+
+function LoadCronsJobs(path)
+  if os.date("%S") == "00" then -- run every minute
+    path = path or "app/cronjobs"
+    local dir = unix.opendir(path)
+
+    while true do
+      local file, kind = dir:read()
+      if kind == unix.DT_DIR and file ~= "." and file ~= ".." then
+        LoadViewsRecursively(path .. "/" .. file)
+      end
+      if kind == unix.DT_REG then
+        if string.match(file, "cron%.lua$") then
+          if assert(unix.fork()) == 0 then
+            package.loaded[file:gsub("%.lua", "")] = nil
+            require(file:gsub("%.lua", ""))
+            unix.exit(0)
+          end
+        end
+      end
+
+      if file == nil then
+        break
+      end
+
+    end
+    dir:close()
+  end
+end

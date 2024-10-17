@@ -1,5 +1,6 @@
 package.path = package.path .. ";.lua/?.lua"
 package.path = package.path .. ";app/models/?.lua;/zip/app/models/?.lua"
+package.path = package.path .. ";app/cronjobs/?.lua;/zip/app/cronjobs/?.lua"
 package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 
 -- OTP = require("otp") -- OTP functions
@@ -29,6 +30,10 @@ end
 function OnServerReload()
   require("utilities")
   require("routes")
+end
+
+function OnServerHeartbeat()
+  LoadCronsJobs()
 end
 
 function OnWorkerStart()

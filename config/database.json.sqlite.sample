@@ -1,12 +1,12 @@
 {
 	"development": {
-		"db_file": "luaonbeans_dev.sqlite3"
+		"db_name": "kyc_dev"
 	},
 	"production": {
-		"db_file": "luaonbeans_production.sqlite3"
+		"db_name": "kyc_production"
 	},
 	"test": {
-		"db_file": "luaonbeans_test.sqlite3"
+		"db_name": "kyc_test"
 	},
 	"engine": "sqlite"
 }

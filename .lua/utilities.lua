@@ -22,4 +22,11 @@ for _, var in pairs(unix.environ()) do
   ENV[var[1]] = var[2]
 end
 
+function LogError(message)
+  if type(message) == "table" then
+    message = EncodeJson(message)
+  end
+  Log(kLogError, message)
+end
+
 BeansEnv = ENV['BEANS_ENV'] or "development"

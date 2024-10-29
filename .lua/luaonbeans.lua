@@ -281,7 +281,10 @@ function WriteJSON(object)
 end
 
 function InitDB(db_config)
-  if (db_config["engine"] == "arangodb") then
+  if (db_config["engine"] == "postgrest") then
+    PGRest = require("postgrest")
+    PGRest.init(db_config[BeansEnv])
+  elseif (db_config["engine"] == "arangodb") then
     Adb = require("arango")
     Adb.Auth(db_config[BeansEnv])
     Adb.UpdateCacheConfiguration({ mode = "on" })

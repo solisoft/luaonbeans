@@ -240,7 +240,11 @@ function DefineRoute(path, method)
     if Params.action == nil then
       if RoutePath("/public" .. GetPath()) == false then
         SetStatus(404)
-        Page("404", "app")
+        if isAPI then
+          WriteJSON({ error = "404", message = "Not Found" })
+        else
+          Page("404", "app")
+        end
         return
       end
     else

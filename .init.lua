@@ -66,5 +66,5 @@ function OnHttpRequest()
     Surreal.refresh_token(db_config[BeansEnv]) -- reconnect to surrealdb if needed
   end
 
-  DefineRoutes(GetPath(), GetMethod())
+  DefineRoute(GetPath(), GetMethod())
 end

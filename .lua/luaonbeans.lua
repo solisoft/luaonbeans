@@ -175,7 +175,7 @@ local function tableSplat(input_list)
   return output_table
 end
 
-function DefineRoutes(path, method)
+function DefineRoute(path, method)
   if method == "PATCH" then method = "PUT" end
   local recognized_route = Routes[method]
   local route_found = false

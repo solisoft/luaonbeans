@@ -45,6 +45,5 @@ return {
   read = read,
   insert = insert,
   update = update,
-  delete = delete,
-  upsert = upsert
+  delete = delete
 }

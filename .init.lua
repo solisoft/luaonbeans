@@ -67,4 +67,6 @@ function OnHttpRequest()
   end
 
   DefineRoute(GetPath(), GetMethod())
+
+  HandleRequest()
 end

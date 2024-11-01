@@ -62,4 +62,4 @@ local app = {
 }
 
 assert(app[Params.action] ~= nil, "Missing method '" .. Params.action .. "'!")
-app[Params.action]()
+app

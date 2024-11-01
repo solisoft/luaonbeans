@@ -251,6 +251,34 @@ function DefineRoute(path, method)
 
 end
 
+local handle_404_error = function()
+  SetStatus(404)
+  if isApi then
+    WriteJSON({ status = 404, message = "Not Found" })
+  else
+    Page("404", "app")
+  end
+end
+
+function HandleRequest()
+  if Params.action == nil then
+    if RoutePath("/public" .. GetPath()) == false then
+      handle_404_error()
+    end
+  else
+    if BeansEnv == "production" then
+      local status, controller = pcall(require, Params.controller .. "_controller")
+      if status == false then
+        handle_404_error()
+      else
+        controller[Params.action]()
+      end
+    else
+      RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
+    end
+  end
+end
+
 function GetBodyParams()
   local body_Params = {}
   for i, data in pairs(Params) do

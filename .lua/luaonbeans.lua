@@ -234,24 +234,21 @@ function DefineRoute(path, method)
     )
   end
 
-  if BeansEnv == "test" then
-    -- do nothing
-  else
-    if Params.action == nil then
-      if RoutePath("/public" .. GetPath()) == false then
-        SetStatus(404)
-        if isAPI then
-          WriteJSON({ error = "404", message = "Not Found" })
-        else
-          Page("404", "app")
-        end
-        return
+  if Params.action == nil then
+    if RoutePath("/public" .. GetPath()) == false then
+      SetStatus(404)
+      if isAPI then
+        WriteJSON({ error = "404", message = "Not Found" })
+      else
+        Page("404", "app")
       end
-    else
-      RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
       return
     end
+  else
+    RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
+    return
   end
+
 end
 
 function GetBodyParams()

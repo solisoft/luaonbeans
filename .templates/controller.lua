@@ -62,4 +62,8 @@ local app = {
 }
 
 assert(app[Params.action] ~= nil, "Missing method '" .. Params.action .. "'!")
-app
+if BeansEnv == "development" then
+	return app[Params.action]()
+else
+	return app
+end

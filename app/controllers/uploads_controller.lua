@@ -71,4 +71,8 @@ local app = {
 
 }
 
-return app
+if BeansEnv == "development" then
+	return app[Params.action]()
+else
+	return app
+end

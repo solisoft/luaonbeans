@@ -6,4 +6,4 @@ local app = {
 	end,
 }
 
-return app[Params.action]()
+return app

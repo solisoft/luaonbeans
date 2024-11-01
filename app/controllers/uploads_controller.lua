@@ -71,4 +71,4 @@ local app = {
 
 }
 
-return app[Params.action]()
+return app

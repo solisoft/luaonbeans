@@ -31,11 +31,18 @@ return {
           type = "collection", -- collection or member -- customers#ban
         })
 
+        CustomRoute("POST", "/", "welcome#create")
+
         CustomRoute("POST", "ban", "customers#ban")
 
         Resource("books", {
           only = { "index" },
         })
+
+        Params = {}
+        DefineRoute("/", "POST")
+        expect.equal(Params.controller, "welcome")
+        expect.equal(Params.action, "create")
 
         Params = {}
         DefineRoute("/customers", "GET")

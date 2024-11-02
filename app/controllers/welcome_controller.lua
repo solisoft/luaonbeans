@@ -6,8 +6,4 @@ local app = {
 	end,
 }
 
-if BeansEnv == "development" then
-	return app[Params.action]()
-else
-	return app
-end
+return HandleController(app)

@@ -87,22 +87,26 @@ local function assignRoute(method, name, options, value)
     end
   end
 
-  for i = 1, #path do
-    local v = path[i]
-    if v:sub(1, 1) == ":" then
-      current[":var"] = {
-        [":name"] = v:sub(2),
-        [":regex"] = options[v] or "([0-9a-zA-Z_\\-]+)"
-      }
-      if i == #path then current[":var"][""] = value end
-      current = current[":var"]
-    else
-      current[v] = current[v] or {}
-      if i == #path then
-        current[v] = value
+  if #path > 0 then
+    for i = 1, #path do
+      local v = path[i]
+      if v:sub(1, 1) == ":" then
+        current[":var"] = {
+          [":name"] = v:sub(2),
+          [":regex"] = options[v] or "([0-9a-zA-Z_\\-]+)"
+        }
+        if i == #path then current[":var"][""] = value end
+        current = current[":var"]
+      else
+        current[v] = current[v] or {}
+        if i == #path then
+          current[v] = value
+        end
+        current = current[v]
       end
-      current = current[v]
     end
+  else
+    current[""] = value
   end
 end
 
@@ -233,22 +237,6 @@ function DefineRoute(path, method)
       { controller = recognized_route[1], action = recognized_route[2] }
     )
   end
-
-  if Params.action == nil then
-    if RoutePath("/public" .. GetPath()) == false then
-      SetStatus(404)
-      if isAPI then
-        WriteJSON({ error = "404", message = "Not Found" })
-      else
-        Page("404", "app")
-      end
-      return
-    end
-  else
-    RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
-    return
-  end
-
 end
 
 local handle_404_error = function()
@@ -276,6 +264,14 @@ function HandleRequest()
     else
       RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
     end
+  end
+end
+
+function HandleController(controller)
+  if BeansEnv == "development" then
+    return controller[Params.action]()
+  else
+    return controller
   end
 end
 

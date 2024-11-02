@@ -11,7 +11,7 @@ return {
         it('load page', function()
           local status, h, body = Fetch("http://localhost:8080")
           expect.equal(status, 200)
-          expect.truthy(string.match(body, "welcome"))
+          expect.truthy(string.match(body, "Welcome"))
         end)
       end)
     end)

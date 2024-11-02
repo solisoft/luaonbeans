@@ -2,7 +2,7 @@ local app = {
 	index = function()
 		Page("welcome/index", "app")
 		-- or
-		-- WriteJson({ hello = "world" })
+		-- WriteJSON({ hello = "world" })
 	end,
 }
 

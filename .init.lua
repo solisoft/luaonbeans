@@ -1,4 +1,5 @@
 package.path = package.path .. ";.lua/?.lua"
+package.path = package.path .. ";app/controllers/?.lua;/zip/app/controllers/?.lua"
 package.path = package.path .. ";app/models/?.lua;/zip/app/models/?.lua"
 package.path = package.path .. ";app/cronjobs/?.lua;/zip/app/cronjobs/?.lua"
 package.path = package.path .. ";config/?.lua;/zip/config/?.lua"

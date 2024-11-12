@@ -21,7 +21,8 @@ function PDFGenerator.new()
     objCounter = 1
     local self = {
         objects = {},
-        current_page = nil,
+        current_page = 0,
+        current_page_obj = nil,
         page_list = {},  -- Array to store page objects
         pages_obj = nil, -- Object number for pages tree
         images = {},
@@ -48,6 +49,9 @@ function PDFGenerator.new()
             data_options = nil
         }
     }
+
+    self.header = function(pageId) end
+    self.footer = function(pageId) self:addParagraph("Page %s of %s" % { pageId, #self.page_list }, { fontSize = 8, alignment = "right",newPage = false }) end
 
     -- Initialize document
     self.info = getNewObjNum()
@@ -78,12 +82,10 @@ function PDFGenerator:addPage(width, height)
     local pageObj = getNewObjNum()
     local contentObj = getNewObjNum()
 
-    self.current_x = 0
-    self.current_y = 0
-
     -- Add page object to the list
     table.insert(self.page_list, pageObj)
-    self.current_page = pageObj
+    self.current_page_obj = pageObj
+    self.current_page = self.current_page + 1
 
     -- Create content stream
     self.contents[pageObj] = {
@@ -102,6 +104,12 @@ function PDFGenerator:addPage(width, height)
         numberToString(height),
         self:addBasicFont()
     )
+
+    --self:drawHeader()
+    --self:drawFooter()
+
+    self:setY(0)
+    self:setX(0)
 
     -- Display table header
     if self.current_table.header_columns then
@@ -179,7 +187,7 @@ function PDFGenerator:useFont(fontName)
     self.current_font = fontName
 
     -- Update the page's resources to include the custom font
-    local pageObj = self.current_page
+    local pageObj = self.current_page_obj
     self.objects[pageObj] = self.objects[pageObj]:gsub(
         "(/Font << /F1 %d+ 0 R >>)",
         string.format("/Font << /F1 %d 0 R /%s %d 0 R >>",
@@ -329,7 +337,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
     alignment = alignment or "justify"  -- default left alignment
     color = PDFGenerator:hexToRGB(color)
 
-    local content = self.contents[self.current_page]
+    local content = self.contents[self.current_page_obj]
     local fontName = self.current_font or "F1"  -- Use current_font if set, otherwise fallback to F1
 
     -- Calculate x position based on alignment
@@ -435,10 +443,11 @@ end
 -- Draw a row table with multiple columns
 function PDFGenerator:drawRowTable(columns, row_options)
     row_options = row_options or {}
+    row_options.newPage = row_options.newPage or true
 
     self:calculateMaxHeight(columns)
 
-    if self.page_height - self.current_y - self.current_table.current_row.height  < self.margin_y[1] + self.margin_y[2] then
+    if row_options.newPage == true and self.page_height - self.current_y - self.current_table.current_row.height  < self.margin_y[1] + self.margin_y[2] then
         self:addPage()
     end
 
@@ -514,6 +523,18 @@ function PDFGenerator:setY(y)
     return self
 end
 
+-- Set header
+function PDFGenerator:setHeader(header)
+    self.header = header
+    return self
+end
+
+-- Set footer
+function PDFGenerator:setFooter(footer)
+    self.footer = footer
+    return self
+end
+
 -- Move current X position
 function PDFGenerator:moveX(x)
     self.current_x = self.current_x + x
@@ -529,6 +550,7 @@ end
 -- Add paragraph to current page
 function PDFGenerator:addParagraph(text, options)
     options = options or {}
+    options.newPage = options.newPage or true
     options.fontSize = options.fontSize or 12
     options.alignment = options.alignment or "left"
     options.width = options.width or (self.page_width - self.margin_x[1] - self.margin_x[2])
@@ -538,7 +560,7 @@ function PDFGenerator:addParagraph(text, options)
     local lines = self:splitTextToLines(text, options.fontSize, options.width)
     for i, line in ipairs(lines) do
         self.current_y = self.current_y + options.fontSize*1.2
-        if self.page_height - self.current_y < self.margin_y[1] + self.margin_y[2] then
+        if options.new_page == true and self.page_height - self.current_y < self.margin_y[1] + self.margin_y[2] then
             self:addPage()
         end
         self:addText(line, options.fontSize, options.color, options.alignment, options.width)
@@ -549,7 +571,7 @@ end
 -- Draw line on current page
 function PDFGenerator:drawLine(x1, y1, x2, y2, width)
     width = width or 1
-    local content = self.contents[self.current_page]
+    local content = self.contents[self.current_page_obj]
     content.stream = content.stream .. string.format(
         "%s w\n%s %s m\n%s %s l\nS\n",
         numberToString(width),
@@ -573,7 +595,7 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
     fillColor = fillColor or "ffffff"  -- default white
     fillColor = PDFGenerator:hexToRGB(fillColor)
 
-    local content = self.contents[self.current_page]
+    local content = self.contents[self.current_page_obj]
 
     -- Save graphics state
     content.stream = content.stream .. "q\n"
@@ -678,7 +700,7 @@ function PDFGenerator:drawRectangle(width, height, borderWidth, borderStyle, bor
     fillColor = fillColor or "ffffff"  -- default gray
     fillColor = PDFGenerator:hexToRGB(fillColor)
 
-    local content = self.contents[self.current_page]
+    local content = self.contents[self.current_page_obj]
 
     -- Save graphics state
     content.stream = content.stream .. "q\n"
@@ -732,7 +754,7 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
     fillColor = fillColor or "ffffff"  -- default white
     fillColor = PDFGenerator:hexToRGB(fillColor)
 
-    local content = self.contents[self.current_page]
+    local content = self.contents[self.current_page_obj]
 
     -- Save graphics state
     content.stream = content.stream .. "q\n"
@@ -839,16 +861,16 @@ function PDFGenerator:drawImage(imgName, x, y, width, height)
     end
 
     -- Check if image XObject is already included in page resources
-    local pageObj = self.objects[self.current_page]
+    local pageObj = self.objects[self.current_page_obj]
     if not pageObj:find("/" .. imgName .. " %d+ 0 R") then
         -- Only update page resources if image not already included
         local imgRef = string.format("%d 0 R", self.resources.images[imgName].obj)
         pageObj = pageObj:gsub("(/XObject << )(>>)", "%1/" .. imgName .. " " .. imgRef .. " %2")
-        self.objects[self.current_page] = pageObj
+        self.objects[self.current_page_obj] = pageObj
     end
 
     -- Draw image with corrected coordinate system
-    local content = self.contents[self.current_page]
+    local content = self.contents[self.current_page_obj]
     content.stream = content.stream .. string.format(
         "q\n%s 0 0 %s %s %s cm\n/%s Do\nQ\n",
         numberToString(width),
@@ -860,10 +882,40 @@ function PDFGenerator:drawImage(imgName, x, y, width, height)
     return self
 end
 
+-- Draw header on current page
+function PDFGenerator:drawHeader(pageId)
+    -- Reset position to top of page
+    self.current_x = 0
+    self.current_y = self.margin_y[1]
+
+    -- Execute header function
+    self.header(pageId)
+end
+
+-- Draw footer on current page
+function PDFGenerator:drawFooter(pageId)
+    -- Reset position to top of page
+    self.current_x = 0
+    self.current_y = self.page_height - self.margin_y[2] - self.margin_y[1]
+
+    -- Execute footer function
+    self.footer(pageId)
+end
+
 -- Generate PDF and return as string
 function PDFGenerator:generate()
     local output = {}
+    local current_page = 1
+    -- Add header and footer to all pages
+    for pageId, content in pairs(self.contents) do
+        -- Set current page for header/footer drawing
+        self.current_page_obj = pageId
 
+        self:drawHeader(current_page)
+        self:drawFooter(current_page)
+
+        current_page = current_page + 1
+    end
     -- Add header
     table.insert(output, "%PDF-1.7\n%âãÏÓ\n")
 

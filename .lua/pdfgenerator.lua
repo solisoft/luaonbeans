@@ -32,8 +32,9 @@ function PDFGenerator.new()
         root = nil,
         page_width = 595,
         page_height = 842,
+        header_height = 50,
         margin_x = {50, 50},
-        margin_y = {50, 50},
+        margin_y = {50, 80},
         current_x = 0,
         current_y = 0,
         resources = {},
@@ -51,7 +52,10 @@ function PDFGenerator.new()
     }
 
     self.header = function(pageId) end
-    self.footer = function(pageId) self:addParagraph("Page %s of %s" % { pageId, #self.page_list }, { fontSize = 8, alignment = "right",newPage = false }) end
+    self.footer = function(pageId)
+        self.moveY(self, 5)
+        self:addParagraph("Page %s of %s" % { pageId, #self.page_list }, { fontSize = 8, alignment = "right",newPage = false })
+    end
 
     -- Initialize document
     self.info = getNewObjNum()
@@ -369,7 +373,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
             numberToString(color[3]),
             numberToString(word_spacing),  -- Set word spacing using Tw operator
             numberToString(x_pos),
-            numberToString(self.page_height - self.margin_y[1] - self.current_y),
+            numberToString(self.currentYPos(self)),
             EscapeHtml(text)
         )
         return self
@@ -385,7 +389,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
         numberToString(color[2]),
         numberToString(color[3]),
         numberToString(x_pos),
-        numberToString(self.page_height - self.margin_y[1] - self.current_y),
+        numberToString(self.currentYPos(self)),
         EscapeHtml(text)
     )
 
@@ -447,7 +451,7 @@ function PDFGenerator:drawRowTable(columns, row_options)
 
     self:calculateMaxHeight(columns)
 
-    if row_options.newPage == true and self.page_height - self.current_y - self.current_table.current_row.height  < self.margin_y[1] + self.margin_y[2] then
+    if row_options.newPage == true and self.page_height - self.current_y - self.current_table.current_row.height - self.header_height  < self.margin_y[1] + self.margin_y[2] then
         self:addPage()
     end
 
@@ -538,13 +542,15 @@ end
 -- Move current X position
 function PDFGenerator:moveX(x)
     self.current_x = self.current_x + x
-    return self
 end
 
 -- Move current Y position
 function PDFGenerator:moveY(y)
     self.current_y = self.current_y + y
-    return self
+end
+
+function PDFGenerator:currentYPos()
+    return self.page_height - self.margin_y[1] - self.current_y - self.header_height
 end
 
 -- Add paragraph to current page
@@ -560,7 +566,7 @@ function PDFGenerator:addParagraph(text, options)
     local lines = self:splitTextToLines(text, options.fontSize, options.width)
     for i, line in ipairs(lines) do
         self.current_y = self.current_y + options.fontSize*1.2
-        if options.new_page == true and self.page_height - self.current_y < self.margin_y[1] + self.margin_y[2] then
+        if options.new_page == true and self.page_height - self.current_y - self.header_height < self.margin_y[1] + self.margin_y[2] then
             self:addPage()
         end
         self:addText(line, options.fontSize, options.color, options.alignment, options.width)
@@ -732,7 +738,7 @@ function PDFGenerator:drawRectangle(width, height, borderWidth, borderStyle, bor
     content.stream = content.stream .. string.format(
         "%s %s %s %s re\nB\n",
         numberToString(self.margin_x[1] + self.current_x),
-        numberToString(self.page_height - self.margin_y[1] - self.current_y - height),
+        numberToString(self.currentYPos(self) - height),
         numberToString(width),
         numberToString(height)
     )
@@ -896,8 +902,7 @@ end
 function PDFGenerator:drawFooter(pageId)
     -- Reset position to top of page
     self.current_x = 0
-    self.current_y = self.page_height - self.margin_y[2] - self.margin_y[1]
-
+    self.current_y = self.page_height - self.margin_y[2] - self.margin_y[1] - self.header_height
     -- Execute footer function
     self.footer(pageId)
 end
@@ -905,16 +910,13 @@ end
 -- Generate PDF and return as string
 function PDFGenerator:generate()
     local output = {}
-    local current_page = 1
     -- Add header and footer to all pages
-    for pageId, content in pairs(self.contents) do
+    for current_page, pageId in pairs(self.page_list) do
         -- Set current page for header/footer drawing
         self.current_page_obj = pageId
 
         self:drawHeader(current_page)
         self:drawFooter(current_page)
-
-        current_page = current_page + 1
     end
     -- Add header
     table.insert(output, "%PDF-1.7\n%âãÏÓ\n")

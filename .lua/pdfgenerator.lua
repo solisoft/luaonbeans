@@ -711,8 +711,6 @@ end
 -- borderStyle can be "solid" or "dashed"
 -- borderColor and fillColor should be in format {r, g, b} where each value is between 0 and 1
 function PDFGenerator:drawRectangle(options)
-    Logger(EncodeJson(options.borderSides))
-
     options = options or {}
     options.borderWidth = options.borderWidth or 1
     options.borderStyle = options.borderStyle or "solid"
@@ -765,7 +763,6 @@ function PDFGenerator:drawRectangle(options)
     )
 
     -- Draw left border
-    Logger(EncodeJson(options.borderSides))
     if options.borderSides.left == true then
         content.stream = content.stream .. string.format(
             "%s w\n%s %s m\n%s %s l\nS\n",
@@ -957,6 +954,8 @@ function PDFGenerator:drawImage(imgName, width)
         numberToString(self.currentYPos(self) - height),
         imgName
     )
+
+    self:moveY(height)
     return self
 end
 

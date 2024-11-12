@@ -39,11 +39,13 @@ function PDFGenerator.new()
         current_y = 0,
         resources = {},
         font_metrics = {},
+        last_font = nil,
         current_table = {
             current_row = {
                 height = nil
             },
-            padding = 5,
+            padding_x = 5,
+            padding_y = 5,
             header_columns = nil,
             data_columns = nil,
             header_options = nil,
@@ -112,13 +114,16 @@ function PDFGenerator:addPage(width, height)
 
     --self:drawHeader()
     --self:drawFooter()
+    if self.last_font then
+        self:useFont(self.last_font.fontFamily, self.last_font.factor)
+    end
 
     self:setY(0)
     self:setX(0)
 
     -- Display table header
     if self.current_table.header_columns then
-        self:drawRowTable(self.current_table.header_columns, { fillColor = "eee" })
+        self:drawRowTable(self.current_table.header_columns, self.current_table.header_options)
     end
 
     return self
@@ -135,18 +140,15 @@ function PDFGenerator:addBasicFont()
 end
 
 -- Add custom font (TrueType)
-function PDFGenerator:addCustomFont(fontPath, fontName)
+function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
     local fontObj = getNewObjNum()
     local fontFileObj = getNewObjNum()
     local fontDescObj = getNewObjNum()
 
     -- Read font file
-    local file = io.open(fontPath, "rb")
-    if not file then
-        error("Could not open font file: " .. fontPath)
-    end
-    local fontData = file:read("*all")
-    file:close()
+
+    local fontData = LoadAsset(fontPath)
+    local fontMetrics = LoadAsset(fontPath:gsub("%.ttf$", ".json"))
 
     -- Font descriptor object
     self.objects[fontDescObj] = string.format(
@@ -178,12 +180,14 @@ function PDFGenerator:addCustomFont(fontPath, fontName)
         self.custom_fonts = {}
     end
     self.custom_fonts[fontName] = fontObj
-
-    return fontObj
+    self.font_metrics[fontName] = self.font_metrics[fontName] or {}
+    self.font_metrics[fontName][fontWeight] = DecodeJson(fontMetrics)
 end
 
 -- Use custom font for text
-function PDFGenerator:useFont(fontName)
+function PDFGenerator:useFont(fontName, factor)
+    factor = factor or 1
+
     if not self.custom_fonts or not self.custom_fonts[fontName] then
         error("Font not loaded: " .. fontName)
     end
@@ -202,6 +206,8 @@ function PDFGenerator:useFont(fontName)
         )
     )
 
+    self.last_font = { fontFamily = fontName, factor = factor }
+
     return self
 end
 -- Get text width for current font and size using font metrics
@@ -212,7 +218,7 @@ function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
     -- Helvetica character widths (in 1/1000 units of font size)
     -- These metrics are from the Adobe Font Metrics (AFM) file for Helvetica
     -- Values represent character widths in 1/1000 units of the font size
-    local helveticaMetrics = {
+    local fontMetrics = {
         normal = {
             [32]=278, [33]=278, [34]=355, [35]=556, [36]=556, [37]=889, [38]=667, [39]=191, [40]=333, [41]=333,
             [42]=389, [43]=584, [44]=278, [45]=333, [46]=278, [47]=278, [48]=556, [49]=556, [50]=556, [51]=556,
@@ -273,11 +279,16 @@ function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
         }
     }
 
+    if self.font_metrics[self.last_font.fontFamily] then
+        fontMetrics = self.font_metrics[self.last_font.fontFamily]
+    end
+
     local width = 0
     for i = 1, #text do
         local charCode = string.byte(text, i)
-        local metrics = helveticaMetrics[fontWeight]
-        width = width + (metrics[charCode] or 556) -- default to 556 for unknown chars
+        local metrics = fontMetrics[fontWeight]
+
+        width = width + (metrics[""..charCode] or 556) -- default to 556 for unknown chars
     end
 
     -- Convert from font units (1/1000) to points
@@ -397,16 +408,45 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
     return self
 end
 
--- Draw a table
-function PDFGenerator:drawTable(options)
+-- Add paragraph to current page
+function PDFGenerator:addParagraph(text, options)
     options = options or {}
+    options.fontSize = options.fontSize or 12
+    options.alignment = options.alignment or "left"
+    options.width = options.width or (self.page_width - self.margin_x[1] - self.margin_x[2])
+    options.color = options.color or "000000"
+    options.width = options.width
+
+    local lines = self:splitTextToLines(text, options.fontSize, options.width)
+    for i, line in ipairs(lines) do
+        self.current_y = self.current_y + options.fontSize*1.2
+        if self.out_of_page == false and self.page_height - self.current_y - self.header_height < self.margin_y[1] + self.margin_y[2] then
+            self:addPage()
+        end
+        self:addText(line, options.fontSize, options.color, options.alignment, options.width)
+    end
+    return self
+end
+
+-- Draw a table
+function PDFGenerator:drawTable(options, table_options)
+    options = options or {}
+    self.current_table = table.merge(self.current_table, table_options or {})
     self.current_table.header_columns = options.header_columns
     self.current_table.data_columns = options.data_columns
     self.current_table.header_options = options.header_options
     self.current_table.data_options = options.data_options
 
     self:drawRowTable(options.header_columns, options.header_options)
-    for _, column in ipairs(options.data_columns) do
+    for line, column in ipairs(options.data_columns) do
+        if options.data_options.oddFillColor and line % 2 == 0 then
+            options.data_options.fillColor = options.data_options.oddFillColor
+        end
+
+        if options.data_options.evenFillColor and line % 2 == 1 then
+            options.data_options.fillColor = options.data_options.evenFillColor
+        end
+
         self:drawRowTable(column, options.data_options)
     end
 
@@ -414,7 +454,7 @@ function PDFGenerator:drawTable(options)
     self.current_table.data_columns = nil
     self.current_table.header_options = nil
     self.current_table.data_options = nil
-    self.current_table.current_row = { height = nil, padding = 5}
+    self.current_table.current_row = { height = nil, padding_x = 5, padding_y = 5}
 end
 
 -- Calculate maximum height needed for a collection of text items
@@ -426,14 +466,15 @@ function PDFGenerator:calculateMaxHeight(items)
         local text = item.text or ""
         local fontSize = item.fontSize or 12
         local width = item.width or (self.page_width - self.margin_x[1] - self.margin_x[2])
-        local padding = item.padding or self.current_table.padding or 5
+        local padding_x = item.padding_x or self.current_table.padding_x or 5
+        local padding_y = item.padding_y or self.current_table.padding_y or 5
 
         -- Split text into lines considering the available width
-        local lines = self:splitTextToLines(text, fontSize, width - (padding * 2))
+        local lines = self:splitTextToLines(text, fontSize, width - (padding_x * 2))
 
         -- Calculate height for this item
         local line_height = fontSize * 1.5  -- Standard line height
-        local text_height = #lines * line_height + 2 -- + (padding * 2)  -- Include padding
+        local text_height = #lines * line_height + 2 + (padding_y * 2)  -- Include padding
         -- Update max_height if this item is taller
         if text_height > max_height then
             max_height = text_height
@@ -485,24 +526,27 @@ function PDFGenerator:drawTableCell(text, options)
     options.borderColor = options.borderColor or "000"
 
     -- Draw cell border using existing rectangle method
-    self:drawRectangle(
-        options.width,
-        self.current_table.current_row.height,
-        options.borderWidth,
-        "solid",
-        options.borderColor,
-        options.fillColor
-    )
+    self:drawRectangle({
+        width = options.width,
+        height = self.current_table.current_row.height,
+        borderWidth = options.borderWidth,
+        borderStyle = "solid",
+        borderColor = options.borderColor,
+        fillColor = options.fillColor,
+        borderSides = options.borderSides;
+    })
 
     -- Save current position before drawing text
     local saved_x = self.current_x
     local saved_y = self.current_y
 
     if options.alignment == "left" then
-        self:moveX(self.current_table.padding)
+        self:moveX(self.current_table.padding_x)
     elseif options.alignment == "right" then
-        self:moveX(-self.current_table.padding)
+        self:moveX(-self.current_table.padding_x)
     end
+
+    self:moveY(self.current_table.padding_y)
 
     self:addParagraph(text, { fontSize = options.fontSize, alignment = options.alignment, width = options.width })
 
@@ -540,26 +584,6 @@ end
 -- Calcutate the current Y position based on margins and header
 function PDFGenerator:currentYPos()
     return self.page_height - self.margin_y[1] - self.current_y - self.header_height
-end
-
--- Add paragraph to current page
-function PDFGenerator:addParagraph(text, options)
-    options = options or {}
-    options.fontSize = options.fontSize or 12
-    options.alignment = options.alignment or "left"
-    options.width = options.width or (self.page_width - self.margin_x[1] - self.margin_x[2])
-    options.color = options.color or "000000"
-    options.width = options.width
-
-    local lines = self:splitTextToLines(text, options.fontSize, options.width)
-    for i, line in ipairs(lines) do
-        self.current_y = self.current_y + options.fontSize*1.2
-        if self.out_of_page == false and self.page_height - self.current_y - self.header_height < self.margin_y[1] + self.margin_y[2] then
-            self:addPage()
-        end
-        self:addText(line, options.fontSize, options.color, options.alignment, options.width)
-    end
-    return self
 end
 
 -- Draw line on current page
@@ -686,13 +710,22 @@ end
 -- Draw rectangle on current page
 -- borderStyle can be "solid" or "dashed"
 -- borderColor and fillColor should be in format {r, g, b} where each value is between 0 and 1
-function PDFGenerator:drawRectangle(width, height, borderWidth, borderStyle, borderColor, fillColor)
-    borderWidth = borderWidth or 1
-    borderStyle = borderStyle or "solid"
-    borderColor = borderColor or "000000"  -- default gray
-    borderColor = PDFGenerator:hexToRGB(borderColor)
-    fillColor = fillColor or "ffffff"  -- default gray
-    fillColor = PDFGenerator:hexToRGB(fillColor)
+function PDFGenerator:drawRectangle(options)
+    Logger(EncodeJson(options.borderSides))
+
+    options = options or {}
+    options.borderWidth = options.borderWidth or 1
+    options.borderStyle = options.borderStyle or "solid"
+    options.borderColor = options.borderColor or "000000"  -- default gray
+    options.borderColor = PDFGenerator:hexToRGB(options.borderColor)
+    options.fillColor = options.fillColor or "ffffff"  -- default gray
+    options.fillColor = PDFGenerator:hexToRGB(options.fillColor)
+
+    options.borderSides = options.borderSides or {}
+    options.borderSides.left = options.borderSides.left or true
+    options.borderSides.right = options.borderSides.right or true
+    options.borderSides.top = options.borderSides.top or true
+    options.borderSides.bottom = options.borderSides.bottom or true
 
     local content = self.contents[self.current_page_obj]
 
@@ -702,34 +735,80 @@ function PDFGenerator:drawRectangle(width, height, borderWidth, borderStyle, bor
     -- Set border color
     content.stream = content.stream .. string.format(
         "%s %s %s RG\n",
-        numberToString(borderColor[1]),
-        numberToString(borderColor[2]),
-        numberToString(borderColor[3])
+        numberToString(options.borderColor[1]),
+        numberToString(options.borderColor[2]),
+        numberToString(options.borderColor[3])
     )
 
     -- Set line width
-    content.stream = content.stream .. string.format("%s w\n", numberToString(borderWidth))
+    content.stream = content.stream .. string.format("%s w\n", numberToString(options.borderWidth))
 
     -- Set dash pattern if needed
-    if borderStyle == "dashed" then
+    if options.borderStyle == "dashed" then
         content.stream = content.stream .. "[3 3] 0 d\n"
     end
 
     -- If fill color is provided, set it and draw filled rectangle
     content.stream = content.stream .. string.format(
         "%s %s %s rg\n",
-        numberToString(fillColor[1]),
-        numberToString(fillColor[2]),
-        numberToString(fillColor[3])
+        numberToString(options.fillColor[1]),
+        numberToString(options.fillColor[2]),
+        numberToString(options.fillColor[3])
     )
     -- Draw filled and stroked rectangle
     content.stream = content.stream .. string.format(
-        "%s %s %s %s re\nB\n",
+        "%s %s %s %s re\nf\n",
         numberToString(self.margin_x[1] + self.current_x),
-        numberToString(self.currentYPos(self) - height),
-        numberToString(width),
-        numberToString(height)
+        numberToString(self.currentYPos(self) - options.height),
+        numberToString(options.width),
+        numberToString(options.height)
     )
+
+    -- Draw left border
+    Logger(EncodeJson(options.borderSides))
+    if options.borderSides.left == true then
+        content.stream = content.stream .. string.format(
+            "%s w\n%s %s m\n%s %s l\nS\n",
+            numberToString(options.borderWidth),
+            numberToString(self.margin_x[1] + self.current_x),
+            numberToString(self.currentYPos(self) - options.height),
+            numberToString(self.margin_x[1] + self.current_x),
+            numberToString(self.currentYPos(self))
+        )
+    end
+
+    if options.borderSides.right == true then
+        content.stream = content.stream .. string.format(
+            "%s w\n%s %s m\n%s %s l\nS\n",
+            numberToString(options.borderWidth),
+            numberToString(self.margin_x[1] + self.current_x + options.width),
+            numberToString(self.currentYPos(self) - options.height),
+            numberToString(self.margin_x[1] + self.current_x + options.width),
+            numberToString(self.currentYPos(self))
+        )
+    end
+
+    if options.borderSides.top == true then
+        content.stream = content.stream .. string.format(
+            "%s w\n%s %s m\n%s %s l\nS\n",
+            numberToString(options.borderWidth),
+            numberToString(self.margin_x[1] + self.current_x),
+            numberToString(self.currentYPos(self)),
+            numberToString(self.margin_x[1] + self.current_x + options.width),
+            numberToString(self.currentYPos(self))
+        )
+    end
+
+    if options.borderSides.bottom == true then
+        content.stream = content.stream .. string.format(
+            "%s w\n%s %s m\n%s %s l\nS\n",
+            numberToString(options.borderWidth),
+            numberToString(self.margin_x[1] + self.current_x),
+            numberToString(self.currentYPos(self) - options.height),
+            numberToString(self.margin_x[1] + self.current_x + options.width),
+            numberToString(self.currentYPos(self) - options.height)
+        )
+    end
 
     -- Restore graphics state
     content.stream = content.stream .. "Q\n"

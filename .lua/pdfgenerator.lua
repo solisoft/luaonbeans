@@ -520,6 +520,7 @@ function PDFGenerator:drawTableCell(text, options)
     options = options or {}
     options.width = options.width or self.page_width - self.margin_x[1] - self.margin_x[2]
     options.fontSize = options.fontSize or 12
+    options.textColor = options.textColor or "000"
     options.borderWidth = options.borderWidth or 1
     options.alignment = options.alignment or "left"
     options.fillColor = options.fillColor or "fff"
@@ -548,7 +549,12 @@ function PDFGenerator:drawTableCell(text, options)
 
     self:moveY(self.current_table.padding_y)
 
-    self:addParagraph(text, { fontSize = options.fontSize, alignment = options.alignment, width = options.width })
+    self:addParagraph(text, {
+        fontSize = options.fontSize,
+        alignment = options.alignment,
+        width = options.width,
+        color = options.textColor
+    })
 
     -- Restore cursor position after drawing text
     self.current_x = saved_x

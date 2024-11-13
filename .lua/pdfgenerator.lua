@@ -16,8 +16,13 @@ local function numberToString(num)
     return string.format("%.2f", num)
 end
 
+local fontHelveticaMetrics = {
+    normal = DecodeJson([[{"32":277.83203125,"33":277.83203125,"34":354.98046875,"35":556.15234375,"36":556.15234375,"37":889.16015625,"38":666.9921875,"39":190.91796875,"40":333.0078125,"41":333.0078125,"42":389.16015625,"43":583.984375,"44":277.83203125,"45":333.0078125,"46":277.83203125,"47":277.83203125,"48":556.15234375,"49":556.15234375,"50":556.15234375,"51":556.15234375,"52":556.15234375,"53":556.15234375,"54":556.15234375,"55":556.15234375,"56":556.15234375,"57":556.15234375,"58":277.83203125,"59":277.83203125,"60":583.984375,"61":583.984375,"62":583.984375,"63":556.15234375,"64":1015.13671875,"65":666.9921875,"66":666.9921875,"67":722.16796875,"68":722.16796875,"69":666.9921875,"70":610.83984375,"71":777.83203125,"72":722.16796875,"73":277.83203125,"74":500,"75":666.9921875,"76":556.15234375,"77":833.0078125,"78":722.16796875,"79":777.83203125,"80":666.9921875,"81":777.83203125,"82":722.16796875,"83":666.9921875,"84":610.83984375,"85":722.16796875,"86":666.9921875,"87":943.84765625,"88":666.9921875,"89":666.9921875,"90":610.83984375,"91":277.83203125,"92":277.83203125,"93":277.83203125,"94":469.23828125,"95":556.15234375,"96":333.0078125,"97":556.15234375,"98":556.15234375,"99":500,"100":556.15234375,"101":556.15234375,"102":277.83203125,"103":556.15234375,"104":556.15234375,"105":222.16796875,"106":222.16796875,"107":500,"108":222.16796875,"109":833.0078125,"110":556.15234375,"111":556.15234375,"112":556.15234375,"113":556.15234375,"114":333.0078125,"115":500,"116":277.83203125,"117":556.15234375,"118":500,"119":722.16796875,"120":500,"121":500,"122":500,"123":333.984375,"124":259.765625,"125":333.984375,"126":583.984375,"127":633.7890625,"128":633.7890625,"129":633.7890625,"130":633.7890625,"131":633.7890625,"132":633.7890625,"133":633.7890625,"134":633.7890625,"135":633.7890625,"136":633.7890625,"137":633.7890625,"138":633.7890625,"139":633.7890625,"140":633.7890625,"141":633.7890625,"142":633.7890625,"143":633.7890625,"144":633.7890625,"145":633.7890625,"146":633.7890625,"147":633.7890625,"148":633.7890625,"149":633.7890625,"150":633.7890625,"151":633.7890625,"152":633.7890625,"153":633.7890625,"154":633.7890625,"155":633.7890625,"156":633.7890625,"157":633.7890625,"158":633.7890625,"159":633.7890625,"160":277.83203125,"161":333.0078125,"162":556.15234375,"163":556.15234375,"164":556.15234375,"165":556.15234375,"166":259.765625,"167":556.15234375,"168":333.0078125,"169":736.81640625,"170":370.1171875,"171":556.15234375,"172":583.984375,"173":333.0078125,"174":736.81640625,"175":333.0078125,"176":399.90234375,"177":548.828125,"178":333.0078125,"179":333.0078125,"180":333.0078125,"181":576.171875,"182":537.109375,"183":277.83203125,"184":333.0078125,"185":333.0078125,"186":365.234375,"187":556.15234375,"188":833.984375,"189":833.984375,"190":833.984375,"191":610.83984375,"192":666.9921875,"193":666.9921875,"194":666.9921875,"195":666.9921875,"196":666.9921875,"197":666.9921875,"198":1000,"199":722.16796875,"200":666.9921875,"201":666.9921875,"202":666.9921875,"203":666.9921875,"204":277.83203125,"205":277.83203125,"206":277.83203125,"207":277.83203125,"208":722.16796875,"209":722.16796875,"210":777.83203125,"211":777.83203125,"212":777.83203125,"213":777.83203125,"214":777.83203125,"215":583.984375,"216":777.83203125,"217":722.16796875,"218":722.16796875,"219":722.16796875,"220":722.16796875,"221":666.9921875,"222":666.9921875,"223":610.83984375,"224":556.15234375,"225":556.15234375,"226":556.15234375,"227":556.15234375,"228":556.15234375,"229":556.15234375,"230":889.16015625,"231":500,"232":556.15234375,"233":556.15234375,"234":556.15234375,"235":556.15234375,"236":277.83203125,"237":277.83203125,"238":277.83203125,"239":277.83203125,"240":556.15234375,"241":556.15234375,"242":556.15234375,"243":556.15234375,"244":556.15234375,"245":556.15234375,"246":556.15234375,"247":548.828125,"248":610.83984375,"249":556.15234375,"250":556.15234375,"251":556.15234375,"252":556.15234375,"253":500,"254":556.15234375,"255":500,"256":666.9921875}]])
+}
+
+
 -- Create new PDF document
-function PDFGenerator.new()
+function PDFGenerator.new(options)
     objCounter = 1
     local self = {
         objects = {},
@@ -32,14 +37,15 @@ function PDFGenerator.new()
         root = nil,
         page_width = 595,
         page_height = 842,
-        header_height = 50,
+        header_height = 0,
         margin_x = {50, 50},
         margin_y = {50, 80},
         current_x = 0,
         current_y = 0,
         resources = {},
         font_metrics = {},
-        last_font = nil,
+        fonts = {},
+        last_font = { fontFamily = "Helvetica", fontWeight = "normal" },
         current_table = {
             current_row = {
                 height = nil
@@ -54,6 +60,8 @@ function PDFGenerator.new()
         out_of_page = false,
     }
 
+    self = table.merge(self, options or {})
+
     self.header = function(pageId) end
     self.footer = function(pageId)
         self.moveY(self, 5)
@@ -64,6 +72,7 @@ function PDFGenerator.new()
     self.info = getNewObjNum()
     self.root = getNewObjNum()
     self.pages_obj = getNewObjNum()
+    self.basic_font_obj = getNewObjNum()
 
     -- Initialize resources
     self.resources = {
@@ -89,6 +98,10 @@ function PDFGenerator:addPage(width, height)
     local pageObj = getNewObjNum()
     local contentObj = getNewObjNum()
 
+    if self.current_page == 0 then
+        self:addBasicFont()
+    end
+
     -- Add page object to the list
     table.insert(self.page_list, pageObj)
     self.current_page_obj = pageObj
@@ -103,19 +116,16 @@ function PDFGenerator:addPage(width, height)
     -- Add page object definition
     self.objects[pageObj] = string.format(
         "%d 0 obj\n<< /Type /Page /Parent %d 0 R /Contents %d 0 R /MediaBox [0 0 %s %s] /Resources << /Font << /F1 %d 0 R >> /XObject << >> >> >>\nendobj\n",
-
         pageObj,
         self.pages_obj,
         contentObj,
         numberToString(width),
         numberToString(height),
-        self:addBasicFont()
+        self.basic_font_obj
     )
 
-    --self:drawHeader()
-    --self:drawFooter()
-    if self.last_font then
-        self:useFont(self.last_font.fontFamily, self.last_font.factor)
+    for _, font in ipairs(self.fonts) do
+        self:useFont(font[1], font[2])
     end
 
     self:setY(0)
@@ -131,12 +141,10 @@ end
 
 -- Add basic Helvetica font
 function PDFGenerator:addBasicFont()
-    local fontObj = getNewObjNum()
-    self.objects[fontObj] = string.format(
+    self.objects[self.basic_font_obj] = string.format(
         "%d 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n",
-        fontObj
+        self.basic_font_obj
     )
-    return fontObj
 end
 
 -- Add custom font (TrueType)
@@ -145,8 +153,11 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
     local fontFileObj = getNewObjNum()
     local fontDescObj = getNewObjNum()
 
-    -- Read font file
+    table.insert(self.fonts, {fontName, fontWeight})
 
+    fullFontName = fontName .. "-" .. fontWeight
+
+    -- Read font file
     local fontData = LoadAsset(fontPath)
     local fontMetrics = LoadAsset(fontPath:gsub("%.ttf$", ".json"))
 
@@ -154,7 +165,7 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
     self.objects[fontDescObj] = string.format(
         "%d 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /%s /Flags 32 /FontBBox [-250 -250 1250 1250] /ItalicAngle 0 /Ascent 750 /Descent -250 /CapHeight 750 /StemV 80 /FontFile2 %d 0 R >>\nendobj\n",
         fontDescObj,
-        fontName,
+        fullFontName,
         fontFileObj
     )
 
@@ -171,7 +182,7 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
     self.objects[fontObj] = string.format(
         "%d 0 obj\n<< /Type /Font /Subtype /TrueType /BaseFont /%s /FirstChar 32 /LastChar 255 /Encoding /WinAnsiEncoding /FontDescriptor %d 0 R  >>\nendobj\n",
         fontObj,
-        fontName,
+        fullFontName,
         fontDescObj
     )
 
@@ -179,116 +190,84 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
     if not self.custom_fonts then
         self.custom_fonts = {}
     end
-    self.custom_fonts[fontName] = fontObj
-    self.font_metrics[fontName] = self.font_metrics[fontName] or {}
-    self.font_metrics[fontName][fontWeight] = DecodeJson(fontMetrics)
+
+    self.custom_fonts[fullFontName] = fontObj
+    if fontMetrics then
+        self.font_metrics[fullFontName] = DecodeJson(fontMetrics)
+    end
+
+    self:useFont(fontName, fontWeight)
+
 end
 
 -- Use custom font for text
-function PDFGenerator:useFont(fontName, factor)
-    factor = factor or 1
-
-    if not self.custom_fonts or not self.custom_fonts[fontName] then
-        error("Font not loaded: " .. fontName)
-    end
+function PDFGenerator:useFont(fontName, fontWeight)
+    fontWeight = fontWeight or "normal"
+    self.last_font = self.last_font or {}
+    self.last_font.fontFamily = fontName
+    self.last_font.fontWeight = fontWeight
 
     -- Store the current font name to be used in addText
     self.current_font = fontName
 
     -- Update the page's resources to include the custom font
     local pageObj = self.current_page_obj
-    self.objects[pageObj] = self.objects[pageObj]:gsub(
-        "(/Font << /F1 %d+ 0 R >>)",
-        string.format("/Font << /F1 %d 0 R /%s %d 0 R >>",
-            self:addBasicFont(),
-            fontName,
-            self.custom_fonts[fontName]
-        )
-    )
 
-    self.last_font = { fontFamily = fontName, factor = factor }
+    -- Check if there's already a Font dictionary
+    if self.objects[pageObj]:find("(/Font << [^>]+ >>)") then
+        -- Append new font to existing dictionary
+        self.objects[pageObj] = self.objects[pageObj]:gsub(
+            "(/Font << [^>]+ >>)",
+            function(fontDict)
+                return string.format("%s /%s %d 0 R",
+                    fontDict:sub(1, -3), -- Remove trailing ">>"
+                    fontName .. "-" .. self.last_font.fontWeight,
+                    self.custom_fonts[fontName .. "-" .. self.last_font.fontWeight]
+                ) .. " >>"
+            end
+        )
+    else
+        -- Create new Font dictionary
+        self.objects[pageObj] = self.objects[pageObj]:gsub(
+            "(/Resources << )",
+            string.format("/Resources << /Font << /F1 %d 0 R /%s %d 0 R >> ",
+                self.basic_font_obj,
+                fontName .. "-" .. self.last_font.fontWeight,
+                self.custom_fonts[fontName .. "-" .. self.last_font.fontWeight]
+            )
+        )
+    end
 
     return self
 end
+
+-- Use custom font for text
+function PDFGenerator:setFont(fontName)
+    self.last_font = self.last_font or {}
+    self.last_font.fontFamily = fontName
+
+    -- Store the current font name to be used in addText
+    self.current_font = fontName
+end
+
 -- Get text width for current font and size using font metrics
 function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
     fontSize = fontSize or 12
     fontWeight = fontWeight or "normal"
 
-    -- Helvetica character widths (in 1/1000 units of font size)
-    -- These metrics are from the Adobe Font Metrics (AFM) file for Helvetica
-    -- Values represent character widths in 1/1000 units of the font size
-    local fontMetrics = {
-        normal = {
-            [32]=278, [33]=278, [34]=355, [35]=556, [36]=556, [37]=889, [38]=667, [39]=191, [40]=333, [41]=333,
-            [42]=389, [43]=584, [44]=278, [45]=333, [46]=278, [47]=278, [48]=556, [49]=556, [50]=556, [51]=556,
-            [52]=556, [53]=556, [54]=556, [55]=556, [56]=556, [57]=556, [58]=278, [59]=278, [60]=584, [61]=584,
-            [62]=584, [63]=556, [64]=1015, [65]=667, [66]=667, [67]=722, [68]=722, [69]=667, [70]=611, [71]=778,
-            [72]=722, [73]=278, [74]=500, [75]=667, [76]=556, [77]=833, [78]=722, [79]=778, [80]=667, [81]=778,
-            [82]=722, [83]=667, [84]=611, [85]=722, [86]=667, [87]=944, [88]=667, [89]=667, [90]=611, [91]=278,
-            [92]=278, [93]=278, [94]=469, [95]=556, [96]=333, [97]=556, [98]=556, [99]=500, [100]=556, [101]=556,
-            [102]=278, [103]=556, [104]=556, [105]=222, [106]=222, [107]=500, [108]=222, [109]=833, [110]=556,
-            [111]=556, [112]=556, [113]=556, [114]=333, [115]=500, [116]=278, [117]=556, [118]=500, [119]=722,
-            [120]=500, [121]=500, [122]=500, [123]=334, [124]=260, [125]=334, [126]=584, [127]=350,
-            -- Extended ASCII characters (128-255)
-            -- These values are verified from the official Helvetica AFM specification
-            [128]=556, [129]=350, [130]=222, [131]=556, [132]=333, [133]=1000, [134]=556, [135]=556,
-            [136]=333, [137]=1000, [138]=667, [139]=333, [140]=1000, [141]=350, [142]=611, [143]=350,
-            [144]=350, [145]=222, [146]=222, [147]=333, [148]=333, [149]=350, [150]=556, [151]=1000,
-            [152]=333, [153]=1000, [154]=500, [155]=333, [156]=944, [157]=350, [158]=500, [159]=667,
-            [160]=278, [161]=333, [162]=556, [163]=556, [164]=556, [165]=556, [166]=260, [167]=556,
-            [168]=333, [169]=737, [170]=370, [171]=556, [172]=584, [173]=333, [174]=737, [175]=333,
-            [176]=400, [177]=584, [178]=333, [179]=333, [180]=333, [181]=556, [182]=537, [183]=278,
-            [184]=333, [185]=333, [186]=365, [187]=556, [188]=834, [189]=834, [190]=834, [191]=611,
-            [192]=667, [193]=667, [194]=667, [195]=667, [196]=667, [197]=667, [198]=1000, [199]=722,
-            [200]=667, [201]=667, [202]=667, [203]=667, [204]=278, [205]=278, [206]=278, [207]=278,
-            [208]=722, [209]=722, [210]=778, [211]=778, [212]=778, [213]=778, [214]=778, [215]=584,
-            [216]=778, [217]=722, [218]=722, [219]=722, [220]=722, [221]=667, [222]=667, [223]=611,
-            [224]=556, [225]=556, [226]=556, [227]=556, [228]=556, [229]=556, [230]=889, [231]=500,
-            [232]=556, [233]=556, [234]=556, [235]=556, [236]=278, [237]=278, [238]=278, [239]=278,
-            [240]=556, [241]=556, [242]=556, [243]=556, [244]=556, [245]=556, [246]=556, [247]=584,
-            [248]=611, [249]=556, [250]=556, [251]=556, [252]=556, [253]=500, [254]=556, [255]=500
-        },
-        bold = {
-            [32]=278, [33]=333, [34]=474, [35]=556, [36]=556, [37]=889, [38]=722, [39]=238, [40]=333, [41]=333,
-            [42]=389, [43]=584, [44]=278, [45]=333, [46]=278, [47]=278, [48]=556, [49]=556, [50]=556, [51]=556,
-            [52]=556, [53]=556, [54]=556, [55]=556, [56]=556, [57]=556, [58]=333, [59]=333, [60]=584, [61]=584,
-            [62]=584, [63]=611, [64]=975, [65]=722, [66]=722, [67]=722, [68]=722, [69]=667, [70]=611, [71]=778,
-            [72]=722, [73]=278, [74]=556, [75]=722, [76]=611, [77]=833, [78]=722, [79]=778, [80]=667, [81]=778,
-            [82]=722, [83]=667, [84]=611, [85]=722, [86]=667, [87]=944, [88]=667, [89]=667, [90]=611, [91]=333,
-            [92]=278, [93]=333, [94]=584, [95]=556, [96]=333, [97]=556, [98]=611, [99]=556, [100]=611, [101]=556,
-            [102]=333, [103]=611, [104]=611, [105]=278, [106]=278, [107]=556, [108]=278, [109]=889, [110]=611,
-            [111]=611, [112]=611, [113]=611, [114]=389, [115]=556, [116]=333, [117]=611, [118]=556, [119]=778,
-            [120]=556, [121]=556, [122]=500, [123]=389, [124]=280, [125]=389, [126]=584, [127]=350,
-            [128]=556, [129]=350, [130]=278, [131]=556, [132]=500, [133]=1000, [134]=556, [135]=556,
-            [136]=333, [137]=1000, [138]=667, [139]=333, [140]=1000, [141]=350, [142]=611, [143]=350,
-            [144]=350, [145]=278, [146]=278, [147]=500, [148]=500, [149]=350, [150]=556, [151]=1000,
-            [152]=333, [153]=1000, [154]=556, [155]=333, [156]=944, [157]=350, [158]=500, [159]=667,
-            [160]=278, [161]=333, [162]=556, [163]=556, [164]=556, [165]=556, [166]=280, [167]=556,
-            [168]=333, [169]=737, [170]=370, [171]=556, [172]=584, [173]=333, [174]=737, [175]=333,
-            [176]=400, [177]=584, [178]=333, [179]=333, [180]=333, [181]=611, [182]=556, [183]=278,
-            [184]=333, [185]=333, [186]=365, [187]=556, [188]=834, [189]=834, [190]=834, [191]=611,
-            [192]=722, [193]=722, [194]=722, [195]=722, [196]=722, [197]=722, [198]=1000, [199]=722,
-            [200]=667, [201]=667, [202]=667, [203]=667, [204]=278, [205]=278, [206]=278, [207]=278,
-            [208]=722, [209]=722, [210]=778, [211]=778, [212]=778, [213]=778, [214]=778, [215]=584,
-            [216]=778, [217]=722, [218]=722, [219]=722, [220]=722, [221]=667, [222]=667, [223]=611,
-            [224]=556, [225]=556, [226]=556, [227]=556, [228]=556, [229]=556, [230]=889, [231]=556,
-            [232]=556, [233]=556, [234]=556, [235]=556, [236]=278, [237]=278, [238]=278, [239]=278,
-            [240]=611, [241]=611, [242]=611, [243]=611, [244]=611, [245]=611, [246]=611, [247]=584,
-            [248]=611, [249]=611, [250]=611, [251]=611, [252]=611, [253]=556, [254]=611, [255]=556
-        }
-    }
+    local fontMetrics = fontHelveticaMetrics -- default font metrics
 
-    if self.font_metrics[self.last_font.fontFamily] then
-        fontMetrics = self.font_metrics[self.last_font.fontFamily]
+    self.font_metrics = self.font_metrics or {}
+    if self.font_metrics[self.last_font.fontFamily .. "-" .. fontWeight] then
+        fontMetrics = self.font_metrics[self.last_font.fontFamily .. "-" .. fontWeight]
+    else
+        fontMetrics = fontMetrics[fontWeight] or fontMetrics["normal"]
     end
 
     local width = 0
     for i = 1, #text do
         local charCode = string.byte(text, i)
-        local metrics = fontMetrics[fontWeight]
-
-        width = width + (metrics[""..charCode] or 556) -- default to 556 for unknown chars
+        width = width + (fontMetrics[""..charCode] or 556) -- default to 556 for unknown chars
     end
 
     -- Convert from font units (1/1000) to points
@@ -312,10 +291,8 @@ function PDFGenerator:splitTextToLines(text, fontSize, maxWidth)
     local currentWidth = 0
 
     for i, word in ipairs(words) do
-        local wordWidth = self:getTextWidth(word, fontSize)
-        local spaceWidth = self:getTextWidth(" ", fontSize)
-
-        --Logger("word %s, wordWidth %s, spaceWidth %s" % { word, wordWidth, spaceWidth })
+        local wordWidth = self:getTextWidth(word, fontSize, self.last_font.fontWeight)
+        local spaceWidth = self:getTextWidth(" ", fontSize, self.last_font.fontWeight)
 
         -- Check if adding this word would exceed maxWidth
         if currentWidth + wordWidth + (currentWidth > 0 and spaceWidth or 0) <= maxWidth then
@@ -354,11 +331,15 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
     color = PDFGenerator:hexToRGB(color)
 
     local content = self.contents[self.current_page_obj]
-    local fontName = self.current_font or "F1"  -- Use current_font if set, otherwise fallback to F1
+    local fontName = "F1"
+
+    if self.current_font then
+        fontName = self.current_font .. "-" .. self.last_font.fontWeight
+    end
 
     -- Calculate x position based on alignment
     local x_pos = self.margin_x[1] + self.current_x
-    local text_width = self:getTextWidth(text, fontSize)
+    local text_width = self:getTextWidth(text, fontSize, self.last_font.fontWeight)
 
     if alignment == "center" then
         x_pos = x_pos + (width - text_width) / 2
@@ -415,11 +396,18 @@ function PDFGenerator:addParagraph(text, options)
     options.alignment = options.alignment or "left"
     options.width = options.width or (self.page_width - self.margin_x[1] - self.margin_x[2])
     options.color = options.color or "000000"
-    options.width = options.width
+    options.newLine = options.newLine or true
+    options.fontWeight = options.fontWeight or "normal"
+    options.paddingX = options.paddingX or 0
 
-    local lines = self:splitTextToLines(text, options.fontSize, options.width)
+    self.last_font = self.last_font or {}
+    self.last_font.fontWeight = options.fontWeight
+
+    local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
     for i, line in ipairs(lines) do
-        self.current_y = self.current_y + options.fontSize*1.2
+        if options.newLine == true then
+            self.current_y = self.current_y + options.fontSize*1.2
+        end
         if self.out_of_page == false and self.page_height - self.current_y - self.header_height < self.margin_y[1] + self.margin_y[2] then
             self:addPage()
         end
@@ -553,7 +541,8 @@ function PDFGenerator:drawTableCell(text, options)
         fontSize = options.fontSize,
         alignment = options.alignment,
         width = options.width,
-        color = options.textColor
+        color = options.textColor,
+        paddingX = self.current_table.padding_x * 2
     })
 
     -- Restore cursor position after drawing text

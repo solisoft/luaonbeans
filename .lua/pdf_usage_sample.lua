@@ -101,4 +101,3 @@ end
 
 SetHeader("Content-Type", "application/pdf")
 Write(pdf:generate())
-Logger(GetTime() - t1)

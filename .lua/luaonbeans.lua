@@ -268,10 +268,10 @@ function HandleRequest()
 end
 
 function HandleController(controller)
-  if BeansEnv == "development" then
-    return controller[Params.action]()
-  else
+  if BeansEnv == "production" then
     return controller
+  else
+    return controller[Params.action]()
   end
 end
 

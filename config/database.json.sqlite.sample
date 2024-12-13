@@ -1,12 +1,12 @@
 {
 	"development": {
-		"db_name": "kyc_dev"
+		"db_name": "db_dev"
 	},
 	"production": {
-		"db_name": "kyc_production"
+		"db_name": "db_production"
 	},
 	"test": {
-		"db_name": "kyc_test"
+		"db_name": "db_test"
 	},
 	"engine": "sqlite"
 }

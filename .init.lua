@@ -29,8 +29,6 @@ function OnServerStart()
 end
 
 function OnServerReload()
-  require("utilities")
-  require("routes")
 end
 
 function OnServerHeartbeat()
@@ -38,7 +36,8 @@ function OnServerHeartbeat()
 end
 
 function OnWorkerStart()
-  HandleSqliteFork(db_config) -- you can remove it if you do not use SQLite
+  -- Uncomment code if you use SQLite
+  -- HandleSqliteFork(db_config) -- you can remove it if you do not use SQLite
 end
 
 -- OnError hook
@@ -57,15 +56,15 @@ function OnHttpRequest()
   Params = GetParams()
   PrepareMultiPartParams() -- if you handle file uploads
 
-  -- Remove code if you do not use arangodb
-  if (db_config ~= nil and db_config["engine"] == "arangodb") then
-    Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
-  end
+  -- Uncomment code if you use arangodb
+  -- if (db_config ~= nil and db_config["engine"] == "arangodb") then
+  --  Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
+  -- end
 
-  -- Remove code if you do not use surrealdb
-  if (db_config ~= nil and db_config["engine"] == "surrealdb") then
-    Surreal.refresh_token(db_config[BeansEnv]) -- reconnect to surrealdb if needed
-  end
+  -- Uncomment code if you use surrealdb
+  -- if (db_config ~= nil and db_config["engine"] == "surrealdb") then
+  --  Surreal.refresh_token(db_config[BeansEnv]) -- reconnect to surrealdb if needed
+  -- end
 
   DefineRoute(GetPath(), GetMethod())
 

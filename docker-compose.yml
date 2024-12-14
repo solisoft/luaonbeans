@@ -34,5 +34,14 @@ services:
     ports:
       - 7070:8080
 
+  cratedb:
+    image: crate:latest
+    ports:
+      - 4200:4200
+      - 4300:4300
+    volumes:
+      - cratedb-data:/data
+
 volumes:
   arangodb-data:
+  cratedb-data:

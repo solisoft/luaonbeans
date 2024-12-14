@@ -306,7 +306,10 @@ function WriteJSON(object)
 end
 
 function InitDB(db_config)
-  if (db_config["engine"] == "postgrest") then
+  if (db_config["engine"] == "crate") then
+    Crate = require("crate")
+    Crate.init(db_config[BeansEnv])
+  elseif (db_config["engine"] == "postgrest") then
     PGRest = require("postgrest")
     PGRest.init(db_config[BeansEnv])
   elseif (db_config["engine"] == "arangodb") then

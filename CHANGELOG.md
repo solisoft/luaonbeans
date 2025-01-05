@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.12.0](https://github.com/solisoft/luaonbeans/compare/v0.11.0...v0.12.0) (2024-11-18)
+
+
+### Features
+
+* add header / footer and pagination to pages ([23fdc2a](https://github.com/solisoft/luaonbeans/commit/23fdc2a1d4912f02f4098b731593866b86184195))
+* add support to postgrest ([00be8a6](https://github.com/solisoft/luaonbeans/commit/00be8a696f14eb50dc439d4228615ee8b2d5dcf2))
+* allow isAPI global variable to handle 404 errors ([b6ef99c](https://github.com/solisoft/luaonbeans/commit/b6ef99c09f90fe81243c0086af9502cc985ba7d5))
+* cronjobs + fix database.json.sqlite.sampl ([88011f6](https://github.com/solisoft/luaonbeans/commit/88011f6ff25bc0d894c1d6f7fe182b11eb22bc7c))
+* Dockerfile is working ([6fcbaff](https://github.com/solisoft/luaonbeans/commit/6fcbaff1590db87edd49286b77af14c72f56ed96))
+* improve controller performances by 50% ([84ecc96](https://github.com/solisoft/luaonbeans/commit/84ecc96256335d878e795aa82cdf896bb9f604d8))
+* improve controller performances by 50% ([46fbfb7](https://github.com/solisoft/luaonbeans/commit/46fbfb766c3a0647b9ff810743760bdd397027f8))
+* improve controller performances by 50% ([bc68813](https://github.com/solisoft/luaonbeans/commit/bc68813d6e3365144fd7c493154da72d318e2405))
+* LogError() ([3e813ff](https://github.com/solisoft/luaonbeans/commit/3e813ffab4fadfcfe266d2c84fd022f4bc3e45f2))
+* PostGrest =&gt; remove upsert for now ([f73b519](https://github.com/solisoft/luaonbeans/commit/f73b519261dfaa14461e64ccd6a6d0a8c347c94f))
+* WIP PDFGenerator ([4f39d38](https://github.com/solisoft/luaonbeans/commit/4f39d387eacc3c0c71a9116fe879c07431196a15))
+
+
+### Bug Fixes
+
+* add controllers requirable ([f1f1d13](https://github.com/solisoft/luaonbeans/commit/f1f1d13a6d6fc26eaa75164299ea161dd773cfbe))
+* add header / footer and pagination to pages ([e5abe92](https://github.com/solisoft/luaonbeans/commit/e5abe9279dba57fc8271de979330219feb8ca74a))
+* add header / footer and pagination to pages ([cf328b3](https://github.com/solisoft/luaonbeans/commit/cf328b3b1de8d96ddaddcc459a07fa43806abb34))
+* allow POST on / in the CustomRoutes ([3a004bf](https://github.com/solisoft/luaonbeans/commit/3a004bf896ad171a65dbb4f9a75d7b36c21067ee))
+* controller template ([8561f98](https://github.com/solisoft/luaonbeans/commit/8561f98dc0d2820d51f1ea0dd73fdc82917a274a))
+* enhance tables ([cefcbf1](https://github.com/solisoft/luaonbeans/commit/cefcbf19cd032f204ed659eea16ce252fa137adf))
+* HandleSqliteFork ([042ce81](https://github.com/solisoft/luaonbeans/commit/042ce812f6ac3ab6664dd5f7ef125dbd4bfc4d93))
+* pdf =&gt; set metrics for Helvetica-Bold ([08986f7](https://github.com/solisoft/luaonbeans/commit/08986f7928ddaf3a51b02dd39ce00279e2f5956d))
+* PDF: add textCOlor to cells ([4dc4667](https://github.com/solisoft/luaonbeans/commit/4dc4667154f25d03308250299fd7067b82175140))
+* PDF: custom & default font fixes ([a87ba35](https://github.com/solisoft/luaonbeans/commit/a87ba350f00c7bcc35eb986b93d0ea0d79d3002f))
+* PDF: provide a pdf usage sample ([43d213d](https://github.com/solisoft/luaonbeans/commit/43d213de0b2eb15e76ee54bc331cc39c81473b75))
+* PDF: provide a pdf usage sample ([96368cd](https://github.com/solisoft/luaonbeans/commit/96368cde1c102918a448f2f8c8e05c47cc434734))
+* PDF: provide an easy way to update it for lpais ([d1af8d6](https://github.com/solisoft/luaonbeans/commit/d1af8d604b187cdc58a83dcca0849fc86e19fddc))
+* PDF: put cursor_y after image ([1ed1702](https://github.com/solisoft/luaonbeans/commit/1ed170277509e2c5c5c5827ee165a12141ad8e05))
+* remove log file ([7ad46be](https://github.com/solisoft/luaonbeans/commit/7ad46bed22628e7374a7b80301cb9429285abb90))
+* rename DefineRoutes method ([54c714e](https://github.com/solisoft/luaonbeans/commit/54c714eb7644091f65d235fea6a9ececc0bb3330))
+* restore controller specs ([f94a4e5](https://github.com/solisoft/luaonbeans/commit/f94a4e5037a3e1ffcf8d32a9f04764912a9890f7))
+* restore controller specs ([cda66fb](https://github.com/solisoft/luaonbeans/commit/cda66fbb676009d1f4cf8f602cc8e4236b21d45e))
+* restore controller specs ([8c54443](https://github.com/solisoft/luaonbeans/commit/8c544436a0b92e30233684e73ca6bd150024de83))
+* test mode ([cb67dc3](https://github.com/solisoft/luaonbeans/commit/cb67dc38b5d248e1cf50c0cb3df07f8eafa81bbd))
+
 ## [0.11.0](https://github.com/solisoft/luaonbeans/compare/v0.10.0...v0.11.0) (2024-10-07)
 
 

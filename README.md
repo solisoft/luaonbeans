@@ -25,5 +25,5 @@ beans new my-project
 ### Run the project
 
 ```bash
-./luaonbeans -D .
+./luaonbeans.ord -D .
 ```

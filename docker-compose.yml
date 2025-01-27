@@ -15,12 +15,12 @@ services:
     image: arangodb/arangodb:latest
     environment:
       ARANGO_ROOT_PASSWORD: password
-    #healthcheck:
-    #  test: wget -qO- http://localhost:8529
-    #  interval: 1s
-    #  start_interval: 1s
-    #  timeout: 10s
-    #  retries: 25
+    healthcheck:
+      test: wget -qO- http://localhost:8529
+      interval: 1s
+      start_interval: 1s
+      timeout: 10s
+      retries: 25
     ports:
       - 8529:8529
     volumes:
@@ -34,5 +34,14 @@ services:
     ports:
       - 7070:8080
 
+  cratedb:
+    image: crate:latest
+    ports:
+      - 4200:4200
+      - 4300:4300
+    volumes:
+      - cratedb-data:/data
+
 volumes:
   arangodb-data:
+  cratedb-data:

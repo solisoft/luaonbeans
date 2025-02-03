@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.13.0](https://github.com/solisoft/luaonbeans/compare/v0.12.0...v0.13.0) (2025-02-03)
+
+
+### Features
+
+* add crate db support ([b7b8296](https://github.com/solisoft/luaonbeans/commit/b7b8296e8ab3d15149f0f65b33b119191cfb2f17))
+* add migrations files WIP ([7f8a018](https://github.com/solisoft/luaonbeans/commit/7f8a018f79d5ba91388c6696b9c0223c66cb2f3a))
+
+
+### Bug Fixes
+
+* docker compose & readme ([5b1fc4c](https://github.com/solisoft/luaonbeans/commit/5b1fc4c96994cf05dc1b2e7c8b1bc9b580eebf3d))
+* docker-compose ([bab168e](https://github.com/solisoft/luaonbeans/commit/bab168e5e53bed58a7c1b050f8d802e6870fda27))
+
 ## [0.12.0](https://github.com/solisoft/luaonbeans/compare/v0.11.0...v0.12.0) (2024-11-18)
 
 

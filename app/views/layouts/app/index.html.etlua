@@ -8,8 +8,11 @@
 	<link rel="stylesheet" href="<%= PublicPath("/app.css") %>" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 
 <style>
@@ -72,7 +75,9 @@
 <body class="min-h-screen flex flex-col">
 	<div class="container mx-auto">
 		<%- Partial("header") %>
-		<div class="grow mb-10 bg-white shadow rounded p-5 text-black">@yield</div>
+		<div class="grow mb-10 bg-white shadow rounded p-5 text-black">
+    <div class="grid grid-cols-12 gap-4">@yield</div>
+    </div>
 		<%- Partial("footer") %>
 	</div>
 </body>

@@ -1,0 +1,45 @@
+<% component.width = component.width or {4, 6, 12} %>
+<div class="lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
+  <h1 class="text-2xl font-bold"><%= component.title %></h1>
+  <table class="w-full border-collapse border">
+    <% if component.headers then %>
+    <thead>
+      <tr>
+        <% for _, cell in pairs(component.headers) do %>
+        <th class="text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
+          <%= cell.title %>
+        </th>
+        <% end %>
+      </tr>
+    </thead>
+    <% end %>
+
+    <% if component.rows then %>
+    <tbody>
+      <% for _, row in pairs(component.rows) do %>
+      <tr>
+        <% for _, cell in pairs(row) do %>
+        <td class="text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
+          <%= cell.title %>
+        </td>
+        <% end %>
+      </tr>
+      <% end %>
+    </tbody>
+    <% end %>
+
+    <% if component.footer then %>
+    <tfoot>
+      <% for _, row in pairs(component.footer) do %>
+      <tr>
+        <% for _, cell in pairs(row) do %>
+        <td class="text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
+          <%= cell.title %>
+        </td>
+        <% end %>
+      </tr>
+      <% end %>
+    </tfoot>
+    <% end %>
+  </table>
+</div>

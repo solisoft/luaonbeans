@@ -12,6 +12,7 @@ ProgramMaxPayloadSize(10485760) -- 10 MB
 
 -- ArangoDB connection
 local db_config = DecodeJson(LoadAsset("config/database.json"))
+print(EncodeJson(db_config[BeansEnv]))
 InitDB(db_config)
 
 Views = {}
@@ -56,10 +57,9 @@ function OnHttpRequest()
   Params = GetParams()
   PrepareMultiPartParams() -- if you handle file uploads
 
-  -- Uncomment code if you use arangodb
-  -- if (db_config ~= nil and db_config["engine"] == "arangodb") then
-  --  Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
-  -- end
+  if Adb then
+    Adb.RefreshToken(db_config[BeansEnv]) -- reconnect to arangoDB if needed
+  end
 
   -- Uncomment code if you use surrealdb
   -- if (db_config ~= nil and db_config["engine"] == "surrealdb") then

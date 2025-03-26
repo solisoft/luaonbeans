@@ -1,0 +1,32 @@
+<% component.width = component.width or {4, 6, 12} %>
+<% component.keys = component.keys or table.keys(component.data) or {} %>
+<div class="relative border rounded-md shadow-md flex flex-col gap-4 p-4 item-center lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
+  <% if component.icon then %>
+    <div class="absolute -top-2 right-2 ">
+      <span class="material-icons-outlined border border-<%= component.color or "yellow" %>-600 text-<%= component.color or "yellow" %>-900 bg-<%= component.color or "yellow" %>-50 p-2 shadow-md">
+        <%= component.icon %>
+      </span>
+    </div>
+  <% end %>
+  <div class="flex flex-col ">
+    <% if component.title then %> <h2 class="font-bold uppercase text-lg text-gray-600"><%= component.title %></h2> <% end %>
+    <% if component.description then %> <p class="text-sm text-gray-500 "><%= component.description %></p> <% end %>
+  </div>
+  <div class="flex flex-col gap-2">
+    <% for _, key in pairs(component.keys) do %>
+      <% if(#component.data[key] > 50) then %>
+        <div class="flex flex-col"><strong><%= key %> :</strong> <%- component.data[key] %></div>
+      <% else %>
+        <div><strong><%= key %> :</strong> <%- component.data[key] %></div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if component.components then %>
+    <div class="grid grid-cols-12 gap-4">
+      <% for _, component in pairs(component.components) do %>
+        <%- CreateComponent(component) %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

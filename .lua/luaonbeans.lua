@@ -10,7 +10,7 @@ function LoadViewsRecursively(path)
     end
     if kind == unix.DT_REG then
       if string.match(file, "%.etlua$") then
-        Views[path .. "/" .. file] = LoadAsset(path .. "/" .. file)
+        Views[path .. "/" .. file] = Etlua.compile(LoadAsset(path .. "/" .. file))
       end
     end
 
@@ -26,16 +26,19 @@ end
 
 function Page(view, layout, bindVarsView, bindVarsLayout)
   if (BeansEnv == "development") then
-    Views["app/views/layouts/" .. layout .. "/index.html.etlua"] = LoadAsset("app/views/layouts/" ..
-      layout .. "/index.html.etlua")
+    Views["app/views/layouts/" .. layout .. "/index.html.etlua"] = Etlua.compile(LoadAsset("app/views/layouts/" ..
+      layout .. "/index.html.etlua"))
   end
 
   if (BeansEnv == "development") then
-    Views["app/views/" .. view .. ".etlua"] = LoadAsset("app/views/" .. view .. ".etlua")
+    Views["app/views/" .. view .. ".etlua"] = Etlua.compile(LoadAsset("app/views/" .. view .. ".etlua"))
   end
 
-  layout = Etlua.compile(Views["app/views/layouts/" .. layout .. "/index.html.etlua"])(bindVarsLayout or {})
-  view = Etlua.compile(Views["app/views/" .. view .. ".etlua"])(bindVarsView or {})
+  layout = Views["app/views/layouts/" .. layout .. "/index.html.etlua"](bindVarsLayout or {})
+
+  if Views["app/views/" .. view .. ".etlua"] then
+    view = Views["app/views/" .. view .. ".etlua"](bindVarsView or {})
+  end
 
   local content
   if view:find("%%") then
@@ -62,11 +65,11 @@ function Partial(partial, bindVars)
   end
 
   if (BeansEnv == "development") then
-    Views["app/views/partials/" .. partial .. ".html.etlua"] = LoadAsset("app/views/partials/" ..
-      partial .. ".html.etlua")
+    Views["app/views/partials/" .. partial .. ".html.etlua"] = Etlua.compile(LoadAsset("app/views/partials/" ..
+      partial .. ".html.etlua"))
   end
 
-  return Etlua.compile(Views["app/views/partials/" .. partial .. ".html.etlua"])(bindVars)
+  return Views["app/views/partials/" .. partial .. ".html.etlua"](bindVars)
 end
 
 local function assignRoute(method, name, options, value)
@@ -250,8 +253,30 @@ end
 
 function HandleRequest()
   if Params.action == nil then
-    if RoutePath("/public" .. GetPath()) == false then
-      handle_404_error()
+    local path = GetPath()
+
+
+    if GetPath() == "/" then
+      path = {
+        ["GET"] = "/index",
+        ["POST"] = "/create",
+        ["PUT"] = "/update",
+        ["PATCH"] = "/update",
+        ["DELETE"] = "/delete"
+      }
+      path = path[GetMethod()]
+    end
+
+    local aql_page = false
+    if not string.match(path, "%.") then -- check only if there is no extension
+      aql_page = LoadAsset("aqlpages/" .. path .. ".aql")
+    end
+    if aql_page then
+      HandleAqlPage(aql_page)
+    else
+      if RoutePath("/public" .. path) == false then
+        handle_404_error()
+      end
     end
   else
     if BeansEnv == "production" then

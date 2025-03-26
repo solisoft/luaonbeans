@@ -279,16 +279,17 @@ function HandleRequest()
       end
     end
   else
-    if BeansEnv == "production" then
-      local status, controller = pcall(require, Params.controller .. "_controller")
-      if status == false then
-        handle_404_error()
-      else
-        controller[Params.action]()
-      end
-    else
-      RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
-    end
+    -- if BeansEnv == "production" then
+    --   local status, controller = pcall(require, Params.controller .. "_controller")
+    --   if status == false then
+    --     handle_404_error()
+    --   else
+    --     controller[Params.action]()
+    --   end
+    -- else
+    --   RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
+    -- end
+    RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
   end
 end
 

@@ -1,6 +1,6 @@
 <% component.width = component.width or {4, 6, 12} %>
 
-<div class="border relative shadow-md rounded-md lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
+<div class="border border-gray-300  relative shadow-md rounded-md lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
   <% if component.icon then %>
     <div class="absolute -top-2 right-2 ">
       <span class="material-icons-outlined border border-<%= component.color or "yellow" %>-600 text-<%= component.color or "yellow" %>-900 bg-<%= component.color or "yellow" %>-50 p-2 shadow-md">

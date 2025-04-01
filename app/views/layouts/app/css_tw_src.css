@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 input[type="text"],
 textarea {
@@ -37,11 +35,18 @@ a {
   @apply text-purple-400 hover:text-blue-900;
 }
 
-.material-icons-outlined.md-18 { font-size: 18px; }
-.material-icons-outlined.md-24 { font-size: 24px; }
-.material-icons-outlined.md-36 { font-size: 36px; }
-.material-icons-outlined.md-48 { font-size: 48px; }
-
+.material-icons-outlined.md-18 {
+  font-size: 18px;
+}
+.material-icons-outlined.md-24 {
+  font-size: 24px;
+}
+.material-icons-outlined.md-36 {
+  font-size: 36px;
+}
+.material-icons-outlined.md-48 {
+  font-size: 48px;
+}
 
 table {
   @apply w-full border-collapse border;
@@ -52,11 +57,11 @@ table td {
   @apply border p-2;
 }
 
-table th, table tfoot td {
+table th,
+table tfoot td {
   @apply bg-gray-800 text-white;
 }
 
 table tr:nth-child(odd) {
   @apply bg-gray-50;
 }
-

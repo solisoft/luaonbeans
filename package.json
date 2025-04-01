@@ -5,6 +5,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "tailwindcss": "^3.4.7"
+    "@tailwindcss/cli": "^4.0.17"
   }
 }

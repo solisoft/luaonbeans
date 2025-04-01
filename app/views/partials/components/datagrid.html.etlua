@@ -16,7 +16,7 @@
     </div>
   </div>
 
-  <div class="border border-gray-300 rounded-b-md p-4">
+  <div class="border border-gray-300 rounded-b-md p-4  shadow-md">
       <div class="grid grid-cols-<%= #component.items %> gap-4">
       <% for i, item in ipairs(component.items) do %>
         <div class="flex flex-col">

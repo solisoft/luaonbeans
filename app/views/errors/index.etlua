@@ -1,4 +1,4 @@
-<div class="container mx-auto py-10 px-2">
+<div class="col-span-12 container mx-auto py-10 px-2">
   <h1>Error <%= Params.status %></h1>
 
   <p><%= Params.message %></p>

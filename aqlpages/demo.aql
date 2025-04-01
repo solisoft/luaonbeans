@@ -173,6 +173,7 @@ LET table = {
   component: 'table',
   title: 'Table',
   width: [12, 12, 12], // [lg, md, sm]
+  caption: { title: 'this is a caption for the table', position: 'bottom' },
   headers: [{ title: 'Header 1', align: 'left' }, { title: 'Header 2', align: 'center' }, { title: 'Header 3', align: 'right' }],
   rows: [
     [{ title: 'Data 1', align: 'left', color: 'red' }, { title: 'Data 2', align: 'center', color: 'blue' }, { title: 'Data 3', align: 'right', color: 'green' }],

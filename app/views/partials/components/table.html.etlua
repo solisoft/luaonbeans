@@ -2,11 +2,14 @@
 <div class="lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
   <h1 class="text-2xl font-bold"><%= component.title %></h1>
   <table class="w-full border-collapse border">
+    <% if component.caption then %>
+    <caption class="text-sm text-gray-500" style="caption-side: <%= component.caption.position or 'top' %>;"><%= component.caption.title %></caption>
+    <% end %>
     <% if component.headers then %>
     <thead>
       <tr>
         <% for _, cell in pairs(component.headers) do %>
-        <th class="text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
+        <th class="border border-gray-300 text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
           <%= cell.title %>
         </th>
         <% end %>
@@ -19,7 +22,7 @@
       <% for _, row in pairs(component.rows) do %>
       <tr>
         <% for _, cell in pairs(row) do %>
-        <td class="text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
+        <td class="border border-gray-300 text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
           <%= cell.title %>
         </td>
         <% end %>
@@ -33,7 +36,7 @@
       <% for _, row in pairs(component.footer) do %>
       <tr>
         <% for _, cell in pairs(row) do %>
-        <td class="text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
+        <td class="border border-gray-300 text-<%= cell.align or 'left' %> text-<%= cell.color or 'black' %>-600">
           <%= cell.title %>
         </td>
         <% end %>

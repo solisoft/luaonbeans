@@ -11,7 +11,7 @@
       <% if component.title then %> <h1 class="uppercase text-sm text-<%= component.color or "green" %>-600 font-bold upercase"><%= component.title %></h1> <% end %>
       <% if component.value then %>
         <h2 class="font-bold text-4xl">
-          <span id="counter_<%= id %>" data-target="<%= component.value %>">0</span>
+          <span id="counter_<%= id %>" data-target="<%= component.value %>"><%= component.value %></span>
           <% if component.extra then %><span><%= component.extra %></span><% end %>
         </h2>
         <script>

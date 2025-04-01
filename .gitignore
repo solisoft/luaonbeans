@@ -9,3 +9,4 @@ node_modules
 uploads/*
 !uploads/.keep
 *.log
+*.pid

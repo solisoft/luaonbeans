@@ -25,5 +25,5 @@ beans new my-project
 ### Run the project
 
 ```bash
-./luaonbeans.org -D .
+beans dev
 ```

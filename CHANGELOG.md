@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.13.0](https://github.com/solisoft/luaonbeans/compare/v0.12.0...v0.13.0) (2025-04-13)
+
+
+### Features
+
+* add 2 ne widgets ([a5de2a5](https://github.com/solisoft/luaonbeans/commit/a5de2a577d2822d343d37967e80643687b108769))
+* add crate db support ([b7b8296](https://github.com/solisoft/luaonbeans/commit/b7b8296e8ab3d15149f0f65b33b119191cfb2f17))
+* add migrations files WIP ([7f8a018](https://github.com/solisoft/luaonbeans/commit/7f8a018f79d5ba91388c6696b9c0223c66cb2f3a))
+* aql pages ([580caef](https://github.com/solisoft/luaonbeans/commit/580caefbd42afb04daa818589b4d7b2501372e0f))
+* update postgrest connector ([44bd096](https://github.com/solisoft/luaonbeans/commit/44bd096679faac2d8aba3b0ed32e2766a8f17d20))
+* update widgets and add caption to table ([df05ed1](https://github.com/solisoft/luaonbeans/commit/df05ed11178a11f03475016d3354d8bbe3a04991))
+* update widgets and add caption to table ([c09286c](https://github.com/solisoft/luaonbeans/commit/c09286c1abebd320c011588ec7185e88b68fb5ca))
+
+
+### Bug Fixes
+
+* disable pcall for controllers ([d2a5bf4](https://github.com/solisoft/luaonbeans/commit/d2a5bf4e12f60ff2ce64d1796ea0451f33f2d5af))
+* docker compose & readme ([5b1fc4c](https://github.com/solisoft/luaonbeans/commit/5b1fc4c96994cf05dc1b2e7c8b1bc9b580eebf3d))
+* docker-compose ([bab168e](https://github.com/solisoft/luaonbeans/commit/bab168e5e53bed58a7c1b050f8d802e6870fda27))
+* update readme ([0c3bb2d](https://github.com/solisoft/luaonbeans/commit/0c3bb2d6990a065331635a3bfe1bfe06d5e47345))
+
 ## [0.12.0](https://github.com/solisoft/luaonbeans/compare/v0.11.0...v0.12.0) (2024-11-18)
 
 

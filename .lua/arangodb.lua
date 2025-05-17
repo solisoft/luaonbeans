@@ -1,24 +1,21 @@
 Adb = {}
 Adb.__index = Adb
 
-function Adb.new()
+function Adb.new(db_config)
   local self = setmetatable({}, Adb)
 
   self._lastDBConnect = GetTime()
+  self._db_config = db_config
   self._arangoAPI = ""
   self._arangoJWT = ""
-  self._db_config = null
+
+  self:Auth()
 
   return self
 end
 
 function Adb:Api_url(path)
   return self._arangoAPI .. path
-end
-
-function Adb:infos()
-  print(self._arangoAPI)
-  print(self._arangoJWT)
 end
 
 function Adb:Api_run(path, method, params, headers)
@@ -36,13 +33,10 @@ function Adb:Api_run(path, method, params, headers)
   return DecodeJson(body), ok, h
 end
 
-function Adb:Auth(db_config)
-  print(EncodeJson(db_config))
-  if self._db_config == null then self._db_config = db_config end
-
+function Adb:Auth()
   local ok, headers, body =
       Fetch(
-        db_config.url .. "/_open/auth",
+        self._db_config.url .. "/_open/auth",
         {
           method = "POST",
           body = '{ "username": "' .. self._db_config.username .. '", "password": "' .. self._db_config.password .. '" }'
@@ -50,8 +44,7 @@ function Adb:Auth(db_config)
       )
 
   self._arangoAPI = self._db_config.url .. "/_db/" .. self._db_config.db_name .. "/_api"
-  print(self._arangoAPI)
-  print(BeansEnv)
+
   if ok == 200 then
     self._arangoJWT = DecodeJson(body)["jwt"]
   end

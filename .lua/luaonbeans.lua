@@ -349,8 +349,8 @@ function InitDB(db_config)
       PGRest[config.name] = _PGRest
     elseif (config.engine == "arangodb") then
       local _Adb = require("arangodb")
-      local adb_driver = _Adb.new()
-      adb_driver:Auth(config)
+      local adb_driver = _Adb.new(config)
+      adb_driver:Auth()
       adb_driver:UpdateCacheConfiguration({ mode = "on" })
       Adb[config.name] = adb_driver
     elseif (config.engine == "db2rest") then

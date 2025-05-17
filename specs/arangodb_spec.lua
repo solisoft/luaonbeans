@@ -26,7 +26,6 @@ return {
 
 			describe("CreateDocument", function()
 				it("create document", function()
-					print(Adb.primary:infos())
 					local collection = Adb.primary:CreateCollection("test_data")
 					expect.truthy(collection.code == 200)
 

@@ -1,15 +1,26 @@
 {
-	"development": {
-		"db_name": "db",
-		"url": "http://127.0.0.1:7070/v1/rdbms/"
-	},
-	"production": {
-		"db_name": "luaonbeans",
-		"url": "http://127.0.0.1:7070/v1/rdbms/"
-	},
-	"test": {
-		"db_name": "luaonbeans_test",
-		"url": "http://127.0.0.1:7070/v1/rdbms/"
-	},
-	"engine": "db2rest"
+	"development": [
+		{
+			"name": "primary",
+			"engine": "db2rest",
+			"db_name": "db",
+			"url": "http://127.0.0.1:7070/v1/rdbms/"
+		}
+	],
+	"production": [
+		{
+			"name": "primary",
+			"engine": "db2rest",
+			"db_name": "db",
+			"url": "http://127.0.0.1:7070/v1/rdbms/"
+		}
+	],
+	"test": [
+		{
+			"name": "primary",
+			"engine": "db2rest",
+			"db_name": "db",
+			"url": "http://127.0.0.1:7070/v1/rdbms/"
+		}
+	]
 }

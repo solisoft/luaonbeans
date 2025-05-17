@@ -1,9 +1,17 @@
 {
-	"development": {
-		"url": "http://127.0.0.1:4200"
-	},
-	"test": {
-		"url": "http://127.0.0.1:4201"
-	},
-	"engine": "crate"
+	"development": [
+		{
+			"name": "primary",
+			"engine": "crate",
+			"url": "http://127.0.0.1:4200"
+		}
+	]
+	,
+	"test": [
+		{
+			"name": "primary",
+			"engine": "crate",
+			"url": "http://127.0.0.1:4200"
+		}
+	]
 }

@@ -1,4 +1,10 @@
 Routes = {}
+-- DBs
+Adb = {}
+Crate = {}
+PGRest = {}
+Rest = {}
+Surreal = {}
 
 function LoadViewsRecursively(path)
   local dir = unix.opendir(path)
@@ -332,37 +338,45 @@ function WriteJSON(object)
 end
 
 function InitDB(db_config)
-  if (db_config["engine"] == "crate") then
-    Crate = require("crate")
-    Crate.init(db_config[BeansEnv])
-  elseif (db_config["engine"] == "postgrest") then
-    PGRest = require("postgrest")
-    PGRest.init(db_config[BeansEnv])
-  elseif (db_config["engine"] == "arangodb") then
-    Adb = require("arango")
-    Adb.Auth(db_config[BeansEnv])
-    Adb.UpdateCacheConfiguration({ mode = "on" })
-  elseif (db_config["engine"] == "db2rest") then
-    Rest = require("db2rest")
-    Rest.init(db_config[BeansEnv])
-  elseif (db_config["engine"] == "sqlite") then
-    local sqlite3 = require 'lsqlite3'
-    local sqlite = sqlite3.open(db_config[BeansEnv]["db_name"] .. '.sqlite3')
-    sqlite:busy_timeout(1000)
-    sqlite:exec [[PRAGMA journal_mode=WAL]]
-    sqlite:exec [[PRAGMA synchronous=NORMAL]]
-    sqlite:exec [[
-      CREATE TABLE IF NOT EXISTS "migrations"
-      (
-        id integer PRIMARY KEY,
-        filename VARCHAR
-      );
+  for _, config in pairs(db_config[BeansEnv]) do
+    if (config.engine == "crate") then
+      local _Crate = require("crate")
+      _Crate.init(config)
+      Crate[config.name] = _Crate
+    elseif (config.engine == "postgrest") then
+      local _PGRest = require("postgrest")
+      _PGRest.init(config)
+      PGRest[config.name] = _PGRest
+    elseif (config.engine == "arangodb") then
+      local _Adb = require("arangodb")
+      local adb_driver = _Adb.new()
+      adb_driver:Auth(config)
+      adb_driver:UpdateCacheConfiguration({ mode = "on" })
+      Adb[config.name] = adb_driver
+    elseif (config.engine == "db2rest") then
+      local _Rest = require("db2rest")
+      _Rest.init(config)
+      Rest[config.name] = _Rest
+    elseif (config.engine == "sqlite") then
+      local sqlite3 = require 'lsqlite3'
+      local sqlite = sqlite3.open(config["db_name"] .. '.sqlite3')
+      sqlite:busy_timeout(1000)
+      sqlite:exec [[PRAGMA journal_mode=WAL]]
+      sqlite:exec [[PRAGMA synchronous=NORMAL]]
+      sqlite:exec [[
+        CREATE TABLE IF NOT EXISTS "migrations"
+        (
+          id integer PRIMARY KEY,
+          filename VARCHAR
+        );
 
-      CREATE UNIQUE INDEX idx_migrations_filename ON migrations (filename);
-    ]]
-  elseif (db_config["engine"] == "surrealdb") then
-    Surreal = require("surrealdb")
-    Surreal.auth(db_config[BeansEnv])
+        CREATE UNIQUE INDEX idx_migrations_filename ON migrations (filename);
+      ]]
+    elseif (config.engine == "surrealdb") then
+      local _Surreal = require("surrealdb")
+      _Surreal.auth(db_config[BeansEnv])
+      Surreal[config.name] = _Surreal
+    end
   end
 end
 

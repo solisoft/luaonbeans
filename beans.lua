@@ -11,7 +11,6 @@ end
 BeansEnv = ENV["BEANS_ENV"] or "development"
 
 DBConfig = DecodeJson(Slurp("config/database.json"))
-Adb = require "arango"
 
 RecursiveFiles = function(dir, files_found)
   files_found = files_found or {}
@@ -117,38 +116,57 @@ if arg[1] == "create" then
   end
 end
 
-SetupDB = function(env)
+SetupArangoDB = function(env)
   print("Setup " .. env .. " DB")
-  assert(Adb.Auth(DBConfig.system) ~= nil)
-  if env == "test" then
-    Adb.DeleteDatabase(DBConfig[env].db_name)
+
+  Adb = {}
+  _Adb = require "arangodb"
+  for _, config in pairs(DBConfig[BeansEnv]) do
+    local adb_driver = _Adb.new()
+    adb_driver:Auth(config)
+    Adb[config.name] = adb_driver
   end
-  Adb.CreateDatabase(DBConfig[env].db_name)
-  assert(Adb.Auth(DBConfig[env]) ~= nil)
-  Adb.CreateCollection("migrations")
-  Adb.CreateIndex("migrations", {type = "persistent", unique = true, fields = {"filename"}})
-  Adb.CreateCollection("uploads")
-  Adb.CreateIndex("uploads", {type = "persistent", unique = true, fields = {"uuid"}})
-  Adb.CreateDocument("migrations", {filename = "0"})
+
+  if DBConfig["system"] then
+    _Adb = require "arangodb"
+    local adb_driver = _Adb.new()
+    adb_driver:Auth(DBConfig["system"])
+    Adb.system = adb_driver
+  end
+
+  if env == "test" then
+    for _, config in pairs(DBConfig[env]) do
+      print("Suppression de la base de test")
+      Adb.system:DeleteDatabase(config.db_name)
+    end
+  end
+  for _, config in pairs(DBConfig[env]) do
+    print(EncodeJson(Adb.system:CreateDatabase(config.db_name)))
+  end
+
+  Adb.primary:CreateCollection("migrations")
+  Adb.primary:CreateIndex("migrations", {type = "persistent", unique = true, fields = {"filename"}})
+  Adb.primary:CreateCollection("uploads")
+  Adb.primary:CreateIndex("uploads", {type = "persistent", unique = true, fields = {"uuid"}})
+  Adb.primary:CreateDocument("migrations", {filename = "0"})
 end
 
 if arg[1] == "db:setup" then
   if DBConfig["engine"] == "arangodb" then
-    SetupDB(BeansEnv)
+    SetupArangoDB(BeansEnv)
   end
 end
 
 ArangoDB_DBMigrate = function()
   print("Running migrations ...")
-  assert(Adb.Auth(DBConfig[BeansEnv]) ~= nil)
-  local latest_version = Adb.Aql("FOR m IN migrations SORT m.filename DESC LIMIT 1 RETURN m.filename").result[1]
+  local latest_version = Adb.primary:Aql("FOR m IN migrations SORT m.filename DESC LIMIT 1 RETURN m.filename").result[1]
   for name, kind, ino, off in assert(unix.opendir(unix.getcwd() .. "/migrations")) do
     if name ~= "." and name ~= ".." then
       if name > latest_version then
         print("Processing " .. name)
         local migration = require(string.gsub(name, ".lua", ""))
         if migration.up() then
-          Adb.CreateDocument("migrations", {filename = name})
+          Adb.primary:CreateDocument("migrations", {filename = name})
         end
       end
     end
@@ -195,13 +213,12 @@ end
 
 if arg[1] == "db:rollback" then
   if DBConfig["engine"] == "arangodb" then
-    assert(Adb.Auth(DBConfig[BeansEnv]) ~= nil)
-    local latest_version = Adb.Aql("FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m").result[1]
+    local latest_version = Adb.primary.Aql("FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m").result[1]
     if latest_version.filename ~= "0" then
       print("Processing " .. latest_version.filename)
       local migration = require(string.gsub(latest_version.filename, ".lua", ""))
       if migration.down() then
-        Adb.DeleteDocument(latest_version._id)
+        Adb.primary:DeleteDocument(latest_version._id)
       end
     else
       print("Nothing to rollback!")
@@ -235,7 +252,7 @@ end
 
 if arg[1] == "specs" then
   BeansEnv = "test"
-  SetupDB("test")
+  SetupArangoDB("test")
 
   if DBConfig["engine"] == "arangodb" then
     ArangoDB_DBMigrate()

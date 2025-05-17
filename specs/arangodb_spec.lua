@@ -53,7 +53,6 @@ return {
 			describe("UpdateDocument", function()
 				it("update document", function()
 					local collection = Adb.primary:CreateCollection("test_data")
-					print(EncodeJson(collection))
 					expect.truthy(collection.code == 200)
 					local doc = Adb.primary:CreateDocument("test_data", { demo = true })
 					expect.truthy(type(doc._key) == "string")

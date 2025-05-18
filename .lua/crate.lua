@@ -33,9 +33,10 @@ function Crate:sql(sql, bindVars)
     local duration = response["duration"]
 
     local data = {}
+    local rows = response["rows"]
     local columns = response["cols"]
 
-    for j = 1, #response["rows"] do
+    for j = 1, #rows do
       local row = response["rows"][j]
       local rowData = {}
       for k = 1, #columns do rowData[columns[k]] = row[k] end

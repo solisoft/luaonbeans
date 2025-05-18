@@ -1,6 +1,6 @@
 return {
   up = function()
-    local transaction = Adb.BeginTransaction({
+    local transaction = Adb.primary:BeginTransaction({
       collections = {
         writes = { "some", "tables" },
         reads = { "some", "tables" },
@@ -12,16 +12,16 @@ return {
           -- do something
         end)
     then
-      Adb.CommitTransaction(transaction.result.id)
+      Adb.primary:CommitTransaction(transaction.result.id)
       return true
     else
-      Adb.AbortTransaction(transaction.result.id)
+      Adb.primary:AbortTransaction(transaction.result.id)
       return false
     end
   end,
 
   down = function()
-    local transaction = Adb.BeginTransaction({
+    local transaction = Adb.primary:BeginTransaction({
       collections = {
         writes = { "some", "tables" },
         reads = { "some", "tables" },
@@ -33,10 +33,10 @@ return {
           -- do something
         end)
     then
-      Adb.CommitTransaction(transaction.result.id)
+      Adb.primary:CommitTransaction(transaction.result.id)
       return true
     else
-      Adb.AbortTransaction(transaction.result.id)
+      Adb.primary:AbortTransaction(transaction.result.id)
       return false
     end
   end,

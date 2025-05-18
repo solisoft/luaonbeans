@@ -341,22 +341,18 @@ function InitDB(db_config)
   for _, config in pairs(db_config[BeansEnv]) do
     if (config.engine == "crate") then
       local _Crate = require("crate")
-      _Crate.init(config)
-      Crate[config.name] = _Crate
+      Crate[config.name] = _Crate.new(config)
     elseif (config.engine == "postgrest") then
       local _PGRest = require("postgrest")
-      _PGRest.init(config)
-      PGRest[config.name] = _PGRest
+      PGRest[config.name] = _PGRest.new(config)
     elseif (config.engine == "arangodb") then
       local _Adb = require("arangodb")
       local adb_driver = _Adb.new(config)
-      adb_driver:Auth()
       adb_driver:UpdateCacheConfiguration({ mode = "on" })
       Adb[config.name] = adb_driver
     elseif (config.engine == "db2rest") then
       local _Rest = require("db2rest")
-      _Rest.init(config)
-      Rest[config.name] = _Rest
+      Rest[config.name] = _Rest.new(config)
     elseif (config.engine == "sqlite") then
       local sqlite3 = require 'lsqlite3'
       local sqlite = sqlite3.open(config["db_name"] .. '.sqlite3')
@@ -374,8 +370,7 @@ function InitDB(db_config)
       ]]
     elseif (config.engine == "surrealdb") then
       local _Surreal = require("surrealdb")
-      _Surreal.auth(db_config[BeansEnv])
-      Surreal[config.name] = _Surreal
+      Surreal[config.name] = _Surreal.new(config)
     end
   end
 end

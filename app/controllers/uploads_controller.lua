@@ -67,8 +67,7 @@ local app = {
 			RunCommand("vips thumbnail " .. original_filename .. " " .. converted_filename .. " " .. Params.width .. " --height " .. Params.height .. " --crop centre")
 			ServeAsset(converted_filename)
 		end
-	end,
-
+	end
 }
 
 return HandleController(app)

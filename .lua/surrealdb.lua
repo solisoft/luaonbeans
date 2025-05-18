@@ -2,23 +2,28 @@
 --
 -- Usage : Surreal.sql("select * from customers").result
 --
+SurrealDB = {}
+SurrealDB.__index = SurrealDB
 
-SurrealToken = ""
-SurrealConfig = {}
+function SurrealDB.new(db_config)
+  self._surrealToken = ""
+  self._surrealConfig = {}
+  self._db_config = db_config
+  self._lastDBConnect = GetTime()
+  self:auth()
 
-LastDBConnect = GetTime()
+  return self
+end
 
-local function auth(db_config)
-  SurrealConfig = db_config
-
+function SurrealDB:auth()
   local ok, headers, body =
       Fetch(
-        SurrealConfig.url .. "/signin",
+        self._db_config.url .. "/signin",
         {
           method = "POST",
           body = EncodeJson({
-            user = db_config.username,
-            pass = db_config.password
+            user = self._db_config.username,
+            pass = self._db_config.password
           }) or "",
           headers = {
             ["Accept"] = "application/json"
@@ -27,23 +32,23 @@ local function auth(db_config)
       )
 
   if ok == 200 then
-    SurrealToken = DecodeJson(body)["token"]
+    self._surrealToken = DecodeJson(body)["token"]
   end
 
-  return SurrealToken
+  return self._surrealToken
 end
 
-local function surreal_sql(sql)
+function SurrealDB:surreal_sql(sql)
   local ok, headers, body =
       Fetch(
-        SurrealConfig.url .. "/sql",
+        self._db_config.url .. "/sql",
         {
           method = "POST",
           body = sql,
           headers = {
-            ["Authorization"] = "Bearer " .. SurrealToken,
-            ["NS"] = SurrealConfig.ns,
-            ["DB"] = SurrealConfig.db,
+            ["Authorization"] = "Bearer " .. self._surrealToken,
+            ["NS"] = self._db_config.ns,
+            ["DB"] = self._db_config.db,
             ["Accept"] = "application/json"
           }
         }
@@ -52,15 +57,11 @@ local function surreal_sql(sql)
   return DecodeJson(body)[1]
 end
 
-local function refresh_token()
-  if GetTime() - LastDBConnect > 600 then
-    auth(SurrealConfig)
-    LastDBConnect = GetTime()
+function SurrealDB:refresh_token()
+  if GetTime() - self._lastDBConnect > 600 then
+    self:auth()
+    self._lastDBConnect = GetTime()
   end
 end
 
-return {
-  auth = auth,
-  sql = surreal_sql,
-  refresh_token = refresh_token
-}
+return SurrealDB

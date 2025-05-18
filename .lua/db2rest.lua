@@ -1,10 +1,19 @@
-RestApiUrl = ""
+DB2Rest = {}
+DB2Rest.__index = DB2Rest
 
-local function init(db_config)
-  RestApiUrl = db_config["url"] .. db_config["db_name"] .. "/"
+function DB2Rest.new(db_config)
+  self._restApiUrl = ""
+  self._db_config = db_config
+  self:init()
+
+  return self
 end
 
-local function read(collection, params, body)
+function DB2Rest:init()
+  self._restApiUrl = self._db_config["url"] .. self._db_config["db_name"] .. "/"
+end
+
+function DB2Rest:read(collection, params, body)
   params = params or {}
   params['filters'] = params['filters'] or {}
   params['sort'] = params['sort'] or {}
@@ -32,16 +41,16 @@ local function read(collection, params, body)
 
   local ok, h, body =
       Fetch(
-        RestApiUrl .. collection .. expand .. filter,
+        self._restApiUrl .. collection .. expand .. filter,
         request_params
       )
   return DecodeJson(body)
 end
 
-local function write(collection, params)
+function DB2Rest:write(collection, params)
   local ok, h, body =
       Fetch(
-        RestApiUrl .. collection .. filter,
+        self._restApiUrl .. collection .. filter,
         {
           method = "POST",
           body = EncodeJson(params) or "",
@@ -53,10 +62,10 @@ local function write(collection, params)
   return DecodeJson(body)
 end
 
-local function delete(collection, params)
+function DB2Rest:delete(collection, params)
   local ok, h, body =
       Fetch(
-        RestApiUrl .. collection .. filter,
+        self._restApiUrl .. collection .. filter,
         {
           method = "DELETE",
           body = EncodeJson(params) or "",
@@ -68,7 +77,7 @@ local function delete(collection, params)
   return DecodeJson(body)
 end
 
-local function update(collection, filters, params)
+function DB2Rest:update(collection, filters, params)
   local filter = ""
   if type(filters) == "table" then
     filter = "?filter=" .. table.concat(filters, ";")
@@ -76,7 +85,7 @@ local function update(collection, filters, params)
 
   local ok, h, body =
       Fetch(
-        RestApiUrl .. collection .. filter,
+        self._restApiUrl .. collection .. filter,
         {
           method = "PUT",
           body = EncodeJson(params) or "",
@@ -88,10 +97,4 @@ local function update(collection, filters, params)
   return DecodeJson(body)
 end
 
-return {
-  read = read,
-  write = write,
-  delete = delete,
-  update = update,
-  init = init
-}
+return DB2Rest

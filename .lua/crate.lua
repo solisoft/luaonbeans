@@ -1,18 +1,25 @@
--- cratedb wrapper
+-- very basic cratedb wrapper
 --
--- Usage : Crate.sql("select * from customers")
+-- Usage :
+--   local Crate = require("crate")
+--   local crate = Crate.new(config)
+--   crate.sql("select * from customers")
 --
 -- Returns : { duration = 0.001, result = { { id = 1, name = "John" }, { id = 2, name = "Jane" } } }
 --
-local crate_config = nil
+Crate = {}
+Crate.__index = {}
 
-local function init(config)
-  crate_config = config
+function Crate.new(db_config)
+  self._db_config = db_config
+
+  return Crate
 end
+
 
 local function sql(sql, bindVars)
   local ok, headers, body = Fetch(
-    crate_config["url"] .. "/_sql",
+    self._db_config["url"] .. "/_sql",
     {
       method = "POST",
       body = EncodeJson({ stmt= sql, bind_vars= bindVars }),
@@ -45,7 +52,4 @@ local function sql(sql, bindVars)
   end
 end
 
-return {
-  sql = sql,
-  init = init
-}
+return Crate

@@ -123,14 +123,12 @@ SetupArangoDB = function(env)
   _Adb = require "arangodb"
   for _, config in pairs(DBConfig[BeansEnv]) do
     local adb_driver = _Adb.new(config)
-    adb_driver:Auth()
     Adb[config.name] = adb_driver
   end
 
   if DBConfig["system"] then
     _Adb = require "arangodb"
     local adb_driver = _Adb.new(DBConfig["system"])
-    adb_driver:Auth()
     Adb.system = adb_driver
   end
 

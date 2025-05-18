@@ -16,8 +16,7 @@ function Crate.new(db_config)
   return Crate
 end
 
-
-local function sql(sql, bindVars)
+function Crate:sql(sql, bindVars)
   local ok, headers, body = Fetch(
     self._db_config["url"] .. "/_sql",
     {

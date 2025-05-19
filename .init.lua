@@ -11,6 +11,7 @@ require("routes")
 ProgramMaxPayloadSize(10485760) -- 10 MB
 
 -- ArangoDB connection
+
 local db_config = DecodeJson(LoadAsset("config/database.json"))
 InitDB(db_config)
 

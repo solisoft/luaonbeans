@@ -78,11 +78,15 @@ function Adb:Aql(str, bindvars, options)
 end
 
 function Adb:with_Params(endpoint, method, handle, params)
+	method = method or "GET"
 	params = params or {}
+	handle = handle or ""
 	return self:Api_run(endpoint .. handle, method, params)
 end
 
 function Adb:without_Params(endpoint, method, handle)
+	method = method or "GET"
+	handle = handle or ""
 	return self:Api_run(endpoint .. handle, method)
 end
 
@@ -175,7 +179,7 @@ end
 -- Indexes
 
 function Adb:GetAllIndexes(collection)
-	return self:without_Params("/index?collection=" .. collection, "GET", "")
+	return self:without_Params("/index?collection=" .. collection, "GET")
 end
 
 function Adb:CreateIndex(handle, params)
@@ -189,11 +193,11 @@ end
 -- QueryCache
 
 function Adb:GetQueryCacheEntries()
-	return self:without_Params("/query-cache/entries", "GET", "")
+	return self:without_Params("/query-cache/entries")
 end
 
 function Adb:GetQueryCacheConfiguration()
-	return self:without_Params("/query-cache/properties", "GET", "")
+	return self:without_Params("/query-cache/properties")
 end
 
 function Adb:UpdateCacheConfiguration(params)
@@ -201,7 +205,7 @@ function Adb:UpdateCacheConfiguration(params)
 end
 
 function Adb:DeleteQueryCache()
-	return self:without_Params("/query-cache", "DELETE", "")
+	return self:without_Params("/query-cache", "DELETE")
 end
 
 -- Stream transactions
@@ -223,6 +227,22 @@ end
 function Adb:Transaction(params)
   return self:with_Params("/transaction", "POST", "", params)
 end
+
+-- UDF
+
+function Adb:CreateFunction(params)
+	return self:with_Params("/aqlfunction", "POST", "", params)
+end
+
+function Adb:DeleteFunction(name)
+	return self:with_Params("/aqlfunction/" .. name, "DELETE")
+end
+
+function Adb:ListFunctions()
+	return self:with_Params("/aqlfunction")
+end
+
+-- Token
 
 function Adb:RefreshToken()
 	if GetTime() - self._lastDBConnect > 600 then

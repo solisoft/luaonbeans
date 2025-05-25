@@ -265,6 +265,32 @@ return {
 				end)
 			end)
 
+			-- UDF
+
+			describe("Javascript Transactions", function()
+				it("create / read / delete a function", function()
+					local fn = Adb.primary:CreateFunction({
+						name = "myfunctions::temperature::celsiustofahrenheit",
+						code = "function (celsius) { return celsius * 1.8 + 32; }"
+					})
+					expect.equal(fn.code, 201)
+
+					local fns = Adb.primary:ListFunctions()
+					expect.equal(fns.code, 200)
+					expect.equal(#fns.result, 1)
+					expect.equal(fns.result[1].name, "myfunctions::temperature::celsiustofahrenheit")
+
+					local dfn = Adb.primary:DeleteFunction(
+						"myfunctions::temperature::celsiustofahrenheit"
+					)
+					expect.equal(dfn.code, 200)
+
+					fns = Adb.primary:ListFunctions()
+					expect.equal(fns.code, 200)
+					expect.equal(#fns.result, 0)
+				end)
+			end)
+
 			-- CACHE
 
 			describe("GetQueryCacheEntries", function()

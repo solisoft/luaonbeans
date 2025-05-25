@@ -267,7 +267,7 @@ return {
 
 			-- UDF
 
-			describe("Javascript Transactions", function()
+			describe("User Defined Functions", function()
 				it("create / read / delete a function", function()
 					local fn = Adb.primary:CreateFunction({
 						name = "myfunctions::temperature::celsiustofahrenheit",

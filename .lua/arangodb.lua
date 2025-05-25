@@ -209,7 +209,7 @@ function Adb:DeleteQueryCache()
 end
 
 -- Stream transactions
--- POST /_api/transaction/begin
+
 function Adb:BeginTransaction(params)
   return self:with_Params("/transaction/begin", "POST", "", params)
 end
@@ -220,6 +220,12 @@ end
 
 function Adb:AbortTransaction(transaction_id)
   return self:without_Params("/transaction/", "DELETE", transaction_id)
+end
+
+-- Javascript transactions
+
+function Adb:Transaction(params)
+  return self:with_Params("/transaction", "POST", "", params)
 end
 
 function Adb:RefreshToken()

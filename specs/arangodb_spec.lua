@@ -199,9 +199,9 @@ return {
 				end)
 			end)
 
-			-- TRANSACTIONS
+			-- STREAM TRANSACTIONS
 
-			describe("Transactions", function()
+			describe("Stream Transactions", function()
 				it("create and commit a transaction", function()
 					local transaction = Adb.primary:BeginTransaction({ collections = {} })
 					expect.equal(transaction.code, 201)
@@ -214,6 +214,54 @@ return {
 					expect.equal(transaction.code, 201)
 					transaction = Adb.primary:AbortTransaction(transaction.result.id)
 					expect.equal(transaction.code, 200)
+				end)
+			end)
+
+			-- JAVASCRIPT TRANSACTIONS
+
+			describe("Javascript Transactions", function()
+				it("execute a transaction", function()
+					Adb.primary:CreateCollection("demo")
+					local transaction = Adb.primary:Transaction(
+						{
+							collections = { read = "demo" },
+							action = [[
+								function() {
+									console.log("hello js transactions")
+								}
+							]]
+						}
+					)
+					expect.equal(transaction.code, 200)
+				end)
+
+				it("do not execute a transaction", function()
+					Adb.primary:CreateCollection("demo")
+					local transaction = Adb.primary:Transaction(
+						{
+							collections = { },
+							action = [[
+									console.log("hello js transactions")
+							]]
+						}
+					)
+					expect.equal(transaction.code, 400)
+				end)
+
+				it("do not execute a transaction", function()
+					Adb.primary:CreateCollection("demo")
+					local transaction = Adb.primary:Transaction(
+						{
+							collections = { },
+							action = [[
+								function() {
+									throw("error js transactions")
+								}
+							]]
+						}
+					)
+					expect.equal(transaction.code, 500)
+					expect.equal(transaction.errorMessage, "error js transactions")
 				end)
 			end)
 

@@ -1,8 +1,10 @@
+local Customer = require("customer")
+
 local app = {
 	index = function()
 		Page("welcome/index", "app")
 		-- or
-		-- WriteJSON({ ["demo"] = true })
+		-- WriteJSON({ demo = true })
 	end,
 }
 

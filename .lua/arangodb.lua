@@ -72,16 +72,17 @@ end
 function Adb:Aql(str, bindvars, options)
 	bindvars = bindvars or {}
 	options = options or { fullCount = true }
-
 	local request = self:Raw_aql({ query = str, cache = true, bindVars = bindvars, options = options })
 	return request
 end
 
-function Adb:with_Params(endpoint, method, handle, params)
+function Adb:with_Params(endpoint, method, handle, params, options)
 	method = method or "GET"
 	params = params or {}
 	handle = handle or ""
-	return self:Api_run(endpoint .. handle, method, params)
+	options = options or ""
+	if options ~= "" then options = "?" .. options end
+	return self:Api_run(endpoint .. handle .. options, method, params)
 end
 
 function Adb:without_Params(endpoint, method, handle)
@@ -92,12 +93,12 @@ end
 
 -- Documents
 
-function Adb:UpdateDocument(handle, params)
-	return self:with_Params("/document/", "PATCH", handle, params)
+function Adb:UpdateDocument(handle, params, options)
+	return self:with_Params("/document/", "PATCH", handle, params, options)
 end
 
-function Adb:CreateDocument(handle, params)
-	return self:with_Params("/document/", "POST", handle, params)
+function Adb:CreateDocument(handle, params, options)
+	return self:with_Params("/document/", "POST", handle, params, options)
 end
 
 function Adb:GetDocument(handle)

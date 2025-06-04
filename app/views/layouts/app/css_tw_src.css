@@ -31,6 +31,13 @@ code {
   @apply rounded bg-slate-800 px-2 py-1 text-white;
 }
 
+pre {
+  @apply rounded bg-slate-100 px-2 py-1 border;
+}
+
+pre code {
+  @apply bg-slate-100 text-black text-wrap text-xs;
+}
 a {
   @apply text-purple-400 hover:text-blue-900;
 }

@@ -2,4 +2,8 @@
   <h1>Error <%= Params.status %></h1>
 
   <p><%= Params.message %></p>
+
+  <% if Params.env == "development" then %>
+  <pre><code><%= Params.details %></code></pre>
+  <% end %>
 </div>

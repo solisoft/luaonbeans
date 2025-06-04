@@ -42,13 +42,15 @@ function OnWorkerStart()
 end
 
 -- OnError hook
-function OnError(status, message)
+function OnError(status, message, details)
   -- Define the error for an API
   -- WriteJSON({ status = status, message = message })
 
   -- Define the error page via a page with a layout
   Params.status = status
   Params.message = message
+  Params.details = details
+  Params.env = BeansEnv
   Page("errors/index", "app")
 end
 

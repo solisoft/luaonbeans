@@ -1,0 +1,14 @@
+local model = require("arango_model")
+
+local Customer = setmetatable({}, { __index = model })
+Customer.__index = Customer
+
+Customer.COLLECTION = "customers"
+
+function Customer.new(data)
+	local self = setmetatable(model.new(data), Customer)
+
+	return self
+end
+
+return Customer

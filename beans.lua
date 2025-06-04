@@ -139,7 +139,7 @@ SetupArangoDB = function(env)
     end
   end
   for _, config in pairs(DBConfig[env]) do
-    print(EncodeJson(Adb.system:CreateDatabase(config.db_name)))
+    EncodeJson(Adb.system:CreateDatabase(config.db_name))
   end
 
   Adb.primary:CreateCollection("migrations")

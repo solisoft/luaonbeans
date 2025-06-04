@@ -3,8 +3,9 @@
 return {
 	run = function()
 		describe("arangodb driver", function()
-			lester.before(function()
-				-- This function is run before every test.
+			lester.after(function()
+				Adb.primary:CreateCollection("test_data")
+				Adb.primary:DeleteCollection("test_data")
 			end)
 
 			-- AQL
@@ -38,14 +39,14 @@ return {
 
 			describe("GetDocument", function()
 				it("get document", function()
-					local collection = Adb.primary:CreateCollection("demo")
+					local collection = Adb.primary:CreateCollection("test_data")
 					expect.truthy(collection.code == 200)
-					local doc = Adb.primary:CreateDocument("demo", { demo = true })
+					local doc = Adb.primary:CreateDocument("test_data", { demo = true })
 					expect.truthy(type(doc._key) == "string")
 					doc = Adb.primary:GetDocument(doc._id)
 					expect.truthy(type(doc._key) == "string")
 					expect.truthy(doc.demo == true)
-					collection = Adb.primary:DeleteCollection("demo")
+					collection = Adb.primary:DeleteCollection("test_data")
 					expect.truthy(collection.code == 200)
 				end)
 			end)
@@ -221,10 +222,10 @@ return {
 
 			describe("Javascript Transactions", function()
 				it("execute a transaction", function()
-					Adb.primary:CreateCollection("demo")
+					Adb.primary:CreateCollection("test_data")
 					local transaction = Adb.primary:Transaction(
 						{
-							collections = { read = "demo" },
+							collections = { read = "test_data" },
 							action = [[
 								function() {
 									console.log("hello js transactions")
@@ -236,7 +237,7 @@ return {
 				end)
 
 				it("do not execute a transaction", function()
-					Adb.primary:CreateCollection("demo")
+					Adb.primary:CreateCollection("test_data")
 					local transaction = Adb.primary:Transaction(
 						{
 							collections = { },
@@ -249,7 +250,7 @@ return {
 				end)
 
 				it("do not execute a transaction", function()
-					Adb.primary:CreateCollection("demo")
+					Adb.primary:CreateCollection("test_data")
 					local transaction = Adb.primary:Transaction(
 						{
 							collections = { },

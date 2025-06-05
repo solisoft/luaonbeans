@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.14.0](https://github.com/solisoft/luaonbeans/compare/v0.13.0...v0.14.0) (2025-06-04)
+
+
+### Features
+
+* add arangodb Javascript transactions ([16040d1](https://github.com/solisoft/luaonbeans/commit/16040d10c8445c64e6fa6238a9b7e24f6ea46763))
+* arango_model ([9b43ff4](https://github.com/solisoft/luaonbeans/commit/9b43ff4a223421348cb5e6440aa426e1e696a466))
+* arango_model ([998ee9e](https://github.com/solisoft/luaonbeans/commit/998ee9ed6a754fb5c75b27535f2f4c227bf6ccc0))
+* arangodb driver clean code ([f123b18](https://github.com/solisoft/luaonbeans/commit/f123b18398dc2b03fdb260f314f57b9ccef84df6))
+* arangodb driver clean code ([df1cf96](https://github.com/solisoft/luaonbeans/commit/df1cf96e98a17f00b611fee1579e269bb2183846))
+* arangodb driver use a class now ([2983333](https://github.com/solisoft/luaonbeans/commit/29833334b188c33a5493be80236078281c869ccd))
+* arangodb driver use a class now ([9645926](https://github.com/solisoft/luaonbeans/commit/9645926e02abfbfc259c0a601eadb391cb0c5aa0))
+* arangodb User Defined Functions ([9b90072](https://github.com/solisoft/luaonbeans/commit/9b90072f2c319bde8127fd37170775229c942b76))
+* arangodb User Defined Functions ([62e2e4c](https://github.com/solisoft/luaonbeans/commit/62e2e4c0993f9e27f3f70c863d0067b3a572c3a8))
+* transform all db drivers to a proper class ([7bfffbe](https://github.com/solisoft/luaonbeans/commit/7bfffbe4fded24037a444a99981a77c9faf4301e))
+* transform all db drivers to a proper class ([43504b7](https://github.com/solisoft/luaonbeans/commit/43504b73e4b5a4cb2481674f25ae9f965021b858))
+* update welcome page ([1943a68](https://github.com/solisoft/luaonbeans/commit/1943a681b0b30d76a2126e1671d1f47bd7a6c8b2))
+
+
+### Bug Fixes
+
+* arangodb lua files ([a088cbd](https://github.com/solisoft/luaonbeans/commit/a088cbdf472a7c9d57189ee2df9c3aed05330ebe))
+* docker compose file & democron syntax issue ([8a75cfb](https://github.com/solisoft/luaonbeans/commit/8a75cfb1121b4616651145a76adf72752f8e06e7))
+* update dockerfile ([68e54f4](https://github.com/solisoft/luaonbeans/commit/68e54f4c512d335dcd14dd4e6b44418702b9e63e))
+* update templates for new arangodb driver ([c96c449](https://github.com/solisoft/luaonbeans/commit/c96c449d5dc181972f4270f7b1856747f92620e9))
+* update the cronjob sample ([6143958](https://github.com/solisoft/luaonbeans/commit/6143958e89b8329b03bcdaaa46fc942df32a8643))
+* welcome controller sample ([fd062c9](https://github.com/solisoft/luaonbeans/commit/fd062c93c1b40f43fa159dfeec6a59310b504da7))
+
 ## [0.13.0](https://github.com/solisoft/luaonbeans/compare/v0.12.0...v0.13.0) (2025-04-13)
 
 

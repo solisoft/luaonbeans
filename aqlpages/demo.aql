@@ -1,229 +1,229 @@
 LET page = {
-  component: 'page',
-  title: 'My Page'
+	component: 'page',
+	title: 'My Page'
 }
 
 LET warning = {
-  component: 'alert',
-  title: 'Warning',
-  description: 'This is a warning!',
-  color: 'yellow',
-  width: [12, 12, 12], // [lg, md, sm]
-  icon: 'warning'
+	component: 'alert',
+	title: 'Warning',
+	description: 'This is a warning!',
+	color: 'yellow',
+	width: [12, 12, 12], // [lg, md, sm]
+	icon: 'warning'
 }
 
 LET cards = (
-  FOR i IN 1..6
-    RETURN {
-      component: 'card',
-      title: CONCAT('Card ', i),
-      description: "something to say ? ",
-      top_image: CONCAT('https://picsum.photos/600/300?random=', i),
-      width: [4, 6, 12], // [lg, md, sm]
-      components: [
-        {
-          component: 'button',
-          title: 'Click me',
-          color: 'blue',
-          icon: 'check_circle',
-          width: [12, 12, 12], // [lg, md, sm]
-        },
-        {
-          component: 'alert',
-          title: 'Warning',
-          description: 'This is a warning!',
-          color: 'yellow',
-          width: [12, 12, 12], // [lg, md, sm]
-          icon: 'warning'
-        }
-      ]
-    }
+	FOR i IN 1..6
+		RETURN {
+			component: 'card',
+			title: CONCAT('Card ', i),
+			description: "something to say ? ",
+			top_image: CONCAT('https://picsum.photos/600/300?random=', i),
+			width: [4, 6, 12], // [lg, md, sm]
+			components: [
+				{
+					component: 'button',
+					title: 'Click me',
+					color: 'blue',
+					icon: 'check_circle',
+					width: [12, 12, 12], // [lg, md, sm]
+				},
+				{
+					component: 'alert',
+					title: 'Warning',
+					description: 'This is a warning!',
+					color: 'yellow',
+					width: [12, 12, 12], // [lg, md, sm]
+					icon: 'warning'
+				}
+			]
+		}
 )
 
 LET alert = {
-  component: 'alert',
-  title: 'This is an alert!',
-  description: "Some message here...",
-  color: 'red', // red, blue, green, yellow, purple, pink, gray
-  width: [6, 12, 12], // [lg, md, sm]
-  icon: 'report_problem' // see https://fonts.google.com/icons?icon.set=Material+Icons&selected=Material+Icons+Outlined:report_problem:&icon.size=24&icon.color=%23e3e3e3&icon.platform=web&icon.query=alert
+	component: 'alert',
+	title: 'This is an alert!',
+	description: "Some message here...",
+	color: 'red', // red, blue, green, yellow, purple, pink, gray
+	width: [6, 12, 12], // [lg, md, sm]
+	icon: 'report_problem' // see https://fonts.google.com/icons?icon.set=Material+Icons&selected=Material+Icons+Outlined:report_problem:&icon.size=24&icon.color=%23e3e3e3&icon.platform=web&icon.query=alert
 }
 
 LET alert2 = {
-  component: 'alert',
-  title: 'Welcome to AQL Pages!',
-  _description: "Some message here...",
-  color: 'green', // red, blue, green, yellow, purple, pink, gray
-  width: [6, 12, 12], // [lg, md, sm]
-  icon: 'check_circle' // see https://fonts.google.com/icons?icon.set=Material+Icons&selected=Material+Icons+Outlined:report_problem:&icon.size=24&icon.color=%23e3e3e3&icon.platform=web&icon.query=alert
+	component: 'alert',
+	title: 'Welcome to AQL Pages!',
+	_description: "Some message here...",
+	color: 'green', // red, blue, green, yellow, purple, pink, gray
+	width: [6, 12, 12], // [lg, md, sm]
+	icon: 'check_circle' // see https://fonts.google.com/icons?icon.set=Material+Icons&selected=Material+Icons+Outlined:report_problem:&icon.size=24&icon.color=%23e3e3e3&icon.platform=web&icon.query=alert
 }
 
 LET card_with_alerts = {
-  component: 'card',
-  width: [12, 12, 12], // [lg, md, sm]
-  components: [alert, alert2],
-  icon: 'check_circle'
+	component: 'card',
+	width: [12, 12, 12], // [lg, md, sm]
+	components: [alert, alert2],
+	icon: 'check_circle'
 }
 
 LET chart2 = {
-  component: 'chart',
-  type: 'radar',
-  labels: ["State 1", "State 2", "State 3", "State 4", "State 5"],
-  series: [
-    {
-      data: [RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
-      name: 'States'
-    }
-  ],
-  width: [6, 6, 12], // [lg, md, sm]
+	component: 'chart',
+	type: 'radar',
+	labels: ["State 1", "State 2", "State 3", "State 4", "State 5"],
+	series: [
+		{
+			data: [RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
+			name: 'States'
+		}
+	],
+	width: [6, 6, 12], // [lg, md, sm]
 }
 
 LET sales_chart = {
-  component: 'chart',
-  title: 'Number of transactions per month',
-  type: 'line',
-  labels: ["2024/01", "2024/02", "2024/03", "2024/04", "2024/05", "2024/06", "2024/07", "2024/08", "2024/09", "2024/10", "2024/11", "2024/12"],
-  series: [
-    {
-      data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
-      name: 'Validated transactions'
-    },
-    {
-      data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
-      name: 'Refused transactions'
-    }
-  ],
-  width: [6, 6, 12], // [lg, md, sm]
+	component: 'chart',
+	title: 'Number of transactions per month',
+	type: 'line',
+	labels: ["2024/01", "2024/02", "2024/03", "2024/04", "2024/05", "2024/06", "2024/07", "2024/08", "2024/09", "2024/10", "2024/11", "2024/12"],
+	series: [
+		{
+			data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
+			name: 'Validated transactions'
+		},
+		{
+			data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
+			name: 'Refused transactions'
+		}
+	],
+	width: [6, 6, 12], // [lg, md, sm]
 }
 
 LET sales_chart2 = {
-  component: 'chart',
-  title: 'Amount of transactions per month',
-  type: 'line',
-  labels: ["2024/01", "2024/02", "2024/03", "2024/04", "2024/05", "2024/06", "2024/07", "2024/08", "2024/09", "2024/10", "2024/11", "2024/12"],
-  series: [
-    {
-      data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
-      name: 'Validated transactions'
-    },
+	component: 'chart',
+	title: 'Amount of transactions per month',
+	type: 'line',
+	labels: ["2024/01", "2024/02", "2024/03", "2024/04", "2024/05", "2024/06", "2024/07", "2024/08", "2024/09", "2024/10", "2024/11", "2024/12"],
+	series: [
+		{
+			data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
+			name: 'Validated transactions'
+		},
 
-    {
-      data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
-      name: 'Refunded transactions'
-    }
-  ],
-  width: [6, 6, 12], // [lg, md, sm]
+		{
+			data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
+			name: 'Refunded transactions'
+		}
+	],
+	width: [6, 6, 12], // [lg, md, sm]
 }
 
 LET map = {
-  component: 'map',
-  title: 'Map',
-  width: [6, 6, 12], // [lg, md, sm]
-  markers: [
-    {
-      latitude: 51.505,
-      longitude: -0.09,
-      content: 'Hello world!'
-    },
-    {
-      latitude: 51.505,
-      longitude: -0.19,
-      content: 'Hello Arnauld!'
-    }
-  ]
+	component: 'map',
+	title: 'Map',
+	width: [6, 6, 12], // [lg, md, sm]
+	markers: [
+		{
+			latitude: 51.505,
+			longitude: -0.09,
+			content: 'Hello world!'
+		},
+		{
+			latitude: 51.505,
+			longitude: -0.19,
+			content: 'Hello Arnauld!'
+		}
+	]
 }
 
 LET kpi1 = {
-  component: 'bignumber',
-  title: 'Total Sales',
-  description: 'Amount of transactions in the last 12 months',
-  value: 10000,
-  extra: '€',
-  color: 'green',
-  width: [4, 6, 12],
-  percentage: 90,
-  icon: 'paid'
+	component: 'bignumber',
+	title: 'Total Sales',
+	description: 'Amount of transactions in the last 12 months',
+	value: 10000,
+	extra: '€',
+	color: 'green',
+	width: [4, 6, 12],
+	percentage: 90,
+	icon: 'paid'
 }
 
 LET kpi2 = {
-  component: 'bignumber',
-  title: 'Total Customers',
-  description: 'Number of customers in the last 12 months',
-  value: 12345,
-  percentage: 90,
-  extra: '',
-  color: 'blue',
-  width: [4, 6, 12],
-  icon: 'person'
+	component: 'bignumber',
+	title: 'Total Customers',
+	description: 'Number of customers in the last 12 months',
+	value: 12345,
+	percentage: 90,
+	extra: '',
+	color: 'blue',
+	width: [4, 6, 12],
+	icon: 'person'
 }
 
 LET kpi3 = {
-  component: 'bignumber',
-  title: 'Total Merchants',
-  description: 'Number of merchants in the last 12 months',
-  value: 123,
-  percentage: 50,
-  extra: '',
-  color: 'yellow',
-  width: [4, 6, 12],
-  icon: 'store'
+	component: 'bignumber',
+	title: 'Total Merchants',
+	description: 'Number of merchants in the last 12 months',
+	value: 123,
+	percentage: 50,
+	extra: '',
+	color: 'yellow',
+	width: [4, 6, 12],
+	icon: 'store'
 }
 
 LET table = {
-  component: 'table',
-  title: 'Table',
-  width: [12, 12, 12], // [lg, md, sm]
-  caption: { title: 'this is a caption for the table', position: 'bottom' },
-  headers: [{ title: 'Header 1', align: 'left' }, { title: 'Header 2', align: 'center' }, { title: 'Header 3', align: 'right' }],
-  rows: [
-    [{ title: 'Data 1', align: 'left', color: 'red' }, { title: 'Data 2', align: 'center', color: 'blue' }, { title: 'Data 3', align: 'right', color: 'green' }],
-    [{ title: 'Data 4', align: 'left', color: 'red' }, { title: 'Data 5', align: 'center', color: 'blue' }, { title: 'Data 6', align: 'right', color: 'green' }],
-    [{ title: 'Data 7', align: 'left', color: 'red' }, { title: 'Data 8', align: 'center', color: 'blue' }, { title: 'Data 9', align: 'right', color: 'green' }]
-  ],
-  footer: [
-    [{ title: 'Footer 1', align: 'left' }, { title: 'Footer 2', align: 'center' }, { title: 'Footer 3', align: 'right' }]
-  ]
+	component: 'table',
+	title: 'Table',
+	width: [12, 12, 12], // [lg, md, sm]
+	caption: { title: 'this is a caption for the table', position: 'bottom' },
+	headers: [{ title: 'Header 1', align: 'left' }, { title: 'Header 2', align: 'center' }, { title: 'Header 3', align: 'right' }],
+	rows: [
+		[{ title: 'Data 1', align: 'left', color: 'red' }, { title: 'Data 2', align: 'center', color: 'blue' }, { title: 'Data 3', align: 'right', color: 'green' }],
+		[{ title: 'Data 4', align: 'left', color: 'red' }, { title: 'Data 5', align: 'center', color: 'blue' }, { title: 'Data 6', align: 'right', color: 'green' }],
+		[{ title: 'Data 7', align: 'left', color: 'red' }, { title: 'Data 8', align: 'center', color: 'blue' }, { title: 'Data 9', align: 'right', color: 'green' }]
+	],
+	footer: [
+		[{ title: 'Footer 1', align: 'left' }, { title: 'Footer 2', align: 'center' }, { title: 'Footer 3', align: 'right' }]
+	]
 }
 
 LET object = (
-  FOR i IN 1..3
-    RETURN {
-      component: 'object',
-      title: 'My object detail',
-      description: 'This is a description of my object',
-      width: [4, 6, 12], // [lg, md, sm]
-      icon: 'warning',
-      color: 'pink',
-      data: {
-        title: 'Warning',
-        description: 'This is a warning!',
-        color: 'yellow',
-        icon: 'warning',
-        extra: 'extra text',
-        longText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl.'
-      },
-      keys: ['title', 'description', 'color', 'icon', 'extra', 'longText'],
-      components: [
-        {
-          component: 'button',
-          title: 'Click me',
-          color: 'blue',
-          icon: 'check_circle',
-          width: [12, 12, 12], // [lg, md, sm]
-        }
-      ]
-    }
+	FOR i IN 1..3
+		RETURN {
+			component: 'object',
+			title: 'My object detail',
+			description: 'This is a description of my object',
+			width: [4, 6, 12], // [lg, md, sm]
+			icon: 'warning',
+			color: 'pink',
+			data: {
+				title: 'Warning',
+				description: 'This is a warning!',
+				color: 'yellow',
+				icon: 'warning',
+				extra: 'extra text',
+				longText: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl.'
+			},
+			keys: ['title', 'description', 'color', 'icon', 'extra', 'longText'],
+			components: [
+				{
+					component: 'button',
+					title: 'Click me',
+					color: 'blue',
+					icon: 'check_circle',
+					width: [12, 12, 12], // [lg, md, sm]
+				}
+			]
+		}
 )
 
 RETURN [
-  page,
-  kpi1, kpi2, kpi3,
-  sales_chart,
-  sales_chart2,
-  cards,
-  card_with_alerts,
-  chart2,
-  map,
-  table,
-  object
+	page,
+	kpi1, kpi2, kpi3,
+	sales_chart,
+	sales_chart2,
+	cards,
+	card_with_alerts,
+	chart2,
+	map,
+	table,
+	object
 ]

@@ -48,7 +48,7 @@ pdf:addParagraph([[
 pdf:moveY(10)
 
 local headerColumns = {
-	{ text = "Label", width = 305, fontSize = 10, alignment = "left", borderSides = { right = "false" }  },
+	{ text = "Label", width = 305, fontSize = 10, alignment = "left", borderSides = { right = "false" }	},
 	{ text = "UnitPrice", width = 70, fontSize = 10, alignment = "right", borderSides = { left = "false", right = "false" } },
 	{ text = "Qty", width = 50, fontSize = 10, alignment = "center", borderSides = { left = "false", right = "false" } },
 	{ text = "Total Price", width = 70, fontSize = 10, alignment = "right", borderSides = { left = "false" } }

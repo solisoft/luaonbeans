@@ -1,25 +1,25 @@
 <% component.width = component.width or {4, 6, 12} %>
 
-<div class="border border-gray-300  relative shadow-md rounded-md lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
-  <% if component.icon then %>
-    <div class="absolute -top-2 right-2 ">
-      <span class="material-icons-outlined border border-<%= component.color or "yellow" %>-600 text-<%= component.color or "yellow" %>-900 bg-<%= component.color or "yellow" %>-50 p-2 shadow-md">
-        <%= component.icon %>
-      </span>
-    </div>
-  <% end %>
-  <% if component.top_image then %>
-    <img src="<%= component.top_image %>" alt="<%= component.title %>" class="w-full h-48 object-cover rounded-t-md">
-  <% end %>
-  <div class="p-4 flex flex-col gap-2">
-    <% if component.title then %> <h2 class="font-bold text-2xl"><%= component.title %></h2> <% end %>
-    <% if component.description then %> <p><%= component.description %></p> <% end %>
-    <% if component.components then %>
-      <div class="grid grid-cols-12 gap-4">
-        <% for _, component in pairs(component.components) do %>
-          <%- CreateComponent(component) %>
-        <% end %>
-      </div>
-    <% end %>
-  </div>
+<div class="border border-gray-300	relative shadow-md rounded-md lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
+	<% if component.icon then %>
+		<div class="absolute -top-2 right-2 ">
+			<span class="material-icons-outlined border border-<%= component.color or "yellow" %>-600 text-<%= component.color or "yellow" %>-900 bg-<%= component.color or "yellow" %>-50 p-2 shadow-md">
+				<%= component.icon %>
+			</span>
+		</div>
+	<% end %>
+	<% if component.top_image then %>
+		<img src="<%= component.top_image %>" alt="<%= component.title %>" class="w-full h-48 object-cover rounded-t-md">
+	<% end %>
+	<div class="p-4 flex flex-col gap-2">
+		<% if component.title then %> <h2 class="font-bold text-2xl"><%= component.title %></h2> <% end %>
+		<% if component.description then %> <p><%= component.description %></p> <% end %>
+		<% if component.components then %>
+			<div class="grid grid-cols-12 gap-4">
+				<% for _, component in pairs(component.components) do %>
+					<%- CreateComponent(component) %>
+				<% end %>
+			</div>
+		<% end %>
+	</div>
 </div>

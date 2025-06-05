@@ -1,30 +1,30 @@
 <% component.width = component.width or {4, 6, 12} %>
 <% local id = UuidV4() %>
 <div class="flex gap-4 flex-col item-center lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
-  <% if component.title then %>
-    <h1 class="text-2xl text-center font-bold"><%= component.title %></h1>
-  <% end %>
-  <div id="chart<%= id %>" class="w-full"></div>
+	<% if component.title then %>
+		<h1 class="text-2xl text-center font-bold"><%= component.title %></h1>
+	<% end %>
+	<div id="chart<%= id %>" class="w-full"></div>
 </div>
 
 <script>
-  var options = {
-    chart: {
-      type: "<%= component.type or "bar" %>",
-      height: <%= component.height or 350 %>,
-      stacked: <%= component.stacked or false %>
-    },
-    series: JSON.parse("<%- EncodeJson(component.series):gsub('\"', '\\\"') %>").map(function(s) {
-      return {
-        name: s.name,
-        data: s.data.map(function(n) { return Number(Number(n).toFixed(2)) })
-      }
-    }),
-    xaxis: {
-      categories: JSON.parse("<%- EncodeJson(component.labels):gsub('\"', '\\\"') %>")
-    }
-  }
+	var options = {
+		chart: {
+			type: "<%= component.type or "bar" %>",
+			height: <%= component.height or 350 %>,
+			stacked: <%= component.stacked or false %>
+		},
+		series: JSON.parse("<%- EncodeJson(component.series):gsub('\"', '\\\"') %>").map(function(s) {
+			return {
+				name: s.name,
+				data: s.data.map(function(n) { return Number(Number(n).toFixed(2)) })
+			}
+		}),
+		xaxis: {
+			categories: JSON.parse("<%- EncodeJson(component.labels):gsub('\"', '\\\"') %>")
+		}
+	}
 
-  window["chart<%= id %>"] = new ApexCharts(document.querySelector("#chart<%= id %>"), options);
-  window["chart<%= id %>"].render();
+	window["chart<%= id %>"] = new ApexCharts(document.querySelector("#chart<%= id %>"), options);
+	window["chart<%= id %>"].render();
 </script>

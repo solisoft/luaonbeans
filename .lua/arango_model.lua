@@ -234,7 +234,7 @@ function ArangoModel:validates_each(data)
 				if table.contains(table.keys(v), "minimum") then
 					assert(type(v.minimum) == "number", "'minimum' argument must be a number")
 					if #value < v.minimum then
-						if v.message == nil then v.message = "must contains at least %d characters" % { v.minimum }  end
+						if v.message == nil then v.message = "must contains at least %d characters" % { v.minimum }	end
 						self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 					end
 				end
@@ -396,7 +396,7 @@ function ArangoModel:create(data)
 	if #self.errors == 0 then
 		self.data = Adb.primary:CreateDocument(self.COLLECTION, data, "returnNew=true")["new"]
 		local callbacks = table.append(self.global_callbacks.after_create, self.callbacks.after_create)
-		for _, methodName in pairs(callbacks) do self[methodName](self)	end
+	  for _, methodName in pairs(callbacks) do self[methodName](self)	end
 	end
 	return self
 end

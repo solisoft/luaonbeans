@@ -210,7 +210,7 @@ return {
 						local self = setmetatable(model.new(data), Customer)
 						self.validations = {
 							demo = {
-								comparaison = { gt = "demo2" 	}
+								comparaison = { gt = "demo2"	 }
 							}
 						}
 						return self

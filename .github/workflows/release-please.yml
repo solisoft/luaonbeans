@@ -1,21 +1,21 @@
 on:
-  push:
-    branches:
-      - main
+	push:
+		branches:
+			- main
 
 permissions:
-  contents: write
-  pull-requests: write
+	contents: write
+	pull-requests: write
 
 name: release-please
 
 jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/release-please-action@v4
-        with:
-          token: ${{ secrets.SEMVERBOT }}
-          # this is a built-in strategy in release-please, see "Action Inputs"
-          # for more options
-          release-type: simple
+	release-please:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: google-github-actions/release-please-action@v4
+				with:
+					token: ${{ secrets.SEMVERBOT }}
+					# this is a built-in strategy in release-please, see "Action Inputs"
+					# for more options
+					release-type: simple

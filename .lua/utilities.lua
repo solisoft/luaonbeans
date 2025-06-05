@@ -19,8 +19,8 @@ require "luaonbeans"
 
 ENV = {}
 for _, var in pairs(unix.environ()) do
-  var = string.split(var, "=")
-  ENV[var[1]] = var[2]
+	var = string.split(var, "=")
+	ENV[var[1]] = var[2]
 end
 
 BeansEnv = ENV['BEANS_ENV'] or "development"
@@ -30,17 +30,17 @@ if BeansEnv == "test" then env_file = ".env.test" end
 
 local env_data = LoadAsset(env_file)
 if env_data then
-  for line in env_data:gmatch("[^\r\n]+") do
-    local key, value = line:match("([^=]+)=(.+)")
-    if key and value then
-      ENV[key:gsub("%s+", "")] = value:gsub("%s+", "")
-    end
-  end
+	for line in env_data:gmatch("[^\r\n]+") do
+		local key, value = line:match("([^=]+)=(.+)")
+		if key and value then
+			ENV[key:gsub("%s+", "")] = value:gsub("%s+", "")
+		end
+	end
 end
 
 function Logger(message)
-  if type(message) == "table" then
-    message = EncodeJson(message)
-  end
-  Log(kLogError, message)
+	if type(message) == "table" then
+		message = EncodeJson(message)
+	end
+	Log(kLogError, message)
 end

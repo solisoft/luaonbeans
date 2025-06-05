@@ -2,73 +2,73 @@
 
 input[type="text"],
 textarea {
-  @apply w-full border border-[#3A687E] px-2 py-1;
+	@apply w-full border border-[#3A687E] px-2 py-1;
 }
 
 html {
-  background: rgb(33, 0, 66);
-  background: radial-gradient(
-    at top,
-    rgba(33, 0, 66, 1) 0%,
-    rgba(62, 9, 121, 1) 58%,
-    rgb(26, 10, 59) 100%
-  );
-  color: white;
+	background: rgb(33, 0, 66);
+	background: radial-gradient(
+		at top,
+		rgba(33, 0, 66, 1) 0%,
+		rgba(62, 9, 121, 1) 58%,
+		rgb(26, 10, 59) 100%
+	);
+	color: white;
 }
 
 input {
-  @apply text-black;
+	@apply text-black;
 }
 input[type="submit"] {
-  @apply rounded bg-black px-5 py-2 text-white;
+	@apply rounded bg-black px-5 py-2 text-white;
 }
 
 h1 {
-  @apply text-xl font-bold;
+	@apply text-xl font-bold;
 }
 
 code {
-  @apply rounded bg-slate-800 px-2 py-1 text-white;
+	@apply rounded bg-slate-800 px-2 py-1 text-white;
 }
 
 pre {
-  @apply rounded bg-slate-100 px-2 py-1 border;
+	@apply rounded bg-slate-100 px-2 py-1 border;
 }
 
 pre code {
-  @apply bg-slate-100 text-black text-wrap text-xs;
+	@apply bg-slate-100 text-black text-wrap text-xs;
 }
 a {
-  @apply text-purple-400 hover:text-blue-900;
+	@apply text-purple-400 hover:text-blue-900;
 }
 
 .material-icons-outlined.md-18 {
-  font-size: 18px;
+	font-size: 18px;
 }
 .material-icons-outlined.md-24 {
-  font-size: 24px;
+	font-size: 24px;
 }
 .material-icons-outlined.md-36 {
-  font-size: 36px;
+	font-size: 36px;
 }
 .material-icons-outlined.md-48 {
-  font-size: 48px;
+	font-size: 48px;
 }
 
 table {
-  @apply w-full border-collapse border;
+	@apply w-full border-collapse border;
 }
 
 table th,
 table td {
-  @apply border p-2;
+	@apply border p-2;
 }
 
 table th,
 table tfoot td {
-  @apply bg-gray-800 text-white;
+	@apply bg-gray-800 text-white;
 }
 
 table tr:nth-child(odd) {
-  @apply bg-gray-50;
+	@apply bg-gray-50;
 }

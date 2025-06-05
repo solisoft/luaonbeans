@@ -1,44 +1,44 @@
 services:
-  app:
-    build: .
-    ports:
-      - 7000:8080
-    environment:
-      BEANS_ENV: production
-  
-  arangodb:
-    image: arangodb/arangodb:latest
-    environment:
-      ARANGO_ROOT_PASSWORD: password
-    ports:
-      - 8529:8529
-    volumes:
-      - arangodb-data:/var/lib/arangodb3
-      - ./foxx:/var/lib/arangodb3-apps
+	app:
+		build: .
+		ports:
+			- 7000:8080
+		environment:
+			BEANS_ENV: production
+	
+	arangodb:
+		image: arangodb/arangodb:latest
+		environment:
+			ARANGO_ROOT_PASSWORD: password
+		ports:
+			- 8529:8529
+		volumes:
+			- arangodb-data:/var/lib/arangodb3
+			- ./foxx:/var/lib/arangodb3-apps
 
-  #db2rest:
-  #  env_file:
-  #    - .env
-  #  image: kdhrubo/db2rest:latest
-  #  ports:
-  #    - 7070:8080
+	#db2rest:
+	#	env_file:
+	#		- .env
+	#	image: kdhrubo/db2rest:latest
+	#	ports:
+	#		- 7070:8080
 
-  #cratedb:
-  #  image: crate:latest
-  #  ports:
-  #    - 4200:4200
-  #    - 4300:4300
-  #  volumes:
-  #    - cratedb-data:/data
+	#cratedb:
+	#	image: crate:latest
+	#	ports:
+	#		- 4200:4200
+	#		- 4300:4300
+	#	volumes:
+	#		- cratedb-data:/data
 
-  #surrealdb:
-  #  image: surrealdb/surrealdb:latest
-  #  command: start --user root --pass password rocksdb:/mydata/luaonbeans.db
-  #  ports:
-  #    - 8000:8000
-  #  volumes:
-  #    - surrealdb-data:/mydata
+	#surrealdb:
+	#	image: surrealdb/surrealdb:latest
+	#	command: start --user root --pass password rocksdb:/mydata/luaonbeans.db
+	#	ports:
+	#		- 8000:8000
+	#	volumes:
+	#		- surrealdb-data:/mydata
 volumes:
-  arangodb-data:
-  #cratedb-data:
-  #surrealdb-data:
+	arangodb-data:
+	#cratedb-data:
+	#surrealdb-data:

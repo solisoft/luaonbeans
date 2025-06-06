@@ -58,7 +58,7 @@ function ArangoModel:all(options)
 
 	local offset = options.per_page * (options.page - 1)
 
-	self.data = Adb.primary:Aql(
+	local request = Adb.primary:Aql(
 		[[
 			FOR doc IN @@collection
 		]] .. table.concat(self.filters) .. [[
@@ -71,7 +71,10 @@ function ArangoModel:all(options)
 			["per_page"] = options.per_page,
 			["offset"] = offset
 		}, self.bindvars)
-	).result
+	)
+
+	self.data = request.result
+
 	return self
 end
 
@@ -173,7 +176,7 @@ end
 
 -- sorting
 
-function ArangoModel:sort(sort)
+function ArangoModel:order(sort)
 	self.sort = sort
 	return self
 end

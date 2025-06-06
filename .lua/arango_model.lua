@@ -195,8 +195,10 @@ function ArangoModel:validates_each(data)
 			end
 
 			if k == "numericality" then
+				local default_error = "must be a valid number"
 				if type(value) ~= "number" then
-					if type(v) == "number" then v = { message = "must be a valid number" } end
+					if type(v) == "number" then v = { message = default_error } end
+					if v.message == nil then v = { message = "must be a valid integer" } end
 					self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 				end
 
@@ -253,7 +255,7 @@ function ArangoModel:validates_each(data)
 				if type(v) == "string" then v = { re = v } end
 				if v.message == nil then v.message = default_error end
 				local regex = assert(re.compile(v.re))
-				local match = regex:search(value)
+				local match = regex:search(value or "")
 				if match == nil then
 					self.errors = table.append(self.errors, {{ field = field, message = default_error }})
 				end

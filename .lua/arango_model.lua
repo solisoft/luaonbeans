@@ -395,8 +395,8 @@ function ArangoModel:create(data)
 
 	if #self.errors == 0 then
 		self.data = Adb.primary:CreateDocument(self.COLLECTION, data, "returnNew=true")["new"]
-		local callbacks = table.append(self.global_callbacks.after_create, self.callbacks.after_create)
-	  for _, methodName in pairs(callbacks) do self[methodName](self)	end
+		callbacks = table.append(self.global_callbacks.after_create, self.callbacks.after_create)
+		for _, methodName in pairs(callbacks) do self[methodName](self)	end
 	end
 	return self
 end
@@ -410,8 +410,8 @@ function ArangoModel:update(data)
 
 	if #self.errors == 0 then
 		self.data = Adb.primary:UpdateDocument(self.data["_id"], data, "returnNew=true")["new"]
-		local callbacks = table.append(self.global_callbacks.after_update, self.callbacks.after_update)
-		for _, method in pairs(callbacks) do self[methodName](self)	end
+		callbacks = table.append(self.global_callbacks.after_update, self.callbacks.after_update)
+		for _, methodName in pairs(callbacks) do self[methodName](self)	end
 	end
 	return self
 end

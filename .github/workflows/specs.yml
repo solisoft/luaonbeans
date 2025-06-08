@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
       - main
@@ -20,20 +20,16 @@ jobs:
     - 8529:8529
   steps:
     - name: Checkout code
-  uses: actions/checkout@v2
-
+      uses: actions/checkout@v2
     - name: Copy database configuration
-  run: cp config/database.json.arangodb.sample config/database.json
-
+      run: cp config/database.json.arangodb.sample config/database.json
     - name: Wait for ArangoDB to be up
-  run: sleep 5
-
+      run: sleep 5
     - name: Start Application
-  run: |
-    touch .env
-    sudo sh -c 'echo -1 > /proc/sys/fs/binfmt_misc/status'
-    ./luaonbeans.org -D . -s -d
-    sleep 1
-
+      run: |
+        touch .env
+        sudo sh -c 'echo -1 > /proc/sys/fs/binfmt_misc/status'
+        ./luaonbeans.org -D . -s -d
+        sleep 1
     - name: Run tests
-  run: ./luaonbeans.org -i beans.lua specs
+      run: ./luaonbeans.org -i beans.lua specs

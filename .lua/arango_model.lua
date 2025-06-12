@@ -80,6 +80,12 @@ end
 
 function ArangoModel:find(handler)
 	assert(self.data == nil, "find not allowed here")
+
+	local prefix = self.COLLECTION .. "/"
+	if string.sub(handler, 1, #prefix) ~= prefix then
+		handler = prefix .. handler
+	end
+
 	self.data = Adb.primary:GetDocument(handler)
 	return self
 end
@@ -393,7 +399,6 @@ end
 function ArangoModel:create(data)
 	assert(self.data == nil, "create not allowed here")
 	local callbacks = table.append(self.global_callbacks.before_create, self.callbacks.before_create)
-
 	for _, methodName in pairs(callbacks) do data = self[methodName](data) end
 
 	self:validates_each(data)
@@ -421,11 +426,21 @@ function ArangoModel:update(data)
 	return self
 end
 
+-- Alias for update
+function ArangoModel:save(data)
+	return self:update(data)
+end
+
 function ArangoModel:delete()
 	assert(self.data, "delete not allowed here")
 	local result = Adb.primary:DeleteDocument(self.data["_id"])
 	self.data = nil
 	return result
+end
+
+-- Alias for delete
+function ArangoModel:destroy()
+	return self:delete()
 end
 
 return ArangoModel

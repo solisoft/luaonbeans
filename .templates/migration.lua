@@ -7,10 +7,10 @@ return {
 			},
 		})
 		if
-				pcall(function()
-					assert(transaction.code == 201, "Transaction is not created")
-					-- do something
-				end)
+			pcall(function()
+				assert(transaction.code == 201, "Transaction is not created")
+				-- do something
+			end)
 		then
 			Adb.primary:CommitTransaction(transaction.result.id)
 			return true
@@ -28,10 +28,10 @@ return {
 			},
 		})
 		if
-				pcall(function()
-					assert(transaction.code == 201, "Transaction is not created")
-					-- do something
-				end)
+			pcall(function()
+				assert(transaction.code == 201, "Transaction is not created")
+				-- do something
+			end)
 		then
 			Adb.primary:CommitTransaction(transaction.result.id)
 			return true

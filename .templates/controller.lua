@@ -30,9 +30,9 @@ local app = {
 	-- PUT ##model_plural###update => ##model_plural##/:id
 	update = function()
 		local bodyParams = table.reject(GetBodyParams(), "authenticity_token")
-		local record = ##model_singular_capitalized##.update(Params.id, bodyParams)
+		local ##model_singular## = ##model_singular_capitalized##.update(Params.id, bodyParams)
 
-		if record.error then
+		if ###model_singular##.errors > 0 then
 			Page("##model_plural##/edit", "app", { ##model_singular## = table.merge(bodyParams, { _key = Params.id }), record = record })
 			return
 		end

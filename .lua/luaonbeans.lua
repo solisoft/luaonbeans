@@ -300,11 +300,7 @@ function HandleRequest()
 end
 
 function HandleController(controller)
-	if BeansEnv == "production" then
-		return controller
-	else
-		return controller[Params.action]()
-	end
+	return controller[Params.action]()
 end
 
 function GetBodyParams()

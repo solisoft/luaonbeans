@@ -8,6 +8,7 @@ Surreal = {}
 
 function LoadViewsRecursively(path)
 	local dir = unix.opendir(path)
+	assert(dir ~= nil, "Error while opening path " .. path)
 
 	while true do
 		local file, kind = dir:read()
@@ -26,8 +27,6 @@ function LoadViewsRecursively(path)
 
 	end
 	dir:close()
-
-	return layouts
 end
 
 function Page(view, layout, bindVarsView, bindVarsLayout)
@@ -263,17 +262,17 @@ function HandleRequest()
 
 
 		if GetPath() == "/" then
-			path = {
+			local default_routes = {
 				["GET"] = "/index",
 				["POST"] = "/create",
 				["PUT"] = "/update",
 				["PATCH"] = "/update",
 				["DELETE"] = "/delete"
 			}
-			path = path[GetMethod()]
+			path = default_routes[GetMethod()]
 		end
 
-		local aql_page = false
+		local aql_page = nil
 		if not string.match(path, "%.") then -- check only if there is no extension
 			aql_page = LoadAsset("aqlpages/" .. path .. ".aql")
 		end
@@ -323,6 +322,8 @@ end
 function WriteJSON(object)
 	SetHeader("Content-Type", "application/json; charset=utf-8")
 	local json = EncodeJson(object)
+	assert(json ~= nil, "Object is not serializable")
+
 	local etag = EncodeBase64(Md5(json))
 
 	if etag == GetHeader("If-None-Match") then
@@ -391,6 +392,8 @@ end
 
 function LoadPublicAssetsRecursively(path)
 	local dir = unix.opendir(path)
+	assert(dir ~= nil, "Error while opening path " .. path)
+
 	while true do
 		local file, kind = dir:read()
 		if file == nil then break end
@@ -445,6 +448,7 @@ function LoadCronsJobs(path)
 	if os.date("%S") == "00" then -- run every minute
 		path = path or "app/cronjobs"
 		local dir = unix.opendir(path)
+		assert(dir ~= nil, "Error while opening path " .. path)
 
 		while true do
 			local file, kind = dir:read()

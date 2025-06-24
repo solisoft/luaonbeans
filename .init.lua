@@ -16,6 +16,7 @@ local db_config = DecodeJson(LoadAsset("config/database.json"))
 InitDB(db_config)
 
 Views = {}
+isApi = false
 
 -- LastModifiedAt is used to cache the last modified time of the assets
 -- so that we can use it to send the correct last modified time to the client

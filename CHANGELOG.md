@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.15.0](https://github.com/solisoft/luaonbeans/compare/v0.14.0...v0.15.0) (2025-06-25)
+
+
+### Features
+
+* arango_model ([2f90612](https://github.com/solisoft/luaonbeans/commit/2f906120c4a81673cebe0e5facd195422b0e7f3a))
+* update arango_model ([37a2c93](https://github.com/solisoft/luaonbeans/commit/37a2c936e009e12d1bf72a96de6f6cd1eb2852e4))
+
+
+### Bug Fixes
+
+* arango_model : sort =&gt; order ([fafdc37](https://github.com/solisoft/luaonbeans/commit/fafdc374a5eecb4901a432b4c18e8b6964f51d21))
+* arango_model updates ([4e44862](https://github.com/solisoft/luaonbeans/commit/4e448627e15d24478661f62597d9e44ca786783c))
+* arango_model updates ([4d7afc9](https://github.com/solisoft/luaonbeans/commit/4d7afc9a83ac47f5b53f8414571f787f64656995))
+* ci ([5ab6a2f](https://github.com/solisoft/luaonbeans/commit/5ab6a2f1dd4e8b508b612ae024412e2c28c0b803))
+* ci ([c716362](https://github.com/solisoft/luaonbeans/commit/c7163621f89d58ef5cd8580c0d46c8c75f060cbf))
+* ci ([6815dfd](https://github.com/solisoft/luaonbeans/commit/6815dfde5c6e42e0fb9513c201a6187ba002a351))
+* ci bad port definition ([bee283a](https://github.com/solisoft/luaonbeans/commit/bee283a045c75377e911e9b5c53e709b4c706b74))
+* controller action in production mode ([4d2e91e](https://github.com/solisoft/luaonbeans/commit/4d2e91e44c898bddf609b8dc73f7a38cf14cffa4))
+* specs ([47c94da](https://github.com/solisoft/luaonbeans/commit/47c94da3a00169d5798ecb6817232c02b58813df))
+* update controller template ([546e120](https://github.com/solisoft/luaonbeans/commit/546e120804e10d8df7bdc900d17cc9cf7629ca46))
+* use tabulation ([23b1e1e](https://github.com/solisoft/luaonbeans/commit/23b1e1e4cf0d3ca807e18f26571819a4069b5fcf))
+
 ## [0.14.0](https://github.com/solisoft/luaonbeans/compare/v0.13.0...v0.14.0) (2025-06-04)
 
 

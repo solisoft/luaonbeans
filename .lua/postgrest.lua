@@ -2,6 +2,7 @@ PGRest = {}
 PGRest.__index = PGRest
 
 function PGRest.new(db_config)
+	local self = setmetatable({}, PGRest)
 	self._db_config = db_config
 	self._api_url = ""
 	self._headers = {}

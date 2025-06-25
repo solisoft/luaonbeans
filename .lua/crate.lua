@@ -11,6 +11,7 @@ Crate = {}
 Crate.__index = {}
 
 function Crate.new(db_config)
+	local self = setmetatable({}, Crate)
 	self._db_config = db_config
 
 	return Crate

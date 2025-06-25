@@ -6,6 +6,7 @@ SurrealDB = {}
 SurrealDB.__index = SurrealDB
 
 function SurrealDB.new(db_config)
+	local self = setmetatable({}, SurrealDB)
 	self._surrealToken = ""
 	self._surrealConfig = {}
 	self._db_config = db_config

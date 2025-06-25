@@ -55,7 +55,7 @@ function HandleAqlPage(aql, use_layout, write)
 		return error
 	end
 
-	for key, item in pairs(data.result[1]) do
+	for _, item in pairs(data.result[1]) do
 		if #item == 0 then
 			if item.component == "page" then
 				page_title = item.title

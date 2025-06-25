@@ -2,15 +2,11 @@ DB2Rest = {}
 DB2Rest.__index = DB2Rest
 
 function DB2Rest.new(db_config)
-	self._restApiUrl = ""
+	local self = setmetatable({}, DB2Rest)
 	self._db_config = db_config
-	self:init()
+	self._restApiUrl = db_config["url"] .. db_config["db_name"] .. "/"
 
 	return self
-end
-
-function DB2Rest:init()
-	self._restApiUrl = self._db_config["url"] .. self._db_config["db_name"] .. "/"
 end
 
 function DB2Rest:read(collection, params, body)

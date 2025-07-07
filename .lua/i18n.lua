@@ -12,26 +12,30 @@ function I18nClass.new(locale, locales)
 end
 
 function I18nClass:t(path, params)
-		params = type(params) == "table" and params or {}
-		if type(path) ~= "string" or path == "" then
-				return nil
-		end
-
-		local keys = string.split(path, ".")
-		table.insert(keys, 1, self.locale)
-		local str = table.dig(self.translations, keys)
-		if not str then
+	params = type(params) == "table" and params or {}
+	if type(path) ~= "string" or path == "" then
 			return nil
-		end
+	end
 
-		if type(str) == "string" then
-			return params[1] and str % params or str
-		end
+	local keys = string.split(path, ".")
+	table.insert(keys, 1, self.locale)
+	local str = table.dig(self.translations, keys)
+	if not str then
+		return nil
+	end
 
-		local count = tonumber(params[1]) or 0
-		local key = count == 0 and "zero" or count == 1 and "one" or "more"
-		local plural_str = str[key]
-		return plural_str and type(plural_str) == "string" and plural_str % params or nil
+	if type(str) == "string" then
+		return params[1] and str % params or str
+	end
+
+	local count = tonumber(params[1]) or 0
+	local key = count == 0 and "zero" or count == 1 and "one" or "more"
+	local plural_str = str[key]
+	return plural_str and type(plural_str) == "string" and plural_str % params or nil
+end
+
+function I18nClass:set_locale(locale)
+	self.locale = locale
 end
 
 -- Set metatable after defining methods

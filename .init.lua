@@ -18,6 +18,7 @@ InitDB(db_config)
 local I18nClass = require("i18n")
 I18n = I18nClass.new("en")
 
+print(EncodeJson(I18n))
 Views = {}
 isApi = false
 

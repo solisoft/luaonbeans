@@ -63,4 +63,4 @@ local app = {
 
 assert(app[Params.action] ~= nil, "Missing method '" .. Params.action .. "'!")
 
-return HandleController(app)
+return BeansEnv == "production" and app or HandleController(app)

@@ -1,4 +1,4 @@
-ArangoModel = {}
+local ArangoModel = {}
 ArangoModel = setmetatable({}, { __index = ArangoModel })
 
 function ArangoModel.new(data)
@@ -195,7 +195,7 @@ function ArangoModel:validates_each(data)
 		local value = table.contains(table.keys(data), field) and data[field] or nil
 		for k, v in pairs(validations) do
 			if k == "presence" then
-				local default_error = "must be present"
+				local default_error = I18n:t("models.errors.presence")
 				if v == true then v = { message = default_error } end
 				if v.message == nil then v.message = default_error end
 				if value == nil then
@@ -204,15 +204,15 @@ function ArangoModel:validates_each(data)
 			end
 
 			if k == "numericality" then
-				local default_error = "must be a valid number"
+				local default_error = I18n:t("models.errors.numericality.valid_number")
 				if type(value) ~= "number" then
 					if type(v) == "number" then v = { message = default_error } end
-					if v.message == nil then v = { message = "must be a valid integer" } end
+					if v.message == nil then v = { message = "must be a valid number" } end
 					self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 				end
 
 				if type(v) == "table" and v.only_integer ~= nil then
-					if v.message == nil then v = { message = "must be a valid integer" } end
+					if v.message == nil then v = { message = I18n:t("models.errors.numericality.valid_integer") } end
 					if math.type(value) ~= "integer" then
 						self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 					end
@@ -220,13 +220,13 @@ function ArangoModel:validates_each(data)
 			end
 
 			if k == "length" then
-				local default_error = "must contains %d characters"
+				local default_error = I18n:t("models.errors.length.eq")
 				if type(v) == "number" then v = { eq = v, message = default_error % { v } } end
 
 				if table.contains(table.keys(v), "eq") then
 					if v.message == nil then v.message = default_error % { v } end
 					if #value ~= v.eq then
-						if v.message == nil then v.message = "must contains %d characters" % { v.eq } end
+						if v.message == nil then v.message = default_error % { v.eq } end
 						self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 					end
 				end
@@ -237,7 +237,7 @@ function ArangoModel:validates_each(data)
 					assert(type(v["between"][1]) == "number" and type(v["between"][2]) == "number", "'between' arguments must be numbers")
 
 					if #value < v["between"][1] or #value > v["between"][2] then
-						if v.message == nil then v.message = "must be a value between %d and %d characters" % { v["between"][1], v["between"][2] } end
+						if v.message == nil then v.message = I18n:t("models.errors.length.between", { v["between"][1], v["between"][2] }) end
 						self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 					end
 				end
@@ -245,7 +245,7 @@ function ArangoModel:validates_each(data)
 				if table.contains(table.keys(v), "minimum") then
 					assert(type(v.minimum) == "number", "'minimum' argument must be a number")
 					if #value < v.minimum then
-						if v.message == nil then v.message = "must contains at least %d characters" % { v.minimum }	end
+						if v.message == nil then v.message = I18n:t("models.errors.length.minimum", { v.minimum })	end
 						self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 					end
 				end
@@ -253,14 +253,14 @@ function ArangoModel:validates_each(data)
 				if table.contains(table.keys(v), "maximum") then
 					assert(type(v.maximum) == "number", "'maximum' argument must be a number")
 					if #value > v.maximum then
-						if v.message == nil then v.message = "must contains at max %d characters" % { v.maximum } end
+						if v.message == nil then v.message = I18n:t("models.errors.length.maximum", { v.maximum }) end
 						self.errors = table.append(self.errors, {{ field = field, message = v.message }})
 					end
 				end
 			end
 
 			if k == "format" then
-				local default_error = "do not match the format"
+				local default_error = I18n:t("models.errors.format")
 				if type(v) == "string" then v = { re = v } end
 				if v.message == nil then v.message = default_error end
 				local regex = assert(re.compile(v.re))
@@ -271,7 +271,7 @@ function ArangoModel:validates_each(data)
 			end
 
 			if k == "comparaison" then
-				local default_error = "do not match value"
+				local default_error = I18n:t("models.errors.comparaison")
 				if type(v) == "string" then v = { eq = v } end
 				if v.message == nil then v.message = default_error end
 
@@ -367,7 +367,7 @@ function ArangoModel:validates_each(data)
 			end
 
 			if k == "acceptance" then
-				local default_error = "you must accept"
+				local default_error = I18n:t("models.errors.acceptance")
 				if(type(v) ~= "table") then v = { } end
 				if v.message == nil then v.message = default_error end
 				if value ~= true then
@@ -376,7 +376,7 @@ function ArangoModel:validates_each(data)
 			end
 
 			if k == "inclusion" then
-				local default_error = "must be part of the defined list"
+				local default_error = I18n:t("models.errors.inclusion")
 				if v.message == nil then v.message = default_error end
 				if table.contains(v.values, value) ~= true then
 					self.errors = table.append(self.errors, {{ field = field, message = default_error }})
@@ -384,7 +384,7 @@ function ArangoModel:validates_each(data)
 			end
 
 			if k == "exclusion" then
-				local default_error = "must not be part of the defined list"
+				local default_error = I18n:t("models.errors.exclusion")
 				if v.message == nil then v.message = default_error end
 				if table.contains(v.values, value) ~= false then
 					self.errors = table.append(self.errors, {{ field = field, message = default_error }})

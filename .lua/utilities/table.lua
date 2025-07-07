@@ -40,3 +40,17 @@ table.reject = function(t, key)
 	end
 	return result
 end
+
+table.dig = function(t, keys)
+	local current = t
+
+	for _, key in ipairs(keys) do
+		if type(current) == "table" and current[key] ~= nil then
+			current = current[key]
+		else
+			return nil
+		end
+	end
+
+	return current
+end

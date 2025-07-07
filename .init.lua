@@ -15,6 +15,9 @@ ProgramMaxPayloadSize(10485760) -- 10 MB
 local db_config = DecodeJson(LoadAsset("config/database.json"))
 InitDB(db_config)
 
+local I18nClass = require("i18n")
+I18n = I18nClass.new("en")
+
 Views = {}
 isApi = false
 

@@ -1,6 +1,9 @@
 package.path = package.path .. ";.lua/?.lua;migrations/?.lua;specs/?.lua"
+package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 require("utilities")
 lester = require("lester")
+local I18nClass = require("i18n")
+I18n = I18nClass.new("en")
 
 ENV = {}
 for _, var in pairs(unix.environ()) do

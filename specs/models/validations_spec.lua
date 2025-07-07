@@ -29,13 +29,26 @@ return {
 			end)
 
 			describe("numericality", function()
-				it("validates numericality (number)", function()
+				it("validates numericality (table param)", function()
 					function Customer.new(data)
 						local self = setmetatable(model.new(data), Customer)
 						self.validations = {
 							demo = {
 								numericality = { message = "must be a number" }
 							}
+						}
+						return self
+					end
+
+					local customer = Customer.new():create({ demo = 12.3 })
+					expect.truthy(#customer.errors == 0)
+				end)
+
+				it("validates numericality (true param)", function()
+					function Customer.new(data)
+						local self = setmetatable(model.new(data), Customer)
+						self.validations = {
+							demo = { numericality = true }
 						}
 						return self
 					end

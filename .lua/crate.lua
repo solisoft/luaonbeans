@@ -14,7 +14,7 @@ function Crate.new(db_config)
 	local self = setmetatable({}, Crate)
 	self._db_config = db_config
 
-	return Crate
+	return self
 end
 
 function Crate:sql(sql, bindVars)

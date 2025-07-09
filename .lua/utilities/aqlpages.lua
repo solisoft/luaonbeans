@@ -37,7 +37,7 @@ function HandleAqlPage(aql, use_layout, write)
 	if write == nil then write = true end
 	if use_layout == nil then use_layout = true end
 
-	local data = Adb.Aql(aql)
+	local data = Adb.primary:Aql(aql)
 
 	local layout = ""
 	local page_title = ""

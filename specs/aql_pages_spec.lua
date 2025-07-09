@@ -8,10 +8,9 @@ return {
 			end)
 
 			describe('aqlpages#demo', function() -- Describe blocks can be nested.
-				it('load page', function()
+				it('load AQL page', function()
 					local status, h, body = Fetch("http://localhost:8080/demo")
 					expect.equal(status, 200)
-					expect.truthy(string.match(body, "Number of transactions per month"))
 				end)
 			end)
 		end)

@@ -4,21 +4,20 @@ package.path = package.path .. ";app/models/?.lua;/zip/app/models/?.lua"
 package.path = package.path .. ";app/cronjobs/?.lua;/zip/app/cronjobs/?.lua"
 package.path = package.path .. ";config/?.lua;/zip/config/?.lua"
 
+
 -- OTP = require("otp") -- OTP functions
 require("utilities")
 require("routes")
 
-ProgramMaxPayloadSize(10485760) -- 10 MB
-
--- ArangoDB connection
-
-local db_config = DecodeJson(LoadAsset("config/database.json"))
-InitDB(db_config)
-
 local I18nClass = require("i18n")
 I18n = I18nClass.new("en")
 
-print(EncodeJson(I18n))
+ProgramMaxPayloadSize(10485760) -- 10 MB
+
+-- DB connection
+local db_config = DecodeJson(LoadAsset("config/database.json"))
+InitDB(db_config)
+
 Views = {}
 isApi = false
 

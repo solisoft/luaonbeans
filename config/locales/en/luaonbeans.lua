@@ -20,6 +20,11 @@ return {
 				exclusion = "must not be part of the defined list"
 			}
 		},
+		controllers = {
+			welcome = {
+				default_message = "Welcome aboard"
+			}
+		},
 		demo = {
 			items = {
 				zero = "no items",

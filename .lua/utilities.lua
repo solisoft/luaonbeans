@@ -44,3 +44,4 @@ function Logger(message)
 	end
 	Log(kLogError, message)
 end
+

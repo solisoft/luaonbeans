@@ -15,6 +15,16 @@
 			"password": "password"
 		}
 	],
+	"production": [
+		{
+			"name": "primary",
+			"engine": "arangodb",
+			"db_name": "luaonbeans_dev",
+			"url": "http://127.0.0.1:8529",
+			"username": "root",
+			"password": "password"
+		}
+	],
 	"test": [
 		{
 			"name": "primary",

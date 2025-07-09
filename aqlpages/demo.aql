@@ -85,11 +85,11 @@ LET sales_chart = {
 	labels: ["2024/01", "2024/02", "2024/03", "2024/04", "2024/05", "2024/06", "2024/07", "2024/08", "2024/09", "2024/10", "2024/11", "2024/12"],
 	series: [
 		{
-			data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
+			data: [RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
 			name: 'Validated transactions'
 		},
 		{
-			data: [RANDOM() * 100, RANDOM() * 1000, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
+			data: [RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100, RANDOM() * 100],
 			name: 'Refused transactions'
 		}
 	],

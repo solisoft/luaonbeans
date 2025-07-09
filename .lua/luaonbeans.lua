@@ -289,7 +289,7 @@ function HandleRequest()
 			if status == false then
 				handle_404_error()
 			else
-				controller[Params.action]()
+				return controller
 			end
 		else
 			RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")

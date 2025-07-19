@@ -2,9 +2,6 @@ PDFGenerator = require("pdfgenerator")
 
 local pdf = PDFGenerator.new({header_height = 50})
 
-pdf:addCustomFont("fonts/Helvetica.ttf", "helvetica", "normal")
-pdf:addCustomFont("fonts/Helvetica-Bold.ttf", "helvetica", "bold")
-
 pdf:setHeader(function(pageId)
 	pdf:addParagraph("Header - redbean.com PDF Generator - %s on %d" % { pageId, pdf:totalPage(self) }, { fontSize = 16, alignment = "left", newPage = false })
 	pdf:drawLine(50, 842-50, 595 - 50, 842-50, 1)
@@ -12,6 +9,8 @@ end)
 
 -- Add a page (default A4 size)
 pdf:addPage()
+pdf:addCustomFont("fonts/Helvetica.ttf", "helvetica", "normal")
+pdf:addCustomFont("fonts/Helvetica-Bold.ttf", "helvetica", "bold")
 
 local imgName = pdf:addImage(LoadAsset("usa.jpeg"), 1567, 444, "jpeg")
 pdf:drawImage(imgName)

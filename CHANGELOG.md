@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.16.0](https://github.com/solisoft/luaonbeans/compare/v0.15.0...v0.16.0) (2025-07-19)
+
+
+### Features
+
+* add additional aqlpage basic spec ([3af3fa9](https://github.com/solisoft/luaonbeans/commit/3af3fa95e49adedbd8f2e14e61bd6d88b6bb2e69))
+* add additional aqlpage basic spec ([eb5b197](https://github.com/solisoft/luaonbeans/commit/eb5b19773a01a3b5c44bc2736cc03816afc78d25))
+* I18n ([e0407d4](https://github.com/solisoft/luaonbeans/commit/e0407d44a1dd0a3ff173a7af686b1bf3105c0338))
+* improve I18n ([88819e0](https://github.com/solisoft/luaonbeans/commit/88819e06c3384b85dc5234cb95a63167693babb9))
+* improve I18n and update view ([d020ab8](https://github.com/solisoft/luaonbeans/commit/d020ab85cb58269ac867f79accc1b0f036812511))
+
+
+### Bug Fixes
+
+* add a picture in pdf sample ([ba50285](https://github.com/solisoft/luaonbeans/commit/ba50285d88ede2a4ed1b8dc48aae321a44ec33e7))
+* add default font ([898b9ae](https://github.com/solisoft/luaonbeans/commit/898b9aec88bceab46048035538abd1a46ac144db))
+* add default font ([5cf4ab7](https://github.com/solisoft/luaonbeans/commit/5cf4ab73dc239b5d6d3b51a423fbd6744359d7bb))
+* add metrics json files for demo purpose and remove unsused code ([4f4ace3](https://github.com/solisoft/luaonbeans/commit/4f4ace3a115012938ad66082c522539b0f93cae7))
+* aql_pages ([3bb0fda](https://github.com/solisoft/luaonbeans/commit/3bb0fda080303f836dbc64f3af41f7071ffe3c22))
+* new route for pdf demo ([a4560db](https://github.com/solisoft/luaonbeans/commit/a4560dbc8dc6e646cffbc33b4dfee87e1ec8d45f))
+* pdf generator with custom fonts ([ee26c16](https://github.com/solisoft/luaonbeans/commit/ee26c16eb0079cbbf3e3cf8b402fd31608d6203a))
+* production controller returning value ([0f8b138](https://github.com/solisoft/luaonbeans/commit/0f8b13805ad9a522a20235ade0482446d70998d4))
+* restore gen_metrics.js ([3d8be4c](https://github.com/solisoft/luaonbeans/commit/3d8be4cb86e02b7e23712b465795b672f17a24aa))
+* run app in githib action in production mode ([87317ec](https://github.com/solisoft/luaonbeans/commit/87317ec4a4d743a39b99c251e5f2375dc60e0600))
+
 ## [0.15.0](https://github.com/solisoft/luaonbeans/compare/v0.14.0...v0.15.0) (2025-06-25)
 
 

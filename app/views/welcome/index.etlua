@@ -1,1 +1,5 @@
-<div class="col-span-12"><h1><%= I18n:t("controllers.welcome.default_message") %></h1></div>
+<div class="col-span-12">
+	<h1>
+		<%= I18n:t("controllers.welcome.default_message") %>
+	</h1>
+</div>

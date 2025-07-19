@@ -142,8 +142,9 @@ function PDFGenerator:addPage(width, height)
 				self.basic_bold_font_obj
 		)
 
+		-- Ensure all custom fonts are properly added to page resources
 		for _, font in ipairs(self.fonts) do
-				self:useFont(font[1], font[2])
+				self:addFontToPageResources(font[1], font[2])
 		end
 
 		self:setY(0)
@@ -189,17 +190,26 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
 
 		if fontMetrics then
 				self.font_metrics[fullFontName] = decodeJson(fontMetrics)
+		else
+				-- Fallback to Helvetica metrics if no custom metrics provided
+				self.font_metrics[fullFontName] = fontHelveticaMetrics[fontWeight] or fontHelveticaMetrics.normal
 		end
 
-		-- Font descriptor object
+		-- Validate and normalize font metrics for better compatibility
+		self:validateFontMetrics(fullFontName)
+
+		-- Improved font descriptor object with better Firefox compatibility
 		self.objects[fontDescObj] = string.format(
-				"%d 0 obj\n<< /Type /Font /%s /Flags 32 /FontBBox [-250 -250 1250 1250] /ItalicAngle 0 /Ascent 750 /Descent -250 /CapHeight 750 /StemV 80 /StemH 80 /FontFile2 %d 0 R >>\nendobj\n",
+				"%d 0 obj\n<< /Type /FontDescriptor /FontName /%s /Flags 32 /FontBBox [-250 -250 1250 1250] /ItalicAngle 0 /Ascent 750 /Descent -250 /CapHeight 750 /StemV 80 /StemH 80 /FontFile2 %d 0 R /FontFamily (%s) /FontStretch /Normal /FontWeight %s >>\nendobj\n",
 				fontDescObj,
 				fullFontName,
-				fontFileObj
+				fontFileObj,
+				fontName,
+				fontWeight == "bold" and "700" or "400"
 		)
 
-		-- Font file stream object
+		-- Font file stream object with proper encoding
+		-- Note: For TrueType fonts, we don't use FlateDecode as the font data is already compressed
 		self.objects[fontFileObj] = string.format(
 				"%d 0 obj\n<< /Length %d /Length1 %d >>\nstream\n%sendstream\nendobj\n",
 				fontFileObj,
@@ -208,15 +218,108 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
 				fontData
 		)
 
-		-- Font object
+		-- Improved font object with better encoding support
 		self.objects[fontObj] = string.format(
-				"%d 0 obj\n<< /Type /Font /Subtype /TrueType /BaseFont /%s /FirstChar 32 /LastChar 255 /Encoding /WinAnsiEncoding /FontDescriptor %d 0 R	>>\nendobj\n",
+				"%d 0 obj\n<< /Type /Font /Subtype /TrueType /BaseFont /%s /FirstChar 32 /LastChar 255 /Widths [%s] /Encoding /WinAnsiEncoding /FontDescriptor %d 0 R /ToUnicode %d 0 R >>\nendobj\n",
 				fontObj,
 				fullFontName,
-				fontDescObj
+				self:generateWidthsArray(fullFontName),
+				fontDescObj,
+				self:createToUnicodeStream()
 		)
 
 		self:useFont(fontName, fontWeight)
+end
+
+-- Generate widths array for better font rendering
+function PDFGenerator:generateWidthsArray(fontName)
+		local widths = {}
+		local fontMetrics = self.font_metrics[fontName] or fontHelveticaMetrics.normal
+
+		for i = 32, 255 do
+				local width = fontMetrics[""..i] or 556
+				table.insert(widths, math.floor(width + 0.5))
+		end
+
+		return table.concat(widths, " ")
+end
+
+-- Create ToUnicode stream for better text extraction and rendering
+function PDFGenerator:createToUnicodeStream()
+		local toUnicodeObj = getNewObjNum()
+		local toUnicodeContent = "/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def\n/CMapName /Adobe-Identity-UCS def\n/CMapType 2 def\n1 begincodespacerange\n<0020> <00FF>\nendcodespacerange\n"
+
+		-- Add character mappings for basic Latin
+		for i = 32, 255 do
+				local hexCode = string.format("%04X", i)
+				toUnicodeContent = toUnicodeContent .. string.format("<%s> <%s>\n", hexCode, hexCode)
+		end
+
+		toUnicodeContent = toUnicodeContent .. "endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend"
+
+		self.objects[toUnicodeObj] = string.format(
+				"%d 0 obj\n<< /Length %d >>\nstream\n%s\nendstream\nendobj\n",
+				toUnicodeObj,
+				#toUnicodeContent,
+				toUnicodeContent
+		)
+
+		return toUnicodeObj
+end
+
+-- Properly escape text for PDF content streams
+function PDFGenerator:escapePdfText(text)
+		if not text then return "" end
+
+		-- Escape special PDF characters
+		local escaped = text:gsub("\\", "\\\\")
+		escaped = escaped:gsub("%(", "\\(")
+		escaped = escaped:gsub("%)", "\\)")
+		escaped = escaped:gsub("%[", "\\[")
+		escaped = escaped:gsub("%]", "\\]")
+		escaped = escaped:gsub("%{", "\\{")
+		escaped = escaped:gsub("%}", "\\}")
+		escaped = escaped:gsub("%%", "\\%")
+
+		-- Handle non-ASCII characters by converting to octal
+		local result = ""
+		for i = 1, #escaped do
+				local byte = string.byte(escaped, i)
+				if byte >= 32 and byte <= 126 then
+						result = result .. string.char(byte)
+				else
+						result = result .. string.format("\\%03o", byte)
+				end
+		end
+
+		return result
+end
+
+-- Validate and normalize font metrics for better cross-browser compatibility
+function PDFGenerator:validateFontMetrics(fontName)
+		local metrics = self.font_metrics[fontName]
+		if not metrics then return end
+
+		-- Ensure all required characters have valid widths
+		for i = 32, 255 do
+				if not metrics[""..i] or metrics[""..i] <= 0 then
+						-- Use Helvetica metrics as fallback
+						local fallbackMetrics = fontHelveticaMetrics.normal
+						metrics[""..i] = fallbackMetrics[""..i] or 556
+				end
+		end
+
+		-- Normalize widths to ensure they're reasonable
+		for i = 32, 255 do
+				if metrics[""..i] then
+						-- Ensure width is within reasonable bounds (100-2000 font units)
+						if metrics[""..i] < 100 then
+								metrics[""..i] = 100
+						elseif metrics[""..i] > 2000 then
+								metrics[""..i] = 2000
+						end
+				end
+		end
 end
 
 -- Use custom font for text
@@ -229,35 +332,56 @@ function PDFGenerator:useFont(fontName, fontWeight)
 		-- Store the current font name to be used in addText
 		self.current_font = fontName
 
-		-- Update the page's resources to include the custom font
-		local pageObj = self.current_page_obj
+		-- Ensure font is added to current page resources
+		self:addFontToPageResources(fontName, fontWeight)
 
-		-- Check if there's already a Font dictionary
-		if self.objects[pageObj]:find("(/Font << [^>]+ >>)") then
-				-- Append new font to existing dictionary
-				self.objects[pageObj] = self.objects[pageObj]:gsub(
+		return self
+end
+
+-- Add font to page resources for better cross-browser compatibility
+function PDFGenerator:addFontToPageResources(fontName, fontWeight)
+		fontWeight = fontWeight or "normal"
+		local fullFontName = fontName .. "-" .. fontWeight
+
+		if not self.custom_fonts or not self.custom_fonts[fullFontName] then
+				return -- Font not loaded
+		end
+
+		local pageObj = self.current_page_obj
+		local pageContent = self.objects[pageObj]
+
+		-- Check if font is already in page resources
+		if pageContent:find("/" .. fullFontName .. " %d+ 0 R") then
+				return -- Font already added
+		end
+
+		-- Add font to page resources
+		if pageContent:find("(/Font << [^>]+ >>)") then
+				-- Append to existing font dictionary
+				pageContent = pageContent:gsub(
 						"(/Font << [^>]+ >>)",
 						function(fontDict)
 								return string.format("%s /%s %d 0 R",
 										fontDict:sub(1, -3), -- Remove trailing ">>"
-										fontName .. "-" .. self.last_font.fontWeight,
-										self.custom_fonts[fontName .. "-" .. self.last_font.fontWeight]
+										fullFontName,
+										self.custom_fonts[fullFontName]
 								) .. " >>"
 						end
 				)
 		else
-				-- Create new Font dictionary
-				self.objects[pageObj] = self.objects[pageObj]:gsub(
+				-- Create new font dictionary
+				pageContent = pageContent:gsub(
 						"(/Resources << )",
-						string.format("/Resources << /Font << /F1 %d 0 R /%s %d 0 R >> ",
+						string.format("/Resources << /Font << /F1 %d 0 R /F2 %d 0 R /%s %d 0 R >> ",
 								self.basic_font_obj,
-								fontName .. "-" .. self.last_font.fontWeight,
-								self.custom_fonts[fontName .. "-" .. self.last_font.fontWeight]
+								self.basic_bold_font_obj,
+								fullFontName,
+								self.custom_fonts[fullFontName]
 						)
 				)
 		end
 
-		return self
+		self.objects[pageObj] = pageContent
 end
 
 -- Use custom font for text
@@ -386,7 +510,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 						numberToString(word_spacing),	-- Set word spacing using Tw operator
 						numberToString(x_pos),
 						numberToString(self.currentYPos(self)),
-						EscapeHtml(text)
+						self:escapePdfText(text)
 				)
 				return self
 		end
@@ -402,7 +526,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
         numberToString(color[3]),
         numberToString(x_pos),
         numberToString(self.currentYPos(self)),
-        EscapeHtml(text)
+        self:escapePdfText(text)
     )
 
     return self

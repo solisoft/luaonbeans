@@ -215,7 +215,16 @@ LET object = (
 		}
 )
 
+LET breadcrumb = {
+	component: 'breadcrumb',
+	items: [
+		{ label: 'Home', url: '/' },
+		{ label: 'Aql Pages', url: '/aql_pages' }
+	]
+}
+
 RETURN [
+	breadcrumb,
 	page,
 	kpi1, kpi2, kpi3,
 	sales_chart,

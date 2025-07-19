@@ -23,8 +23,8 @@ local app = {
 		pdf:addCustomFont("fonts/TitilliumWeb-Bold.ttf", "titillium", "bold")
 
 
-		--local imgName = pdf:addImage(LoadAsset("usa.jpeg"), 1567, 444, "jpeg")
-		--pdf:drawImage(imgName)
+		local imgName = pdf:addImage(LoadAsset("greece.jpg"), 1600, 492, "jpeg")
+		pdf:drawImage(imgName)
 
 		-- Add some text
 		pdf:addParagraph([[

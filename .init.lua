@@ -15,8 +15,8 @@ I18n = I18nClass.new("en")
 ProgramMaxPayloadSize(10485760) -- 10 MB
 
 -- DB connection
-local db_config = DecodeJson(LoadAsset("config/database.json"))
-InitDB(db_config)
+-- local db_config = DecodeJson(LoadAsset("config/database.json"))
+-- InitDB(db_config)
 
 Views = {}
 isApi = false
@@ -63,9 +63,10 @@ function OnHttpRequest()
 	Params = GetParams()
 	PrepareMultiPartParams() -- if you handle file uploads
 
-	if Adb then
-		Adb.primary:RefreshToken() -- reconnect to arangoDB if needed
-	end
+	-- Uncomment code if you use ArangoDB
+		-- if Adb then
+	--	Adb.primary:RefreshToken() -- reconnect to arangoDB if needed
+	--end
 
 	-- Uncomment code if you use surrealdb
 	-- if (db_config ~= nil and db_config["engine"] == "surrealdb") then

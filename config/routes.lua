@@ -1,4 +1,9 @@
-Routes = { ["GET"] = { [""] = "welcome#index", ["pdf"] = "welcome#pdf" } } --define root
+Routes = { ["GET"] = {
+    [""] = "welcome#index",
+    ["pdf"] = "welcome#pdf",
+    ["chart"] = "welcome#chart"
+  }
+}
 
 CustomRoute("POST", "/upload/:collection/:key/:field", "uploads#upload")
 CustomRoute("GET", "/o/:uuid/:format", "uploads#original_image")

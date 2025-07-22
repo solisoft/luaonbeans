@@ -449,57 +449,57 @@ end
 
 -- Add text to current page
 function PDFGenerator:addText(text, fontSize, color, alignment, width)
-		width = width or self.page_width
-		fontSize = fontSize or 12
-		color = color or "000"	-- default black
-		alignment = alignment or "justify"	-- default left alignment
-		color = PDFGenerator:hexToRGB(color)
+    width = width or self.page_width
+    fontSize = fontSize or 12
+    color = color or "000"	-- default black
+    alignment = alignment or "justify"	-- default left alignment
+    color = PDFGenerator:hexToRGB(color)
 
-		local content = self.contents[self.current_page_obj]
-		local fontName = self.last_font.fontWeight == "bold" and "F1" or "F2"
+    local content = self.contents[self.current_page_obj]
+    local fontName = self.last_font.fontWeight == "bold" and "F1" or "F2"
 
-		if self.current_font then
-				fontName = self.current_font .. "-" .. self.last_font.fontWeight
-		end
+    if self.current_font then
+        fontName = self.current_font .. "-" .. self.last_font.fontWeight
+    end
 
-		-- Calculate x position based on alignment
-		local x_pos = self.margin_x[1] + self.current_x
-		local text_width = self:getTextWidth(text, fontSize, self.last_font.fontWeight)
+    -- Calculate x position based on alignment
+    local x_pos = self.margin_x[1] + self.current_x
+    local text_width = self:getTextWidth(text, fontSize, self.last_font.fontWeight)
 
-		if alignment == "center" then
-				x_pos = x_pos + (width - text_width) / 2
-		elseif alignment == "right" then
-				x_pos = x_pos + (width - text_width)
-		end
+    if alignment == "center" then
+            x_pos = x_pos + (width - text_width) / 2
+    elseif alignment == "right" then
+            x_pos = x_pos + (width - text_width)
+    end
 
-		-- For justified text, we need to calculate word spacing
-		if alignment == "justify"	then
-				local spaces = text:gsub("[^ ]", ""):len()	-- Count spaces
-				local words = select(2, text:gsub("%S+", "")) + 1	-- Count words
-				local available_width = self.page_width - self.margin_x[1] - self.margin_x[2]
-				local extra_space = available_width - text_width
-				local word_spacing = extra_space / spaces
-				if word_spacing > 30 then
-						word_spacing = 1
-				end
-				content.stream = content.stream .. string.format(
-						"BT\n/%s %s Tf\n%s %s %s rg\n%s Tw\n%s %s Td\n(%s) Tj\nET\n",
-						fontName,
-						numberToString(fontSize),
-						numberToString(color[1]),
-						numberToString(color[2]),
-						numberToString(color[3]),
-						numberToString(word_spacing),	-- Set word spacing using Tw operator
-						numberToString(x_pos),
-						numberToString(self.currentYPos(self)),
-						self:escapePdfText(text)
-				)
-				return self
-		end
+    -- For justified text, we need to calculate word spacing
+    if alignment == "justify"	then
+            local spaces = text:gsub("[^ ]", ""):len()	-- Count spaces
+            local words = select(2, text:gsub("%S+", "")) + 1	-- Count words
+            local available_width = self.page_width - self.margin_x[1] - self.margin_x[2]
+            local extra_space = available_width - text_width
+            local word_spacing = extra_space / spaces
+            if word_spacing > 30 then
+                    word_spacing = 1
+            end
+            content.stream = content.stream .. string.format(
+                    "BT\n/%s %s Tf\n%s %s %s rg\n%s Tw\n%s %s Td\n(%s) Tj\nET\n",
+                    fontName,
+                    numberToString(fontSize),
+                    numberToString(color[1]),
+                    numberToString(color[2]),
+                    numberToString(color[3]),
+                    numberToString(word_spacing),	-- Set word spacing using Tw operator
+                    numberToString(x_pos),
+                    numberToString(self.currentYPos(self)),
+                    self:escapePdfText(text)
+            )
+            return self
+    end
 
-		-- For left, center, and right alignment
-		-- Check if text width exceeds available space for left/right alignment
-		content.stream = content.stream .. string.format(
+    -- For left, center, and right alignment
+    -- Check if text width exceeds available space for left/right alignment
+	content.stream = content.stream .. string.format(
 	      "BT\n/%s %s Tf\n%s %s %s rg\n0 Tw\n%s %s Td\n(%s) Tj\nET\n",
         fontName,
         numberToString(fontSize),
@@ -830,6 +830,11 @@ end
 -- Draw rectangle on current page
 function PDFGenerator:drawRectangle(options)
     options = options or {}
+
+    if self.out_of_page == false and self.page_height - self.current_y - options.height - self.header_height < self.margin_y[1] + self.margin_y[2] then
+        self:addPage()
+    end
+
     options.borderWidth = options.borderWidth or 1
     options.borderStyle = options.borderStyle or "solid"
     options.borderColor = options.borderColor or "000000"  -- default gray
@@ -844,6 +849,7 @@ function PDFGenerator:drawRectangle(options)
     options.borderSides.bottom = options.borderSides.bottom or true
 
     local content = self.contents[self.current_page_obj]
+
 
     -- Save graphics state
     content.stream = content.stream .. "q\n"

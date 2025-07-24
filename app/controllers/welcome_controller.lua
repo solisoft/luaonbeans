@@ -87,9 +87,9 @@ local app = {
 		for i = 1, 10 do
 			table.insert(dataColumns, {
 				{ text = "Mac Mini M4 pro Morbi ultrices pharetra risus sed pellentesque. Integer id semper erat. Duis l" .. i, width = 305, fontSize = 10, alignment = "left" },
-				{ text = "$700", width = 70, fontSize = 10, alignment = "right" },
-				{ text = "2", width = 50, fontSize = 10, alignment = "center" },
-				{ text = "$1400", width = 70, fontSize = 10, alignment = "right" }
+				{ text = "$700", width = 70, fontSize = 10, alignment = "right", vertical_alignment = "middle" },
+				{ text = "2", width = 50, fontSize = 10, alignment = "center", vertical_alignment = "middle" },
+				{ text = "$1400", width = 70, fontSize = 10, alignment = "right", vertical_alignment = "middle" }
 			})
 		end
 

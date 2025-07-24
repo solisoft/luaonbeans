@@ -518,6 +518,7 @@ function PDFGenerator:addParagraph(text, options)
     options.newLine = options.newLine or true
     options.fontWeight = options.fontWeight or "normal"
     options.paddingX = options.paddingX or 0
+    options.paddingY = options.paddingY or 0
 
     self.last_font = self.last_font or {}
     self.last_font.fontWeight = options.fontWeight
@@ -525,7 +526,7 @@ function PDFGenerator:addParagraph(text, options)
     local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
     for i, line in ipairs(lines) do
         if options.newLine == true then
-            self.current_y = self.current_y + options.fontSize*1.2
+            self.current_y = self.current_y + options.fontSize*1.2 + options.paddingY
         end
         if self.out_of_page == false and self.page_height - self.current_y - self.header_height < self.margin_y[1] + self.margin_y[2] then
             self:addPage()
@@ -581,11 +582,13 @@ function PDFGenerator:calculateMaxHeight(items)
 
         -- Calculate height for this item
         local line_height = fontSize * 1.5  -- Standard line height
-        local text_height = #lines * line_height + 2 + (padding_y * 2)  -- Include padding
+        local text_height = #lines * line_height + (padding_y * 2)  -- Include padding
         -- Update max_height if this item is taller
         if text_height > max_height then
             max_height = text_height
         end
+        item.lines = #lines
+        item.height = #lines * line_height
     end
 
     self.current_table.current_row.height = max_height
@@ -612,6 +615,7 @@ function PDFGenerator:drawRowTable(columns, row_options)
         -- Draw the cell using existing method
         local options = table.merge(row_options, column)
         options.text = nil
+        options.height = column.height
         self:drawTableCell(column.text, options)
     end
 
@@ -632,6 +636,7 @@ function PDFGenerator:drawTableCell(text, options)
     options.alignment = options.alignment or "left"
     options.fillColor = options.fillColor or "fff"
     options.borderColor = options.borderColor or "000"
+    options.vertical_alignment = options.vertical_alignment or "top"
 
     -- Draw cell border using existing rectangle method
     self:drawRectangle({
@@ -656,12 +661,22 @@ function PDFGenerator:drawTableCell(text, options)
 
     self:moveY(self.current_table.padding_y)
 
+    local paddingY = 0
+    if options.vertical_alignment == "middle" then
+        paddingY = (self.current_table.current_row.height - options.height - self.current_table.padding_y * 2) / 2
+    end
+
+    if options.vertical_alignment == "bottom" then
+        paddingY = self.current_table.current_row.height - options.height - self.current_table.padding_y * 2
+    end
+
     self:addParagraph(text, {
         fontSize = options.fontSize,
         alignment = options.alignment,
         width = options.width,
         color = options.textColor,
-        paddingX = self.current_table.padding_x * 2
+        paddingX = self.current_table.padding_x * 2,
+        paddingY = paddingY
     })
 
     -- Restore cursor position after drawing text

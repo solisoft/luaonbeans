@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.17.0](https://github.com/solisoft/luaonbeans/compare/v0.16.0...v0.17.0) (2025-07-26)
+
+
+### Features
+
+* improve performances on production + add basic support for svg content in PDF ([59d0179](https://github.com/solisoft/luaonbeans/commit/59d0179444dd2ca2952556787a3ec21d386b0bf7))
+* no need a DB to start the server ([e626f44](https://github.com/solisoft/luaonbeans/commit/e626f44e3ac15ba9769362cbe35e83379a6a7ffb))
+* pdf allow table row vertical_alignement ([03a4da6](https://github.com/solisoft/luaonbeans/commit/03a4da6a86087f97f1d9088751c4d710c5fc02a4))
+
+
+### Bug Fixes
+
+* improve pdf sample and add charts ([a71a570](https://github.com/solisoft/luaonbeans/commit/a71a57020e2465334b5a05bea4f363cdc60cdfd1))
+* indentation ([e6ea708](https://github.com/solisoft/luaonbeans/commit/e6ea708f5aaf12ade24d9b934c791ce5adf6c73a))
+
 ## [0.16.0](https://github.com/solisoft/luaonbeans/compare/v0.15.0...v0.16.0) (2025-07-19)
 
 

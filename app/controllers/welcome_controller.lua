@@ -26,6 +26,8 @@ local app = {
 		local imgName = pdf:addImage(LoadAsset("greece.jpg"), 1600, 492, "jpeg")
 		pdf:drawImage(imgName)
 
+		pdf:moveY(10)
+
 		-- Add some text
 		pdf:addParagraph([[
 			Morbi ultrices pharetra risus sed pellentesque. Integer id semper erat. Duis lobortis mollis erat, id commodo orci lobortis ut. Sed laoreet libero sed lorem sagittis, et lacinia arcu efficitur. Curabitur eu scelerisque elit. Aenean enim turpis, congue nec ipsum non, dapibus laoreet ex. Cras viverra congue tortor vitae rutrum.
@@ -181,4 +183,4 @@ local app = {
 	end,
 }
 
-return HandleController(app)
+return BeansEnv == "development" and HandleController(app) or app

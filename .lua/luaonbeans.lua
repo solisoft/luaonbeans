@@ -284,6 +284,16 @@ function HandleRequest()
 			end
 		end
 	else
+		if BeansEnv == "production" then
+			local ok, err = pcall(function()
+				local controller = require(Params.controller .. "_controller")
+				controller[Params.action]()
+			end)
+			if not ok then
+				assert(false, err)
+				return
+			end
+		end
 		RoutePath("/app/controllers/" .. Params.controller .. "_controller.lua")
 	end
 end

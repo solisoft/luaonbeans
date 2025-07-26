@@ -1215,4 +1215,388 @@ function PDFGenerator:generate()
     return table.concat(output)
 end
 
+-- Basic SVG support
+-- Add SVG to current page
+function PDFGenerator:addSVG(svgData, width, height, options)
+    options = options or {}
+    width = width or 100
+    height = height or 100
+    options.x = options.x or self.current_x
+    options.y = options.y or self.current_y
+
+    -- Ensure we're on a valid page
+    if not self.current_page_obj then
+        self:addPage()
+    end
+
+    -- Parse SVG data
+    local svgContent = self:parseSVG(svgData)
+    local content = self.contents[self.current_page_obj]
+
+    -- Check if SVG fits within page boundaries
+    if self.out_of_page == false and self.page_height - self.current_y - height - self.header_height < self.margin_y[1] + self.margin_y[2] then
+        self:addPage()
+        content = self.contents[self.current_page_obj]
+    end
+
+    -- Save graphics state
+    content.stream = content.stream .. "q\n"
+
+    -- Apply scaling and translation
+    local scaleX = width / (svgContent.width or 100)
+    local scaleY = height / (svgContent.height or 100)
+    content.stream = content.stream .. string.format(
+        "%s 0 0 %s %s %s cm\n",
+        numberToString(scaleX),
+        numberToString(scaleY),
+        numberToString(self.margin_x[1] + options.x),
+        numberToString(self:currentYPos() - height)
+    )
+
+    -- Process SVG elements
+    for _, element in ipairs(svgContent.elements) do
+        if element.type == "path" then
+            self:drawSVGPath(element, content)
+        end
+    end
+
+    -- Restore graphics state
+    content.stream = content.stream .. "Q\n"
+
+    -- Update cursor position
+    self:moveY(height)
+    return self
+end
+
+-- Parse SVG string into a table of elements
+function PDFGenerator:parseSVG(svgData)
+    local svg = {
+        width = 100,
+        height = 100,
+        elements = {}
+    }
+
+    -- Extract width and height from SVG tag
+    local w, h = svgData:match('width="(%d+%.?%d*)"[^>]*height="(%d+%.?%d*)"')
+    if w and h then
+        svg.width = tonumber(w)
+        svg.height = tonumber(h)
+    end
+
+    -- Parse path elements
+    for pathData, fill, stroke, strokeWidth in svgData:gmatch('<path%s+d="([^"]+)"%s+fill="([^"]*)"%s+stroke="([^"]*)"%s+stroke%-width="([^"]*)"%s*/>') do
+        table.insert(svg.elements, {
+            type = "path",
+            d = pathData,
+            fill = fill ~= "none" and fill or nil,
+            stroke = stroke ~= "none" and stroke or nil,
+            strokeWidth = tonumber(strokeWidth) or 1
+        })
+    end
+
+    -- Support <circle> elements in SVG
+    -- Improved <circle> SVG parsing and ensure all attribute orders are supported
+    for circleTag in svgData:gmatch("<circle%s+.-/>") do
+        local cx = circleTag:match('cx="([^"]+)"')
+        local cy = circleTag:match('cy="([^"]+)"')
+        local r = circleTag:match('r="([^"]+)"')
+        local fill = circleTag:match('fill="([^"]*)"')
+        local stroke = circleTag:match('stroke="([^"]*)"')
+        local strokeWidth = circleTag:match('stroke%-width="([^"]*)"')
+        if cx and cy and r then
+            -- Convert SVG circle to a path (PDF does not have a native circle primitive)
+            -- Use 4 Bézier curves to approximate a circle
+            local cx_num = tonumber(cx)
+            local cy_num = tonumber(cy)
+            local r_num = tonumber(r)
+            local kappa = 0.552284749831  -- approximation constant for Bézier circle
+
+            local x0 = cx_num - r_num
+            local y0 = cy_num
+            local x1 = cx_num
+            local y1 = cy_num - r_num
+            local x2 = cx_num + r_num
+            local y2 = cy_num
+            local x3 = cx_num
+            local y3 = cy_num + r_num
+
+            local ox = r_num * kappa
+            local oy = r_num * kappa
+
+            -- Compose path data for a circle using Bézier curves
+            local d = string.format(
+                "M %f %f " ..
+                "C %f %f %f %f %f %f " ..
+                "C %f %f %f %f %f %f " ..
+                "C %f %f %f %f %f %f " ..
+                "C %f %f %f %f %f %f Z",
+                x2, y2,
+                x2, y2 + oy, x3 + ox, y3, x3, y3,
+                x3 - ox, y3, x0, y0 + oy, x0, y0,
+                x0, y0 - oy, x1 - ox, y1, x1, y1,
+                x1 + ox, y1, x2, y2 - oy, x2, y2
+            )
+
+            table.insert(svg.elements, {
+                type = "path",
+                d = d,
+                fill = fill and fill ~= "none" and fill or nil,
+                stroke = stroke and stroke ~= "none" and stroke or nil,
+                strokeWidth = strokeWidth and tonumber(strokeWidth) or 1
+            })
+        end
+    end
+
+    -- Debug: Log parsed elements
+    if #svg.elements == 0 then
+        print("Warning: No SVG path elements parsed")
+    end
+
+    return svg
+end
+
+-- Draw SVG path in PDF content stream
+function PDFGenerator:drawSVGPath(element, content)
+    local fillColor = element.fill and self:hexToRGB(element.fill) or {1, 1, 1} -- Default white
+    local strokeColor = element.stroke and self:hexToRGB(element.stroke) or {0, 0, 0} -- Default black
+    local strokeWidth = element.strokeWidth or 1
+
+    -- Set fill color
+    if element.fill then
+        content.stream = content.stream .. string.format(
+            "%s %s %s rg\n",
+            numberToString(fillColor[1]),
+            numberToString(fillColor[2]),
+            numberToString(fillColor[3])
+        )
+    end
+
+    -- Set stroke color and width
+    if element.stroke then
+        content.stream = content.stream .. string.format(
+            "%s %s %s RG\n",
+            numberToString(strokeColor[1]),
+            numberToString(strokeColor[2]),
+            numberToString(strokeColor[3])
+        )
+        content.stream = content.stream .. string.format("%s w\n", numberToString(strokeWidth))
+    end
+
+    -- Parse and draw path commands
+    local pathCommands = self:parseSVGPath(element.d)
+    --assert(#pathCommands == 0,"Warning: No valid path commands parsed for path: " .. element.d)
+
+    for _, cmd in ipairs(pathCommands) do
+        if cmd.type == "M" then
+            content.stream = content.stream .. string.format(
+                "%s %s m\n",
+                numberToString(cmd.x),
+                numberToString(cmd.y)
+            )
+        elseif cmd.type == "L" then
+            content.stream = content.stream .. string.format(
+                "%s %s l\n",
+                numberToString(cmd.x),
+                numberToString(cmd.y)
+            )
+        elseif cmd.type == "C" then
+            content.stream = content.stream .. string.format(
+                "%s %s %s %s %s %s c\n",
+                numberToString(cmd.x1),
+                numberToString(cmd.y1),
+                numberToString(cmd.x2),
+                numberToString(cmd.y2),
+                numberToString(cmd.x),
+                numberToString(cmd.y)
+            )
+        elseif cmd.type == "Z" then
+            content.stream = content.stream .. "h\n"
+        end
+    end
+
+    -- Apply fill and/or stroke
+    if element.fill and element.stroke then
+        content.stream = content.stream .. "B\n"
+    elseif element.fill then
+        content.stream = content.stream .. "f\n"
+    elseif element.stroke then
+        content.stream = content.stream .. "S\n"
+    end
+end
+
+-- Parse SVG path data into a list of commands
+function PDFGenerator:parseSVGPath(pathData)
+    local commands = {}
+    local currentX, currentY = 0, 0
+    local lastControlX, lastControlY = nil, nil
+    local tokens = {}
+
+    -- Normalize path data: replace commas with spaces, collapse multiple spaces
+    pathData = pathData:gsub(",", " "):gsub("%s+", " ")
+    -- Split into tokens, handling concatenated commands (e.g., M10 -> M, 10)
+    local tempTokens = {}
+    for token in pathData:gmatch("[^%s]+") do
+        if token:match("^[MLCmlczZshvHV]") then
+            local cmd = token:sub(1, 1)
+            local rest = token:sub(2)
+            table.insert(tokens, cmd)
+            if rest ~= "" then
+                table.insert(tokens, rest)
+            end
+        else
+            table.insert(tokens, token)
+        end
+    end
+
+    -- Debug: Log tokens
+    print("Debug: Parsed tokens: " .. table.concat(tokens, ", "))
+
+    local i = 1
+    while i <= #tokens do
+        local cmd = tokens[i]
+        if cmd == "M" or cmd == "m" then
+            if i + 2 > #tokens then
+                print("Error: Insufficient tokens for M command at index " .. i)
+                break
+            end
+            local x = tonumber(tokens[i + 1])
+            local y = tonumber(tokens[i + 2])
+            if not x or not y then
+                print("Error: Invalid numbers for M command at index " .. i .. ": x=" .. tostring(tokens[i + 1]) .. ", y=" .. tostring(tokens[i + 2]))
+                break
+            end
+            if cmd == "m" then
+                x = currentX + x
+                y = currentY + y
+            end
+            table.insert(commands, {type = "M", x = x, y = y})
+            currentX, currentY = x, y
+            lastControlX, lastControlY = nil, nil
+            i = i + 3
+        elseif cmd == "L" or cmd == "l" then
+            if i + 2 > #tokens then
+                print("Error: Insufficient tokens for L command at index " .. i)
+                break
+            end
+            local x = tonumber(tokens[i + 1])
+            local y = tonumber(tokens[i + 2])
+            if not x or not y then
+                print("Error: Invalid numbers for L command at index " .. i .. ": x=" .. tostring(tokens[i + 1]) .. ", y=" .. tostring(tokens[i + 2]))
+                break
+            end
+            if cmd == "l" then
+                x = currentX + x
+                y = currentY + y
+            end
+            table.insert(commands, {type = "L", x = x, y = y})
+            currentX, currentY = x, y
+            lastControlX, lastControlY = nil, nil
+            i = i + 3
+        elseif cmd == "C" or cmd == "c" then
+            if i + 6 > #tokens then
+                print("Error: Insufficient tokens for C command at index " .. i)
+                break
+            end
+            local x1 = tonumber(tokens[i + 1])
+            local y1 = tonumber(tokens[i + 2])
+            local x2 = tonumber(tokens[i + 3])
+            local y2 = tonumber(tokens[i + 4])
+            local x = tonumber(tokens[i + 5])
+            local y = tonumber(tokens[i + 6])
+            if not x1 or not y1 or not x2 or not y2 or not x or not y then
+                print("Error: Invalid numbers for C command at index " .. i .. ": x1=" .. tostring(tokens[i + 1]) .. ", y1=" .. tostring(tokens[i + 2]) .. ", x2=" .. tostring(tokens[i + 3]) .. ", y2=" .. tostring(tokens[i + 4]) .. ", x=" .. tostring(tokens[i + 5]) .. ", y=" .. tostring(tokens[i + 6]))
+                break
+            end
+            if cmd == "c" then
+                x1 = currentX + x1
+                y1 = currentY + y1
+                x2 = currentX + x2
+                y2 = currentY + y2
+                x = currentX + x
+                y = currentY + y
+            end
+            table.insert(commands, {type = "C", x1 = x1, y1 = y1, x2 = x2, y2 = y2, x = x, y = y})
+            currentX, currentY = x, y
+            lastControlX, lastControlY = x2, y2
+            i = i + 7
+        elseif cmd == "S" or cmd == "s" then
+            if i + 4 > #tokens then
+                print("Error: Insufficient tokens for S command at index " .. i)
+                break
+            end
+            local x2 = tonumber(tokens[i + 1])
+            local y2 = tonumber(tokens[i + 2])
+            local x = tonumber(tokens[i + 3])
+            local y = tonumber(tokens[i + 4])
+            if not x2 or not y2 or not x or not y then
+                print("Error: Invalid numbers for S command at index " .. i .. ": x2=" .. tostring(tokens[i + 1]) .. ", y2=" .. tostring(tokens[i + 2]) .. ", x=" .. tostring(tokens[i + 3]) .. ", y=" .. tostring(tokens[i + 4]))
+                break
+            end
+            local x1 = lastControlX and (currentX + (currentX - lastControlX)) or currentX
+            local y1 = lastControlY and (currentY + (currentY - lastControlY)) or currentY
+            if cmd == "s" then
+                x2 = currentX + x2
+                y2 = currentY + y2
+                x = currentX + x
+                y = currentY + y
+            end
+            table.insert(commands, {type = "C", x1 = x1, y1 = y1, x2 = x2, y2 = y2, x = x, y = y})
+            currentX, currentY = x, y
+            lastControlX, lastControlY = x2, y2
+            i = i + 5
+        elseif cmd == "H" or cmd == "h" then
+            if i + 1 > #tokens then
+                print("Error: Insufficient tokens for H command at index " .. i)
+                break
+            end
+            local x = tonumber(tokens[i + 1])
+            if not x then
+                print("Error: Invalid number for H command at index " .. i .. ": x=" .. tostring(tokens[i + 1]))
+                break
+            end
+            if cmd == "h" then
+                x = currentX + x
+            end
+            table.insert(commands, {type = "L", x = x, y = currentY})
+            currentX = x
+            lastControlX, lastControlY = nil, nil
+            i = i + 2
+        elseif cmd == "V" or cmd == "v" then
+            if i + 1 > #tokens then
+                print("Error: Insufficient tokens for V command at index " .. i)
+                break
+            end
+            local y = tonumber(tokens[i + 1])
+            if not y then
+                print("Error: Invalid number for V command at index " .. i .. ": y=" .. tostring(tokens[i + 1]))
+                break
+            end
+            if cmd == "v" then
+                y = currentY + y
+            end
+            table.insert(commands, {type = "L", x = currentX, y = y})
+            currentY = y
+            lastControlX, lastControlY = nil, nil
+            i = i + 2
+        elseif cmd == "Z" or cmd == "z" then
+            table.insert(commands, {type = "Z"})
+            lastControlX, lastControlY = nil, nil
+            i = i + 1
+        else
+            print("Warning: Unrecognized command '" .. cmd .. "' at index " .. i)
+            i = i + 1
+        end
+    end
+
+    -- Debug: Log parsed commands
+    if #commands == 0 then
+        print("Warning: No commands parsed for path: " .. pathData)
+    else
+        print("Debug: Parsed " .. #commands .. " commands")
+    end
+
+    return commands
+end
+-- /Basic SVG support
+
 return PDFGenerator

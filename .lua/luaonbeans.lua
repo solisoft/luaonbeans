@@ -361,22 +361,22 @@ end
 function InitDB(db_config)
 	for _, config in pairs(db_config[BeansEnv]) do
 		if (config.engine == "crate") then
-			local _Crate = require("crate")
+			local _Crate = require("db.crate")
 			Crate[config.name] = _Crate.new(config)
 		elseif (config.engine == "postgrest") then
-			local _PGRest = require("postgrest")
+			local _PGRest = require("db.postgrest")
 			PGRest[config.name] = _PGRest.new(config)
 		elseif (config.engine == "arangodb") then
-			local _Adb = require("arangodb")
+			local _Adb = require("db.arangodb")
 			local adb_driver = _Adb.new(config)
 			adb_driver:UpdateCacheConfiguration({ mode = "on" })
 			Adb[config.name] = adb_driver
 		elseif (config.engine == "db2rest") then
-			local _Rest = require("db2rest")
+			local _Rest = require("db.db2rest")
 			Rest[config.name] = _Rest.new(config)
 		elseif (config.engine == "sqlite") then
-			local sqlite3 = require 'lsqlite3'
-			local sqlite = sqlite3.open(config["db_name"] .. '.sqlite3')
+			local sqlite3 = require("lsqlite3")
+			local sqlite = sqlite3.open(config["db_name"] .. ".sqlite3")
 			sqlite:busy_timeout(1000)
 			sqlite:exec [[PRAGMA journal_mode=WAL]]
 			sqlite:exec [[PRAGMA synchronous=NORMAL]]
@@ -390,7 +390,7 @@ function InitDB(db_config)
 				CREATE UNIQUE INDEX idx_migrations_filename ON migrations (filename);
 			]]
 		elseif (config.engine == "surrealdb") then
-			local _Surreal = require("surrealdb")
+			local _Surreal = require("db.surrealdb")
 			Surreal[config.name] = _Surreal.new(config)
 		end
 	end
@@ -398,8 +398,8 @@ end
 
 function HandleSqliteFork(db_config)
 	if db_config["engine"] == "sqlite" then
-		Sqlite3 = require 'lsqlite3'
-		Sqlite = Sqlite3.open(db_config[BeansEnv]['db_name'] .. '.sqlite3')
+		Sqlite3 = require("lsqlite3")
+		Sqlite = Sqlite3.open(db_config[BeansEnv]['db_name'] .. ".sqlite3")
 		Sqlite:busy_timeout(1000)
 		Sqlite:exec [[PRAGMA journal_mode=WAL]]
 		Sqlite:exec [[PRAGMA synchronous=NORMAL]]

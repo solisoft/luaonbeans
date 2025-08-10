@@ -122,60 +122,9 @@ local app = {
 		pdf:moveY(10)
 
 		for i = 1, 5 do
-
 			local barData = {Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100, Rand64() % 100}
 			local months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"}
-			local chartWidth = 555 - 100
-			local chartHeight = 60
-			local barWidth = chartWidth / #barData - 5
-			local maxValue = 100
-			local startX = 25
-
-
-			-- Draw chart background
-			pdf:drawRectangle({
-				width = chartWidth + 40,
-				height = chartHeight + 40 + 10,
-				borderWidth = 1,
-				borderColor = "cccccc",
-				fillColor = "f8f9fa"
-			})
-
-			local startY = pdf.current_y + 20
-
-			-- Draw bars
-			for i, value in ipairs(barData) do
-				local barHeight = (value / maxValue) * chartHeight
-				local x = startX + (i-1) * (barWidth + 5) - 2
-				local y = startY + chartHeight - barHeight
-
-				-- Bar color based on value
-				local color = value > 80 and "4CAF50" or (value > 60 and "FF9800" or "F44336")
-
-				pdf:setX(x)
-				pdf:setY(startY + chartHeight - barHeight)
-				pdf:drawRectangle({
-					width = barWidth,
-					height = barHeight,
-					borderWidth = 0.3,
-					borderColor = "333333",
-					fillColor = color,
-				})
-
-				-- Value label on top of bar
-				pdf:setX(x)
-				pdf:setY(startY + chartHeight - barHeight - 5)
-				pdf:addText(tostring(value) .. " ", 8, "000000", "center", barWidth)
-
-				-- Month label below bar
-				pdf:setX(x)
-				pdf:setY(startY + chartHeight + 10)
-				pdf:addText(months[i] .. " 2025", 6, "000000", "center", barWidth)
-				pdf:moveY(20)
-			end
-
-			pdf:setX(0)
-			pdf:moveY(5)
+			pdf:BarChart(barData, months)
 		end
 
 		SetHeader("Content-Type", "application/pdf")

@@ -71,4 +71,3 @@ local app = {
 }
 
 return BeansEnv == "production" and app or HandleController(app)
-

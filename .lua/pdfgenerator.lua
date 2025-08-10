@@ -1599,4 +1599,58 @@ function PDFGenerator:parseSVGPath(pathData)
 end
 -- /Basic SVG support
 
+-- ChartBar
+function PDFGenerator:BarChart(barData, labels)
+    local chartWidth = 555 - 100
+    local chartHeight = 60
+    local barWidth = chartWidth / #barData - 5
+    local maxValue = 100
+    local startX = 25
+    -- Draw chart background
+    self:drawRectangle({
+        width = chartWidth + 40,
+        height = chartHeight + 40 + 10,
+        borderWidth = 1,
+        borderColor = "cccccc",
+        fillColor = "f8f9fa"
+    })
+
+    local startY = self.current_y + 20
+
+    -- Draw bars
+    for i, value in ipairs(barData) do
+        local barHeight = (value / maxValue) * chartHeight
+        local x = startX + (i-1) * (barWidth + 5) - 2
+        local y = startY + chartHeight - barHeight
+
+        -- Bar color based on value
+        local color = value > 80 and "4CAF50" or (value > 60 and "FF9800" or "F44336")
+
+        self:setX(x)
+        self:setY(startY + chartHeight - barHeight)
+        self:drawRectangle({
+            width = barWidth,
+            height = barHeight,
+            borderWidth = 0.3,
+            borderColor = "333333",
+            fillColor = color,
+        })
+
+        -- Value label on top of bar
+        self:setX(x)
+        self:setY(startY + chartHeight - barHeight - 5)
+        self:addText(tostring(value) .. " ", 8, "000000", "center", barWidth)
+
+        -- Month label below bar
+        self:setX(x)
+        self:setY(startY + chartHeight + 10)
+        self:addText(labels[i] .. " 2025", 6, "000000", "center", barWidth)
+        self:moveY(20)
+    end
+
+    self:setX(0)
+    self:moveY(5)
+end
+-- /ChartBar
+
 return PDFGenerator

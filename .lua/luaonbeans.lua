@@ -299,7 +299,7 @@ function HandleRequest()
 end
 
 function HandleController(controller)
-	return controller[Params.action]()
+	return BeansEnv == "development" and controller[Params.action]() or controller
 end
 
 function GetBodyParams()

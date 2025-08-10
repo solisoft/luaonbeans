@@ -60,6 +60,8 @@ end
 
 -- OnHttpRequest hook
 function OnHttpRequest()
+	SetDevice() -- comment if you do not need this feature
+
 	Params = GetParams()
 	PrepareMultiPartParams() -- if you handle file uploads
 
@@ -76,4 +78,13 @@ function OnHttpRequest()
 	DefineRoute(GetPath(), GetMethod())
 
 	HandleRequest()
+end
+
+function SetDevice()
+	local user_agent = GetHeader("User-Agent")
+	Variant = ""
+	local preg = assert(re.compile("iPhone"))
+	if preg:search(user_agent) then
+		Variant = "iphone"
+	end
 end

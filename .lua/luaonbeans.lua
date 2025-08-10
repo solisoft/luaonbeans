@@ -30,20 +30,44 @@ function LoadViewsRecursively(path)
 end
 
 function Page(view, layout, bindVarsView, bindVarsLayout)
-	if (BeansEnv == "development") then
-		Views["app/views/layouts/" .. layout .. "/index.html.etlua"] = Etlua.compile(LoadAsset("app/views/layouts/" ..
-			layout .. "/index.html.etlua"))
-	end
+	Variant = Variant or ""
 
 	if (BeansEnv == "development") then
-		Views["app/views/" .. view .. ".etlua"] = Etlua.compile(LoadAsset("app/views/" .. view .. ".etlua"))
+		local asset = nil
+		if Variant == "" then
+			asset = LoadAsset("app/views/layouts/" ..	layout .. "/index.html.etlua")
+			Views["app/views/layouts/" .. layout .. "/index.html.etlua"] = Etlua.compile(asset)
+		else
+			asset = LoadAsset("app/views/layouts/" ..	layout .. "/index.html+" .. Variant .. ".etlua")
+			if asset == nil then
+				asset = LoadAsset("app/views/layouts/" ..	layout .. "/index.html.etlua")
+			end
+			Views["app/views/layouts/" .. layout .. "/index.html+" .. Variant .. ".etlua"] = Etlua.compile(asset)
+		end
+
+		if Variant == "" then
+			asset = LoadAsset("app/views/" ..	view .. ".etlua")
+			Views["app/views/" .. view .. ".etlua"] = Etlua.compile(asset)
+		else
+			asset = LoadAsset("app/views/" ..	view  .. "+" ..  Variant .. ".etlua")
+			if asset == nil then
+				asset = LoadAsset("app/views/" ..	view .. ".etlua")
+			end
+			Views["app/views/" .. view .. "+" .. Variant .. ".etlua"] = Etlua.compile(asset)
+		end
 	end
 
-	layout = Views["app/views/layouts/" .. layout .. "/index.html.etlua"](bindVarsLayout or {})
-
-	if Views["app/views/" .. view .. ".etlua"] then
-		view = Views["app/views/" .. view .. ".etlua"](bindVarsView or {})
+	compiled_layout = Views["app/views/layouts/" .. layout .. "/index.html.etlua"]
+	if Variant ~= "" then
+		compiled_layout = Views["app/views/layouts/" .. layout .. "/index.html+" .. Variant .. ".etlua"] or compiled_layout
 	end
+	layout = compiled_layout(bindVarsLayout or {})
+
+	compiled_view = Views["app/views/" .. view .. ".etlua"]
+  if Variant ~= "" then
+		compiled_view = Views["app/views/" .. view .. "+" .. Variant .. ".etlua"] or compiled_view
+	end
+	view = compiled_view(bindVarsView or {})
 
 	local content
 	if view:find("%%") then

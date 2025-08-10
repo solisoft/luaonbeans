@@ -42,6 +42,6 @@ function Logger(message)
 	if type(message) == "table" then
 		message = EncodeJson(message)
 	end
-	Log(kLogError, message)
+	Log(kLogError, message or "nil")
 end
 

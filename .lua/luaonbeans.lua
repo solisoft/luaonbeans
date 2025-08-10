@@ -30,42 +30,42 @@ function LoadViewsRecursively(path)
 end
 
 function Page(view, layout, bindVarsView, bindVarsLayout)
-	Variant = Variant or ""
+	local variant = Params.request.variant or ""
 
 	if (BeansEnv == "development") then
 		local asset = nil
-		if Variant == "" then
+		if variant == "" then
 			asset = LoadAsset("app/views/layouts/" ..	layout .. "/index.html.etlua")
 			Views["app/views/layouts/" .. layout .. "/index.html.etlua"] = Etlua.compile(asset)
 		else
-			asset = LoadAsset("app/views/layouts/" ..	layout .. "/index.html+" .. Variant .. ".etlua")
+			asset = LoadAsset("app/views/layouts/" ..	layout .. "/index.html+" .. variant .. ".etlua")
 			if asset == nil then
 				asset = LoadAsset("app/views/layouts/" ..	layout .. "/index.html.etlua")
 			end
-			Views["app/views/layouts/" .. layout .. "/index.html+" .. Variant .. ".etlua"] = Etlua.compile(asset)
+			Views["app/views/layouts/" .. layout .. "/index.html+" .. variant .. ".etlua"] = Etlua.compile(asset)
 		end
 
-		if Variant == "" then
+		if variant == "" then
 			asset = LoadAsset("app/views/" ..	view .. ".etlua")
 			Views["app/views/" .. view .. ".etlua"] = Etlua.compile(asset)
 		else
-			asset = LoadAsset("app/views/" ..	view  .. "+" ..  Variant .. ".etlua")
+			asset = LoadAsset("app/views/" ..	view  .. "+" ..  variant .. ".etlua")
 			if asset == nil then
 				asset = LoadAsset("app/views/" ..	view .. ".etlua")
 			end
-			Views["app/views/" .. view .. "+" .. Variant .. ".etlua"] = Etlua.compile(asset)
+			Views["app/views/" .. view .. "+" .. variant .. ".etlua"] = Etlua.compile(asset)
 		end
 	end
 
 	compiled_layout = Views["app/views/layouts/" .. layout .. "/index.html.etlua"]
-	if Variant ~= "" then
-		compiled_layout = Views["app/views/layouts/" .. layout .. "/index.html+" .. Variant .. ".etlua"] or compiled_layout
+	if variant ~= "" then
+		compiled_layout = Views["app/views/layouts/" .. layout .. "/index.html+" .. variant .. ".etlua"] or compiled_layout
 	end
 	layout = compiled_layout(bindVarsLayout or {})
 
 	compiled_view = Views["app/views/" .. view .. ".etlua"]
-  if Variant ~= "" then
-		compiled_view = Views["app/views/" .. view .. "+" .. Variant .. ".etlua"] or compiled_view
+  if variant ~= "" then
+		compiled_view = Views["app/views/" .. view .. "+" .. variant .. ".etlua"] or compiled_view
 	end
 	view = compiled_view(bindVarsView or {})
 

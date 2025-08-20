@@ -313,9 +313,10 @@ end
 
 function response.read(client)
 	local payload = client.network.read(client)
-	local prefix, data = payload:sub(1, - #payload), payload:sub(2)
+  local prefix, data = payload:sub(1, - #payload), payload:sub(2)
+  -- print("Prefix (%s) Data (%s)" % { prefix, data })
 	-- status reply
-	if prefix == '+' then
+  if prefix == '+' then
 		if data == 'OK' then
 			return true
 		elseif data == 'QUEUED' then
@@ -344,7 +345,7 @@ function response.read(client)
 		-- bulk reply
 	elseif prefix == '$' then
 		local length = tonumber(data:match("^[^\n]*"))
-		if not length then
+    if not length then
 			client.error('cannot parse ' .. length .. ' as data length')
 		end
 
@@ -352,7 +353,7 @@ function response.read(client)
 			return nil
 		end
 
-		local nextchunk = data:gsub("^[^\n]*\n", "") .. client.network.read(client, length + 2)
+    local nextchunk = data:gsub("^[^\n]*\n", "")-- .. client.network.read(client, length + 2)
 
 		return nextchunk:sub(1, -3)
 
@@ -904,6 +905,7 @@ end
 function redis.undefine_command(name)
   undefine_command_impl(redis.commands, name)
 end
+
 
 -- ############################################################################
 

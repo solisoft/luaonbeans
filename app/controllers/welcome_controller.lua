@@ -5,6 +5,10 @@ local app = {
 		-- WriteJSON({ demo = true })
 	end,
 
+	redis_incr = function()
+		WriteJSON(Redis:info())
+	end,
+
 	pdf = function()
 		PDFGenerator = require("pdfgenerator")
 

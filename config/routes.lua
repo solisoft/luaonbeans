@@ -1,7 +1,8 @@
 Routes = { ["GET"] = {
     [""] = "welcome#index",
     ["pdf"] = "welcome#pdf",
-    ["chart"] = "welcome#chart"
+    ["chart"] = "welcome#chart",
+    ["redis-incr"] = "welcome#redis_incr"
   }
 }
 

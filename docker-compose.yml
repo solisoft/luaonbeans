@@ -1,10 +1,10 @@
 services:
-  app:
-    build: .
-    ports:
-      - 7000:8080
-    environment:
-      BEANS_ENV: production
+  #app:
+  #  build: .
+  #  ports:
+  #    - 7000:8080
+  #  environment:
+  #    BEANS_ENV: production
 
   arangodb:
     image: arangodb/arangodb:latest
@@ -15,6 +15,27 @@ services:
     volumes:
       - arangodb-data:/var/lib/arangodb3
       - ./foxx:/var/lib/arangodb3-apps
+
+  pgrest:
+    image: postgrest/postgrest
+    ports:
+      - "3000:3000"
+    environment:
+      PGRST_DB_URI: postgres://postgres:password@postgres:5432/app_db
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+      PGRST_JWT_SECRET: "3ed06358-2894-4c70-8f9c-0d202708f3597ec9272e-0b40-4ea4-9b5b-d6084103b8ae"
+      PGRST_DB_SCHEMAS: public
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
 
   #db2rest:
   #  env_file:

@@ -6,7 +6,7 @@ local app = {
 	end,
 
 	redis_incr = function()
-		WriteJSON(Redis:info())
+		WriteJSON(Redis:incr("test"))
 	end,
 
 	pdf = function()

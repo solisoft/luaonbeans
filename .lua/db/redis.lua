@@ -314,8 +314,7 @@ end
 function response.read(client)
 	local payload = client.network.read(client)
   local prefix, data = payload:sub(1, - #payload), payload:sub(2)
-  -- print("Prefix (%s) Data (%s)" % { prefix, data })
-	-- status reply
+  -- status reply
   if prefix == '+' then
 		if data == 'OK' then
 			return true

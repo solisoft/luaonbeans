@@ -22,7 +22,7 @@ function Crate:sql(sql, bindVars)
     self._db_config["url"] .. "/_sql",
     {
       method = "POST",
-      body = EncodeJson({ stmt= sql, bind_vars= bindVars }),
+      body = EncodeJson({ stmt= sql, bind_vars= bindVars }) or "",
       headers = {
         ["Accept"] = "application/json"
       }
@@ -30,15 +30,15 @@ function Crate:sql(sql, bindVars)
   )
 
   if (ok == 200) then
-    local response = DecodeJson(body)
+    local response = DecodeJson(body) or {}
     local duration = response["duration"]
 
     local data = {}
-    local rows = response["rows"]
-    local columns = response["cols"]
+    local rows = response["rows"] or {}
+    local columns = response["cols"] or {}
 
     for j = 1, #rows do
-      local row = response["rows"][j]
+      local row = response["rows"][j] or {}
       local rowData = {}
       for k = 1, #columns do rowData[columns[k]] = row[k] end
       data[j] = rowData

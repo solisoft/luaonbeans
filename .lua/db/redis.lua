@@ -1,7 +1,7 @@
 local redis = {
-	_VERSION		 = 'redis-lua 2.0.5-dev',
-	_DESCRIPTION = 'A Lua client library for the redis key value storage system.',
-	_COPYRIGHT	 = 'Copyright (C) 2009-2012 Daniele Alessandri',
+  _VERSION     = 'redis-lua 2.0.5-dev',
+  _DESCRIPTION = 'A Lua client library for the redis key value storage system.',
+  _COPYRIGHT   = 'Copyright (C) 2009-2012 Daniele Alessandri',
 }
 
 -- The following line is used for backwards compatibility in order to keep the `Redis`
@@ -13,446 +13,446 @@ local unpack = _G.unpack or table.unpack
 local network, request, response = {}, {}, {}
 
 local defaults = {
-	host				= '127.0.0.1',
-	port				= 6379,
-	tcp_nodelay = true,
-	path				= nil,
+  host        = '127.0.0.1',
+  port        = 6379,
+  tcp_nodelay = true,
+  path        = nil,
 }
 
 local function merge_defaults(parameters)
-	if parameters == nil then
-		parameters = {}
-	end
-	for k, v in pairs(defaults) do
-		if parameters[k] == nil then
-			parameters[k] = defaults[k]
-		end
-	end
-	return parameters
+  if parameters == nil then
+    parameters = {}
+  end
+  for k, v in pairs(defaults) do
+    if parameters[k] == nil then
+      parameters[k] = defaults[k]
+    end
+  end
+  return parameters
 end
 
 local function parse_boolean(v)
-	if v == '1' or v == 'true' or v == 'TRUE' then
-		return true
-	elseif v == '0' or v == 'false' or v == 'FALSE' then
-		return false
-	else
-		return nil
-	end
+  if v == '1' or v == 'true' or v == 'TRUE' then
+    return true
+  elseif v == '0' or v == 'false' or v == 'FALSE' then
+    return false
+  else
+    return nil
+  end
 end
 
 local function toboolean(value) return value == 1 end
 
 local function sort_request(client, command, key, Params)
-	--[[ Params = {
-			by		= 'weight_*',
-			get	 = 'object_*',
-			limit = { 0, 10 },
-			sort	= 'desc',
-			alpha = true,
-	} ]]
-	local query = { key }
+  --[[ Params = {
+      by    = 'weight_*',
+      get   = 'object_*',
+      limit = { 0, 10 },
+      sort  = 'desc',
+      alpha = true,
+  } ]]
+  local query = { key }
 
-	if Params then
-		if Params.by then
-			table.insert(query, 'BY')
-			table.insert(query, Params.by)
-		end
+  if Params then
+    if Params.by then
+      table.insert(query, 'BY')
+      table.insert(query, Params.by)
+    end
 
-		if type(Params.limit) == 'table' then
-			-- TODO: check for lower and upper limits
-			table.insert(query, 'LIMIT')
-			table.insert(query, Params.limit[1])
-			table.insert(query, Params.limit[2])
-		end
+    if type(Params.limit) == 'table' then
+      -- TODO: check for lower and upper limits
+      table.insert(query, 'LIMIT')
+      table.insert(query, Params.limit[1])
+      table.insert(query, Params.limit[2])
+    end
 
-		if Params.get then
-			if (type(Params.get) == 'table') then
-				for _, getarg in pairs(Params.get) do
-					table.insert(query, 'GET')
-					table.insert(query, getarg)
-				end
-			else
-				table.insert(query, 'GET')
-				table.insert(query, Params.get)
-			end
-		end
+    if Params.get then
+      if (type(Params.get) == 'table') then
+        for _, getarg in pairs(Params.get) do
+          table.insert(query, 'GET')
+          table.insert(query, getarg)
+        end
+      else
+        table.insert(query, 'GET')
+        table.insert(query, Params.get)
+      end
+    end
 
-		if Params.sort then
-			table.insert(query, Params.sort)
-		end
+    if Params.sort then
+      table.insert(query, Params.sort)
+    end
 
-		if Params.alpha == true then
-			table.insert(query, 'ALPHA')
-		end
+    if Params.alpha == true then
+      table.insert(query, 'ALPHA')
+    end
 
-		if Params.store then
-			table.insert(query, 'STORE')
-			table.insert(query, Params.store)
-		end
-	end
+    if Params.store then
+      table.insert(query, 'STORE')
+      table.insert(query, Params.store)
+    end
+  end
 
-	request.multibulk(client, command, query)
+  request.multibulk(client, command, query)
 end
 
 local function zset_range_request(client, command, ...)
-	local args, opts = { ... }, {}
+  local args, opts = { ... }, {}
 
-	if #args >= 1 and type(args[#args]) == 'table' then
-		local options = table.remove(args, #args)
-		if options.withscores then
-			table.insert(opts, 'WITHSCORES')
-		end
-	end
+  if #args >= 1 and type(args[#args]) == 'table' then
+    local options = table.remove(args, #args)
+    if options.withscores then
+      table.insert(opts, 'WITHSCORES')
+    end
+  end
 
-	for _, v in pairs(opts) do table.insert(args, v) end
-	request.multibulk(client, command, args)
+  for _, v in pairs(opts) do table.insert(args, v) end
+  request.multibulk(client, command, args)
 end
 
 local function zset_range_byscore_request(client, command, ...)
-	local args, opts = { ... }, {}
+  local args, opts = { ... }, {}
 
-	if #args >= 1 and type(args[#args]) == 'table' then
-		local options = table.remove(args, #args)
-		if options.limit then
-			table.insert(opts, 'LIMIT')
-			table.insert(opts, options.limit.offset or options.limit[1])
-			table.insert(opts, options.limit.count or options.limit[2])
-		end
-		if options.withscores then
-			table.insert(opts, 'WITHSCORES')
-		end
-	end
+  if #args >= 1 and type(args[#args]) == 'table' then
+    local options = table.remove(args, #args)
+    if options.limit then
+      table.insert(opts, 'LIMIT')
+      table.insert(opts, options.limit.offset or options.limit[1])
+      table.insert(opts, options.limit.count or options.limit[2])
+    end
+    if options.withscores then
+      table.insert(opts, 'WITHSCORES')
+    end
+  end
 
-	for _, v in pairs(opts) do table.insert(args, v) end
-	request.multibulk(client, command, args)
+  for _, v in pairs(opts) do table.insert(args, v) end
+  request.multibulk(client, command, args)
 end
 
 local function zset_range_reply(reply, command, ...)
-	local args = { ... }
-	local opts = args[4]
-	if opts and (opts.withscores or string.lower(tostring(opts)) == 'withscores') then
-		local new_reply = {}
-		for i = 1, #reply, 2 do
-			table.insert(new_reply, { reply[i], reply[i + 1] })
-		end
-		return new_reply
-	else
-		return reply
-	end
+  local args = { ... }
+  local opts = args[4]
+  if opts and (opts.withscores or string.lower(tostring(opts)) == 'withscores') then
+    local new_reply = {}
+    for i = 1, #reply, 2 do
+      table.insert(new_reply, { reply[i], reply[i + 1] })
+    end
+    return new_reply
+  else
+    return reply
+  end
 end
 
 local function zset_store_request(client, command, ...)
-	local args, opts = { ... }, {}
+  local args, opts = { ... }, {}
 
-	if #args >= 1 and type(args[#args]) == 'table' then
-		local options = table.remove(args, #args)
-		if options.weights and type(options.weights) == 'table' then
-			table.insert(opts, 'WEIGHTS')
-			for _, weight in ipairs(options.weights) do
-				table.insert(opts, weight)
-			end
-		end
-		if options.aggregate then
-			table.insert(opts, 'AGGREGATE')
-			table.insert(opts, options.aggregate)
-		end
-	end
+  if #args >= 1 and type(args[#args]) == 'table' then
+    local options = table.remove(args, #args)
+    if options.weights and type(options.weights) == 'table' then
+      table.insert(opts, 'WEIGHTS')
+      for _, weight in ipairs(options.weights) do
+        table.insert(opts, weight)
+      end
+    end
+    if options.aggregate then
+      table.insert(opts, 'AGGREGATE')
+      table.insert(opts, options.aggregate)
+    end
+  end
 
-	for _, v in pairs(opts) do table.insert(args, v) end
-	request.multibulk(client, command, args)
+  for _, v in pairs(opts) do table.insert(args, v) end
+  request.multibulk(client, command, args)
 end
 
 local function mset_filter_args(client, command, ...)
-	local args, arguments = { ... }, {}
-	if (#args == 1 and type(args[1]) == 'table') then
-		for k, v in pairs(args[1]) do
-			table.insert(arguments, k)
-			table.insert(arguments, v)
-		end
-	else
-		arguments = args
-	end
-	request.multibulk(client, command, arguments)
+  local args, arguments = { ... }, {}
+  if (#args == 1 and type(args[1]) == 'table') then
+    for k, v in pairs(args[1]) do
+      table.insert(arguments, k)
+      table.insert(arguments, v)
+    end
+  else
+    arguments = args
+  end
+  request.multibulk(client, command, arguments)
 end
 
 local function hash_multi_request_builder(builder_callback)
-	return function(client, command, ...)
-		local args, arguments = { ... }, {}
-		if #args == 2 then
-			table.insert(arguments, args[1])
-			for k, v in pairs(args[2]) do
-				builder_callback(arguments, k, v)
-			end
-		else
-			arguments = args
-		end
-		request.multibulk(client, command, arguments)
-	end
+  return function(client, command, ...)
+    local args, arguments = { ... }, {}
+    if #args == 2 then
+      table.insert(arguments, args[1])
+      for k, v in pairs(args[2]) do
+        builder_callback(arguments, k, v)
+      end
+    else
+      arguments = args
+    end
+    request.multibulk(client, command, arguments)
+  end
 end
 
 local function parse_info(response)
-	local info = {}
-	local current = info
+  local info = {}
+  local current = info
 
-	response:gsub('([^\r\n]*)\r\n', function(kv)
-		if kv == '' then return end
+  response:gsub('([^\r\n]*)\r\n', function(kv)
+    if kv == '' then return end
 
-		local section = kv:match('^# (%w+)$')
-		if section then
-			current = {}
-			info[section:lower()] = current
-			return
-		end
+    local section = kv:match('^# (%w+)$')
+    if section then
+      current = {}
+      info[section:lower()] = current
+      return
+    end
 
-		local k, v = kv:match(('([^:]*):([^:]*)'):rep(1))
-		if k:match('db%d+') then
-			current[k] = {}
-			v:gsub(',', function(dbkv)
-				local dbk, dbv = kv:match('([^:]*)=([^:]*)')
-				current[k][dbk] = dbv
-			end)
-		else
-			current[k] = v
-		end
-	end)
+    local k, v = kv:match(('([^:]*):([^:]*)'):rep(1))
+    if k:match('db%d+') then
+      current[k] = {}
+      v:gsub(',', function(dbkv)
+        local dbk, dbv = kv:match('([^:]*)=([^:]*)')
+        current[k][dbk] = dbv
+      end)
+    else
+      current[k] = v
+    end
+  end)
 
-	return info
+  return info
 end
 
 local function scan_request(client, command, ...)
-	local args, req, Params = { ... }, {}, nil
+  local args, req, Params = { ... }, {}, nil
 
-	if command == 'SCAN' then
-		table.insert(req, args[1])
-		Params = args[2]
-	else
-		table.insert(req, args[1])
-		table.insert(req, args[2])
-		Params = args[3]
-	end
+  if command == 'SCAN' then
+    table.insert(req, args[1])
+    Params = args[2]
+  else
+    table.insert(req, args[1])
+    table.insert(req, args[2])
+    Params = args[3]
+  end
 
-	if Params and Params.match then
-		table.insert(req, 'MATCH')
-		table.insert(req, Params.match)
-	end
+  if Params and Params.match then
+    table.insert(req, 'MATCH')
+    table.insert(req, Params.match)
+  end
 
-	if Params and Params.count then
-		table.insert(req, 'COUNT')
-		table.insert(req, Params.count)
-	end
+  if Params and Params.count then
+    table.insert(req, 'COUNT')
+    table.insert(req, Params.count)
+  end
 
-	request.multibulk(client, command, req)
+  request.multibulk(client, command, req)
 end
 
 local zscan_response = function(reply, command, ...)
-	local original, new = reply[2], {}
-	for i = 1, #original, 2 do
-		table.insert(new, { original[i], tonumber(original[i + 1]) })
-	end
-	reply[2] = new
+  local original, new = reply[2], {}
+  for i = 1, #original, 2 do
+    table.insert(new, { original[i], tonumber(original[i + 1]) })
+  end
+  reply[2] = new
 
-	return reply
+  return reply
 end
 
 local hscan_response = function(reply, command, ...)
-	local original, new = reply[2], {}
-	for i = 1, #original, 2 do
-		new[original[i]] = original[i + 1]
-	end
-	reply[2] = new
+  local original, new = reply[2], {}
+  for i = 1, #original, 2 do
+    new[original[i]] = original[i + 1]
+  end
+  reply[2] = new
 
-	return reply
+  return reply
 end
 
 local function load_methods(proto, commands)
-	local client = setmetatable({}, getmetatable(proto))
+  local client = setmetatable({}, getmetatable(proto))
 
-	for cmd, fn in pairs(commands) do
-		if type(fn) ~= 'function' then
-			redis.error('invalid type for command ' .. cmd .. '(must be a function)')
-		end
-		client[cmd] = fn
-	end
+  for cmd, fn in pairs(commands) do
+    if type(fn) ~= 'function' then
+      redis.error('invalid type for command ' .. cmd .. '(must be a function)')
+    end
+    client[cmd] = fn
+  end
 
-	for i, v in pairs(proto) do
-		client[i] = v
-	end
+  for i, v in pairs(proto) do
+    client[i] = v
+  end
 
-	return client
+  return client
 end
 
 local function create_client(proto, client_socket, commands)
-	local client = load_methods(proto, commands)
-	client.error = redis.error
-	client.network = {
-		socket = client_socket,
-		read	 = network.read,
-		write	= network.write,
-	}
-	client.requests = {
-		multibulk = request.multibulk,
-	}
-	return client
+  local client = load_methods(proto, commands)
+  client.error = redis.error
+  client.network = {
+    socket = client_socket,
+    read   = network.read,
+    write  = network.write,
+  }
+  client.requests = {
+    multibulk = request.multibulk,
+  }
+  return client
 end
 
 -- ############################################################################
 
 function network.write(client, buffer)
-	local _, err = unix.send(client.network.socket, buffer)
-	if err then client.error(err) end
+  local _, err = unix.send(client.network.socket, buffer)
+  if err then client.error(err) end
 end
 
 function network.read(client, len)
-	if len == nil then len = '*l' end
-	local line, err = unix.recv(client.network.socket, tonumber(len))
-	if not err then return line else client.error('connection error: ' .. err) end
+  if len == nil then len = '*l' end
+  local line, err = unix.recv(client.network.socket, tonumber(len))
+  if not err then return line else client.error('connection error: ' .. err) end
 end
 
 -- ############################################################################
 
 function response.read(client)
-	local payload = client.network.read(client)
+  local payload = client.network.read(client)
   local prefix, data = payload:sub(1, - #payload), payload:sub(2)
   -- status reply
   if prefix == '+' then
-		if data == 'OK' then
-			return true
-		elseif data == 'QUEUED' then
-			return { queued = true }
-		else
-			return data
-		end
+    if data == 'OK' then
+      return true
+    elseif data == 'QUEUED' then
+      return { queued = true }
+    else
+      return data
+    end
 
-		-- error reply
-	elseif prefix == '-' then
-		return client.error('redis error: ' .. data)
+    -- error reply
+  elseif prefix == '-' then
+    return client.error('redis error: ' .. data)
 
-		-- integer reply
-	elseif prefix == ':' then
-		local number = tonumber(data)
+    -- integer reply
+  elseif prefix == ':' then
+    local number = tonumber(data)
 
-		if not number then
-			if data == 'nil' then
-				return nil
-			end
-			client.error('cannot parse ' .. data .. ' as a numeric response.')
-		end
+    if not number then
+      if data == 'nil' then
+        return nil
+      end
+      client.error('cannot parse ' .. data .. ' as a numeric response.')
+    end
 
-		return number
+    return number
 
-		-- bulk reply
-	elseif prefix == '$' then
-		local length = tonumber(data:match("^[^\n]*"))
+    -- bulk reply
+  elseif prefix == '$' then
+    local length = tonumber(data:match("^[^\n]*"))
     if not length then
-			client.error('cannot parse ' .. length .. ' as data length')
-		end
+      client.error('cannot parse ' .. length .. ' as data length')
+    end
 
-		if length == -1 then
-			return nil
-		end
+    if length == -1 then
+      return nil
+    end
 
     local nextchunk = data:gsub("^[^\n]*\n", "")-- .. client.network.read(client, length + 2)
 
-		return nextchunk:sub(1, -3)
+    return nextchunk:sub(1, -3)
 
-		-- multibulk reply
-	elseif prefix == '*' then
-		local count = tonumber(data)
+    -- multibulk reply
+  elseif prefix == '*' then
+    local count = tonumber(data)
 
-		if count == -1 then
-			return nil
-		end
+    if count == -1 then
+      return nil
+    end
 
-		local list = {}
-		if count > 0 then
-			local reader = response.read
-			for i = 1, count do
-				list[i] = reader(client)
-			end
-		end
-		return list
+    local list = {}
+    if count > 0 then
+      local reader = response.read
+      for i = 1, count do
+        list[i] = reader(client)
+      end
+    end
+    return list
 
-		-- unknown type of reply
-	else
-		return client.error('unknown response prefix: ' .. prefix)
-	end
+    -- unknown type of reply
+  else
+    return client.error('unknown response prefix: ' .. prefix)
+  end
 end
 
 -- ############################################################################
 
 function request.raw(client, buffer)
-	local bufferType = type(buffer)
+  local bufferType = type(buffer)
 
-	if bufferType == 'table' then
-		client.network.write(client, table.concat(buffer))
-	elseif bufferType == 'string' then
-		client.network.write(client, buffer)
-	else
-		client.error('argument error: ' .. bufferType)
-	end
+  if bufferType == 'table' then
+    client.network.write(client, table.concat(buffer))
+  elseif bufferType == 'string' then
+    client.network.write(client, buffer)
+  else
+    client.error('argument error: ' .. bufferType)
+  end
 end
 
 function request.multibulk(client, command, ...)
-	local args = { ... }
-	local argsn = #args
-	local buffer = { true, true }
+  local args = { ... }
+  local argsn = #args
+  local buffer = { true, true }
 
-	if argsn == 1 and type(args[1]) == 'table' then
-		argsn, args = #args[1], args[1]
-	end
+  if argsn == 1 and type(args[1]) == 'table' then
+    argsn, args = #args[1], args[1]
+  end
 
-	buffer[1] = '*' .. tostring(argsn + 1) .. "\r\n"
-	buffer[2] = '$' .. #command .. "\r\n" .. command .. "\r\n"
+  buffer[1] = '*' .. tostring(argsn + 1) .. "\r\n"
+  buffer[2] = '$' .. #command .. "\r\n" .. command .. "\r\n"
 
-	local table_insert = table.insert
-	for i = 1, argsn do
-		local s_argument = tostring(args[i] or '')
-		table_insert(buffer, '$' .. #s_argument .. "\r\n" .. s_argument .. "\r\n")
-	end
+  local table_insert = table.insert
+  for i = 1, argsn do
+    local s_argument = tostring(args[i] or '')
+    table_insert(buffer, '$' .. #s_argument .. "\r\n" .. s_argument .. "\r\n")
+  end
 
-	client.network.write(client, table.concat(buffer))
+  client.network.write(client, table.concat(buffer))
 end
 
 -- ############################################################################
 
 local function custom(command, send, parse)
-	command = string.upper(command)
-	return function(client, ...)
-		send(client, command, ...)
-		local reply = response.read(client)
+  command = string.upper(command)
+  return function(client, ...)
+    send(client, command, ...)
+    local reply = response.read(client)
 
-		if type(reply) == 'table' and reply.queued then
-			reply.parser = parse
-			return reply
-		else
-			if parse then
-				return parse(reply, command, ...)
-			end
-			return reply
-		end
-	end
+    if type(reply) == 'table' and reply.queued then
+      reply.parser = parse
+      return reply
+    else
+      if parse then
+        return parse(reply, command, ...)
+      end
+      return reply
+    end
+  end
 end
 
 local function command(command, opts)
-	if opts == nil or type(opts) == 'function' then
-		return custom(command, request.multibulk, opts)
-	else
-		return custom(command, opts.request or request.multibulk, opts.response)
-	end
+  if opts == nil or type(opts) == 'function' then
+    return custom(command, request.multibulk, opts)
+  else
+    return custom(command, opts.request or request.multibulk, opts.response)
+  end
 end
 
 local define_command_impl = function(target, name, opts)
-	local opts = opts or {}
-	target[string.lower(name)] = custom(
-		opts.command or string.upper(name),
-		opts.request or request.multibulk,
-		opts.response or nil
-	)
+  local opts = opts or {}
+  target[string.lower(name)] = custom(
+    opts.command or string.upper(name),
+    opts.request or request.multibulk,
+    opts.response or nil
+  )
 end
 
 local undefine_command_impl = function(target, name)
-	target[string.lower(name)] = nil
+  target[string.lower(name)] = nil
 end
 
 -- ############################################################################
@@ -460,195 +460,195 @@ end
 local client_prototype = {}
 
 client_prototype.raw_cmd = function(client, buffer)
-	request.raw(client, buffer .. "\r\n")
-	return response.read(client)
+  request.raw(client, buffer .. "\r\n")
+  return response.read(client)
 end
 
 -- obsolete
 client_prototype.define_command = function(client, name, opts)
-	define_command_impl(client, name, opts)
+  define_command_impl(client, name, opts)
 end
 
 -- obsolete
 client_prototype.undefine_command = function(client, name)
-	undefine_command_impl(client, name)
+  undefine_command_impl(client, name)
 end
 
 client_prototype.quit = function(client)
-	request.multibulk(client, 'QUIT')
-	unix.close(client.network.socket)
-	return true
+  request.multibulk(client, 'QUIT')
+  unix.close(client.network.socket)
+  return true
 end
 
 client_prototype.shutdown = function(client)
-	request.multibulk(client, 'SHUTDOWN')
-	unix.close(client.network.socket)
+  request.multibulk(client, 'SHUTDOWN')
+  unix.close(client.network.socket)
 end
 
 -- Command pipelining
 
 client_prototype.pipeline = function(client, block)
-	local requests, replies, parsers = {}, {}, {}
-	local table_insert = table.insert
-	local socket_write, socket_read = client.network.write, client.network.read
+  local requests, replies, parsers = {}, {}, {}
+  local table_insert = table.insert
+  local socket_write, socket_read = client.network.write, client.network.read
 
-	client.network.write = function(_, buffer)
-		table_insert(requests, buffer)
-	end
+  client.network.write = function(_, buffer)
+    table_insert(requests, buffer)
+  end
 
-	-- TODO: this hack is necessary to temporarily reuse the current
-	--			 request -> response handling implementation of redis-lua
-	--			 without further changes in the code, but it will surely
-	--			 disappear when the new command-definition infrastructure
-	--			 will finally be in place.
-	client.network.read = function() return '+QUEUED' end
+  -- TODO: this hack is necessary to temporarily reuse the current
+  --       request -> response handling implementation of redis-lua
+  --       without further changes in the code, but it will surely
+  --       disappear when the new command-definition infrastructure
+  --       will finally be in place.
+  client.network.read = function() return '+QUEUED' end
 
-	local pipeline = setmetatable({}, {
-		__index = function(env, name)
-			local cmd = client[name]
-			if not cmd then
-				client.error('unknown redis command: ' .. name, 2)
-			end
-			return function(self, ...)
-				local reply = cmd(client, ...)
-				table_insert(parsers, #requests, reply.parser)
-				return reply
-			end
-		end
-	})
+  local pipeline = setmetatable({}, {
+    __index = function(env, name)
+      local cmd = client[name]
+      if not cmd then
+        client.error('unknown redis command: ' .. name, 2)
+      end
+      return function(self, ...)
+        local reply = cmd(client, ...)
+        table_insert(parsers, #requests, reply.parser)
+        return reply
+      end
+    end
+  })
 
-	local success, retval = pcall(block, pipeline)
+  local success, retval = pcall(block, pipeline)
 
-	client.network.write, client.network.read = socket_write, socket_read
-	if not success then client.error(retval, 0) end
+  client.network.write, client.network.read = socket_write, socket_read
+  if not success then client.error(retval, 0) end
 
-	client.network.write(client, table.concat(requests, ''))
+  client.network.write(client, table.concat(requests, ''))
 
-	for i = 1, #requests do
-		local reply, parser = response.read(client), parsers[i]
-		if parser then
-			reply = parser(reply)
-		end
-		table_insert(replies, i, reply)
-	end
+  for i = 1, #requests do
+    local reply, parser = response.read(client), parsers[i]
+    if parser then
+      reply = parser(reply)
+    end
+    table_insert(replies, i, reply)
+  end
 
-	return replies, #requests
+  return replies, #requests
 end
 
 -- Publish/Subscribe
 
 do
-	local channels = function(channels)
-		if type(channels) == 'string' then
-			channels = { channels }
-		end
-		return channels
-	end
+  local channels = function(channels)
+    if type(channels) == 'string' then
+      channels = { channels }
+    end
+    return channels
+  end
 
-	local subscribe = function(client, ...)
-		request.multibulk(client, 'subscribe', ...)
-	end
-	local psubscribe = function(client, ...)
-		request.multibulk(client, 'psubscribe', ...)
-	end
-	local unsubscribe = function(client, ...)
-		request.multibulk(client, 'unsubscribe')
-	end
-	local punsubscribe = function(client, ...)
-		request.multibulk(client, 'punsubscribe')
-	end
+  local subscribe = function(client, ...)
+    request.multibulk(client, 'subscribe', ...)
+  end
+  local psubscribe = function(client, ...)
+    request.multibulk(client, 'psubscribe', ...)
+  end
+  local unsubscribe = function(client, ...)
+    request.multibulk(client, 'unsubscribe')
+  end
+  local punsubscribe = function(client, ...)
+    request.multibulk(client, 'punsubscribe')
+  end
 
-	local consumer_loop = function(client)
-		local aborting, subscriptions = false, 0
+  local consumer_loop = function(client)
+    local aborting, subscriptions = false, 0
 
-		local abort = function()
-			if not aborting then
-				unsubscribe(client)
-				punsubscribe(client)
-				aborting = true
-			end
-		end
+    local abort = function()
+      if not aborting then
+        unsubscribe(client)
+        punsubscribe(client)
+        aborting = true
+      end
+    end
 
-		return coroutine.wrap(function()
-			while true do
-				local message
-				local response = response.read(client)
+    return coroutine.wrap(function()
+      while true do
+        local message
+        local response = response.read(client)
 
-				if response[1] == 'pmessage' then
-					message = {
-						kind		= response[1],
-						pattern = response[2],
-						channel = response[3],
-						payload = response[4],
-					}
-				else
-					message = {
-						kind		= response[1],
-						channel = response[2],
-						payload = response[3],
-					}
-				end
+        if response[1] == 'pmessage' then
+          message = {
+            kind    = response[1],
+            pattern = response[2],
+            channel = response[3],
+            payload = response[4],
+          }
+        else
+          message = {
+            kind    = response[1],
+            channel = response[2],
+            payload = response[3],
+          }
+        end
 
-				if string.match(message.kind, '^p?subscribe$') then
-					subscriptions = subscriptions + 1
-				end
-				if string.match(message.kind, '^p?unsubscribe$') then
-					subscriptions = subscriptions - 1
-				end
+        if string.match(message.kind, '^p?subscribe$') then
+          subscriptions = subscriptions + 1
+        end
+        if string.match(message.kind, '^p?unsubscribe$') then
+          subscriptions = subscriptions - 1
+        end
 
-				if aborting and subscriptions == 0 then
-					break
-				end
-				coroutine.yield(message, abort)
-			end
-		end)
-	end
+        if aborting and subscriptions == 0 then
+          break
+        end
+        coroutine.yield(message, abort)
+      end
+    end)
+  end
 
-	client_prototype.pubsub = function(client, subscriptions)
-		if type(subscriptions) == 'table' then
-			if subscriptions.subscribe then
-				subscribe(client, channels(subscriptions.subscribe))
-			end
-			if subscriptions.psubscribe then
-				psubscribe(client, channels(subscriptions.psubscribe))
-			end
-		end
-		return consumer_loop(client)
-	end
+  client_prototype.pubsub = function(client, subscriptions)
+    if type(subscriptions) == 'table' then
+      if subscriptions.subscribe then
+        subscribe(client, channels(subscriptions.subscribe))
+      end
+      if subscriptions.psubscribe then
+        psubscribe(client, channels(subscriptions.psubscribe))
+      end
+    end
+    return consumer_loop(client)
+  end
 end
 
 -- Redis transactions (MULTI/EXEC)
 
 do
-	local function identity(...) return ... end
-	local emptytable = {}
+  local function identity(...) return ... end
+  local emptytable = {}
 
-	local function initialize_transaction(client, options, block, queued_parsers)
-		local table_insert = table.insert
-		local coro = coroutine.create(block)
+  local function initialize_transaction(client, options, block, queued_parsers)
+    local table_insert = table.insert
+    local coro = coroutine.create(block)
 
-		if options.watch then
-			local watch_keys = {}
-			for _, key in pairs(options.watch) do
-				table_insert(watch_keys, key)
-			end
-			if #watch_keys > 0 then
-				client:watch(unpack(watch_keys))
-			end
-		end
+    if options.watch then
+      local watch_keys = {}
+      for _, key in pairs(options.watch) do
+        table_insert(watch_keys, key)
+      end
+      if #watch_keys > 0 then
+        client:watch(unpack(watch_keys))
+      end
+    end
 
-		local transaction_client					 = setmetatable({}, { __index = client })
-		transaction_client.exec						= function(...)
-			client.error('cannot use EXEC inside a transaction block')
-		end
-		transaction_client.multi					 = function(...)
-			coroutine.yield()
-		end
-		transaction_client.commands_queued = function()
-			return #queued_parsers
-		end
+    local transaction_client           = setmetatable({}, { __index = client })
+    transaction_client.exec            = function(...)
+      client.error('cannot use EXEC inside a transaction block')
+    end
+    transaction_client.multi           = function(...)
+      coroutine.yield()
+    end
+    transaction_client.commands_queued = function()
+      return #queued_parsers
+    end
 
-	  assert(coroutine.resume(coro, transaction_client))
+    assert(coroutine.resume(coro, transaction_client))
 
     transaction_client.multi = nil
     transaction_client.discard = function(...)

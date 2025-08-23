@@ -1,23 +1,23 @@
 {
-	"development": [
-		{
-			"name": "primary",
-			"engine": "sqlite",
-			"db_name": "db_dev"
-		}
-	],
-	"production": [
-		{
-			"name": "primary",
-			"engine": "sqlite",
-			"db_name": "db_prod"
-		}
-	],
-	"test": [
-		{
-			"name": "primary",
-			"engine": "sqlite",
-			"db_name": "db_test"
-		}
-	]
+  "development": [
+    {
+      "name": "primary",
+      "engine": "sqlite",
+      "db_name": "db_dev"
+    }
+  ],
+  "production": [
+    {
+      "name": "primary",
+      "engine": "sqlite",
+      "db_name": "db_prod"
+    }
+  ],
+  "test": [
+    {
+      "name": "primary",
+      "engine": "sqlite",
+      "db_name": "db_test"
+    }
+  ]
 }

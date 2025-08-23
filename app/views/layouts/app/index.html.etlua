@@ -1,84 +1,84 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title><%= title or "[Lua on Beans] micro MVC framework for redbean.dev & arangodb" %></title>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="description" content="a New MVC framework based on redbean.dev and arangoDB" />
-	<link rel="stylesheet" href="<%= PublicPath("/app.css") %>" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
-	<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <meta charset="UTF-8">
+  <title><%= title or "[Lua on Beans] micro MVC framework for redbean.dev & arangodb" %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="a New MVC framework based on redbean.dev and arangoDB" />
+  <link rel="stylesheet" href="<%= PublicPath("/app.css") %>" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 
 <style>
-	.starfield {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: -1;
-		overflow: hidden;
+  .starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
 
-	}
+  }
 
-	.star {
-		position: absolute;
-		background-color: #fff;
-		width: 8px;
-		height: 8px;
-		opacity: 0;
-		border-radius: 50%;
-		animation: starTravel 5s linear infinite;
-	}
+  .star {
+    position: absolute;
+    background-color: #fff;
+    width: 8px;
+    height: 8px;
+    opacity: 0;
+    border-radius: 50%;
+    animation: starTravel 5s linear infinite;
+  }
 
-	@keyframes starTravel {
-		0% {
-			transform: translateZ(0) scale(0.1);
-			opacity: 0;
-		}
-		10% {
-			opacity: 1;
-		}
-		100% {
-			transform: translateZ(1000px) scale(1);
-			opacity: 0;
-		}
-	}
+  @keyframes starTravel {
+    0% {
+      transform: translateZ(0) scale(0.1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateZ(1000px) scale(1);
+      opacity: 0;
+    }
+  }
 </style>
 
 <div class="starfield"></div>
 
 <script>
-	document.addEventListener('DOMContentLoaded', function() {
-		const starfield = document.querySelector('.starfield');
-		let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-		const numStars = vw * 100 / 600; // Increased number of stars
-		for (let i = 0; i < numStars; i++) {
-			const star = document.createElement('div');
-			star.classList.add('star');
-			star.style.left = `${Math.random() * 100}%`;
-			star.style.top = `${Math.random() * 100}%`;
-			star.style.animationDuration = `${Math.random() * 3 + 2}s`; // Varied animation duration
-			star.style.animationDelay = `${Math.random() * 5}s`;
-			starfield.appendChild(star);
-		}
-	});
+  document.addEventListener('DOMContentLoaded', function() {
+    const starfield = document.querySelector('.starfield');
+    let vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+    const numStars = vw * 100 / 600; // Increased number of stars
+    for (let i = 0; i < numStars; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.top = `${Math.random() * 100}%`;
+      star.style.animationDuration = `${Math.random() * 3 + 2}s`; // Varied animation duration
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      starfield.appendChild(star);
+    }
+  });
 </script>
 
 
 <body class="min-h-screen flex flex-col">
-	<div class="container mx-auto">
-		<%- Partial("header") %>
-		<div class="grow mb-10 bg-white shadow rounded p-5 text-black">
-		<div class="grid grid-cols-12 gap-4">@yield</div>
-		</div>
-		<%- Partial("footer") %>
-	</div>
+  <div class="container mx-auto">
+    <%- Partial("header") %>
+    <div class="grow mb-10 bg-white shadow rounded p-5 text-black">
+    <div class="grid grid-cols-12 gap-4">@yield</div>
+    </div>
+    <%- Partial("footer") %>
+  </div>
 </body>
 </html>

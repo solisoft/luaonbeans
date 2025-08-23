@@ -1,9 +1,9 @@
 <div class="col-span-12 container mx-auto py-10 px-2">
-	<h1>Error <%= Params.status %></h1>
+  <h1>Error <%= Params.status %></h1>
 
-	<p><%= Params.message %></p>
+  <p><%= Params.message %></p>
 
-	<% if Params.env == "development" then %>
-	<pre><code><%= Params.details %></code></pre>
-	<% end %>
+  <% if Params.env == "development" then %>
+  <pre><code><%= Params.details %></code></pre>
+  <% end %>
 </div>

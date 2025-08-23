@@ -5,8 +5,8 @@ Customer.__index = Customer
 Customer.COLLECTION = "customers"
 
 function Customer.new(data)
-	local self = setmetatable(model.new(data), Customer)
-	return self
+  local self = setmetatable(model.new(data), Customer)
+  return self
 end
 
 return Customer

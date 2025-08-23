@@ -39,7 +39,7 @@ function PDFGenerator.new(options)
         objects = {},
         current_page = 0,
         current_page_obj = nil,
-        page_list = {},	-- Array to store page objects
+        page_list = {},  -- Array to store page objects
         pages_obj = nil, -- Object number for pages tree
         images = {},
         contents = {},
@@ -101,8 +101,8 @@ end
 
 -- Start a new page
 function PDFGenerator:addPage(width, height)
-    width = width or 595		-- Default A4 width in points
-    height = height or 842	-- Default A4 height in points
+    width = width or 595    -- Default A4 width in points
+    height = height or 842  -- Default A4 height in points
 
     local pageObj = getNewObjNum()
     local contentObj = getNewObjNum()
@@ -445,8 +445,8 @@ end
 function PDFGenerator:addText(text, fontSize, color, alignment, width)
     width = width or self.page_width
     fontSize = fontSize or 12
-    color = color or "000"	-- default black
-    alignment = alignment or "justify"	-- default left alignment
+    color = color or "000"  -- default black
+    alignment = alignment or "justify"  -- default left alignment
     color = PDFGenerator:hexToRGB(color)
 
     local content = self.contents[self.current_page_obj]
@@ -467,9 +467,9 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
     end
 
     -- For justified text, we need to calculate word spacing
-    if alignment == "justify"	then
-            local spaces = text:gsub("[^ ]", ""):len()	-- Count spaces
-            local words = select(2, text:gsub("%S+", "")) + 1	-- Count words
+    if alignment == "justify"  then
+            local spaces = text:gsub("[^ ]", ""):len()  -- Count spaces
+            local words = select(2, text:gsub("%S+", "")) + 1  -- Count words
             local available_width = self.page_width - self.margin_x[1] - self.margin_x[2]
             local extra_space = available_width - text_width
             local word_spacing = extra_space / spaces
@@ -483,7 +483,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
                     numberToString(color[1]),
                     numberToString(color[2]),
                     numberToString(color[3]),
-                    numberToString(word_spacing),	-- Set word spacing using Tw operator
+                    numberToString(word_spacing),  -- Set word spacing using Tw operator
                     numberToString(x_pos),
                     numberToString(self.currentYPos(self)),
                     self:escapePdfText(text)
@@ -493,8 +493,8 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 
     -- For left, center, and right alignment
     -- Check if text width exceeds available space for left/right alignment
-	content.stream = content.stream .. string.format(
-	      "BT\n/%s %s Tf\n%s %s %s rg\n0 Tw\n%s %s Td\n(%s) Tj\nET\n",
+  content.stream = content.stream .. string.format(
+        "BT\n/%s %s Tf\n%s %s %s rg\n0 Tw\n%s %s Td\n(%s) Tj\nET\n",
         fontName,
         numberToString(fontSize),
         numberToString(color[1]),

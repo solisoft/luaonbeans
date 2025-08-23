@@ -1,43 +1,43 @@
 <% component.items = component.items or {} %>
 <div class="col-span-12">
-	<div class="border-t border-x border-gray-300 rounded-t-md p-4">
-		<div class="flex items-center gap-2 align-middle">
-			<div class="material-icons-outlined md-48">
-				paid
-			</div>
-			<div class="flex flex-col">
-				<div class=" text-gray-500 text-2xl">
-					<%= component.title %>
-				</div>
-				<div class=" text-gray-500 text-sm">
-					<%= component.comment %>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div class="border-t border-x border-gray-300 rounded-t-md p-4">
+    <div class="flex items-center gap-2 align-middle">
+      <div class="material-icons-outlined md-48">
+        paid
+      </div>
+      <div class="flex flex-col">
+        <div class=" text-gray-500 text-2xl">
+          <%= component.title %>
+        </div>
+        <div class=" text-gray-500 text-sm">
+          <%= component.comment %>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	<div class="border border-gray-300 rounded-b-md p-4	shadow-md">
-			<div class="grid grid-cols-<%= #component.items %> gap-4">
-			<% for i, item in ipairs(component.items) do %>
-				<div class="flex flex-col">
-					<div class=" text-gray-500 text-lg uppercase">
-						<%= item.title %>
-					</div>
-					<div class="flex">
-						<div class="text-xl flex items-center gap-2 <% if item.color then %> text-<%= item.color %>-600 bg-<%= item.color %>-200 rounded-md px-4 py-1<% end %>">
-							<% if item.icon then %>
-								<div class="material-icons-outlined">
-									<%= item.icon %>
-								</div>
-							<% end %>
-							<%= item.value %>
-						</div>
-					</div>
-					<div class=" text-gray-500 text-sm">
-						<%= item.comment %>
-					</div>
-				</div>
-			<% end %>
-		</div>
-	</div>
+  <div class="border border-gray-300 rounded-b-md p-4  shadow-md">
+      <div class="grid grid-cols-<%= #component.items %> gap-4">
+      <% for i, item in ipairs(component.items) do %>
+        <div class="flex flex-col">
+          <div class=" text-gray-500 text-lg uppercase">
+            <%= item.title %>
+          </div>
+          <div class="flex">
+            <div class="text-xl flex items-center gap-2 <% if item.color then %> text-<%= item.color %>-600 bg-<%= item.color %>-200 rounded-md px-4 py-1<% end %>">
+              <% if item.icon then %>
+                <div class="material-icons-outlined">
+                  <%= item.icon %>
+                </div>
+              <% end %>
+              <%= item.value %>
+            </div>
+          </div>
+          <div class=" text-gray-500 text-sm">
+            <%= item.comment %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>

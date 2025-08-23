@@ -1,15 +1,15 @@
 <% component.width = component.width or {4, 6, 12} %>
 <div class="lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
-	<button
-		class="w-full px-4 py-2 font-bold text-white bg-<%= component.color or "blue" %>-500 rounded hover:bg-<%= component.color or "blue" %>-700 focus:outline-none focus:shadow-outline"
-		type="<%= component.type or "button" %>"
-		<%= component.disabled and "disabled" or "" %>
-	>
-		<% if component.icon then %>
-			<span class="material-icons-outlined mr-2 align-middle">
-				<%= component.icon %>
-			</span>
-		<% end %>
-		<%= component.title or "Button" %>
-	</button>
+  <button
+    class="w-full px-4 py-2 font-bold text-white bg-<%= component.color or "blue" %>-500 rounded hover:bg-<%= component.color or "blue" %>-700 focus:outline-none focus:shadow-outline"
+    type="<%= component.type or "button" %>"
+    <%= component.disabled and "disabled" or "" %>
+  >
+    <% if component.icon then %>
+      <span class="material-icons-outlined mr-2 align-middle">
+        <%= component.icon %>
+      </span>
+    <% end %>
+    <%= component.title or "Button" %>
+  </button>
 </div>

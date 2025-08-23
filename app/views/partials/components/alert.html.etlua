@@ -1,14 +1,14 @@
 <% component.width = component.width or {4, 6, 12} %>
 <div class="flex item-center bg-<%= component.color or "red" %>-50 border-<%= component.color or "red" %>-600 text-<%= component.color or "red" %>-900 border-l-8 lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
-	<div class="p-4 flex items-center gap-4 align-middle">
-		<% if component.icon then %>
-			<span class="material-icons-outlined md-48">
-				<%= component.icon %>
-			</span>
-		<% end %>
-		<div class="flex-1">
-			<% if component.title then %> <h2 class="font-bold text-2xl"><%= component.title %></h2> <% end %>
-			<% if component.description then %> <p><%= component.description %></p> <% end %>
-		</div>
-	</div>
+  <div class="p-4 flex items-center gap-4 align-middle">
+    <% if component.icon then %>
+      <span class="material-icons-outlined md-48">
+        <%= component.icon %>
+      </span>
+    <% end %>
+    <div class="flex-1">
+      <% if component.title then %> <h2 class="font-bold text-2xl"><%= component.title %></h2> <% end %>
+      <% if component.description then %> <p><%= component.description %></p> <% end %>
+    </div>
+  </div>
 </div>

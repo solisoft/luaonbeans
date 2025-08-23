@@ -1,11 +1,11 @@
 <div class="flex item-center col-span-12">
 
-	<div class="flex items-center gap-2">
-		<% for i, item in pairs(component.items) do %>
-			<a href="<%= item.url %>" class="text-blue-500 hover:text-blue-700"><%= item.label %></a>
-			<% if i < #component.items then %>
-				<span class="text-gray-500">&gt;</span>
-			<% end %>
-		<% end %>
-	</div>
+  <div class="flex items-center gap-2">
+    <% for i, item in pairs(component.items) do %>
+      <a href="<%= item.url %>" class="text-blue-500 hover:text-blue-700"><%= item.label %></a>
+      <% if i < #component.items then %>
+        <span class="text-gray-500">&gt;</span>
+      <% end %>
+    <% end %>
+  </div>
 </div>

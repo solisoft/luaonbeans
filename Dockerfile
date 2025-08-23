@@ -8,10 +8,10 @@ COPY . /assets/
 ARG REDBEAN_URL='https://cosmo.zip/pub/cosmos/bin/redbean'
 ADD --chmod=777 https://cosmo.zip/pub/cosmos/bin/assimilate-x86_64.elf /assimilate
 RUN apk add zip \
-	&& wget -O /redbean.com ${REDBEAN_URL} \
-	&& cd /assets \
-	&& zip -r -X /redbean.com * \
-	&& /assimilate /redbean.com
+  && wget -O /redbean.com ${REDBEAN_URL} \
+  && cd /assets \
+  && zip -r -X /redbean.com * \
+  && /assimilate /redbean.com
 
 FROM scratch
 WORKDIR /

@@ -1,32 +1,32 @@
 {
-	"development": [
-		{
-			"name": "primary",
-			"engine": "surrealdb",
-			"db_name": "luaonbeans_dev",
-			"url": "http://127.0.0.1:8529",
-			"username": "root",
-			"password": "password"
-		}
-	],
-	"production": [
-		{
-			"name": "primary",
-			"engine": "surrealdb",
-			"db_name": "luaonbeans_prod",
-			"url": "http://127.0.0.1:8529",
-			"username": "root",
-			"password": "password"
-		}
-	],
-	"test": [
-		{
-			"name": "primary",
-			"engine": "surrealdb",
-			"db_name": "luaonbeans_dev",
-			"url": "http://127.0.0.1:8529",
-			"username": "root",
-			"password": "password"
-		}
-	]
+  "development": [
+    {
+      "name": "primary",
+      "engine": "surrealdb",
+      "db_name": "luaonbeans_dev",
+      "url": "http://127.0.0.1:8529",
+      "username": "root",
+      "password": "password"
+    }
+  ],
+  "production": [
+    {
+      "name": "primary",
+      "engine": "surrealdb",
+      "db_name": "luaonbeans_prod",
+      "url": "http://127.0.0.1:8529",
+      "username": "root",
+      "password": "password"
+    }
+  ],
+  "test": [
+    {
+      "name": "primary",
+      "engine": "surrealdb",
+      "db_name": "luaonbeans_dev",
+      "url": "http://127.0.0.1:8529",
+      "username": "root",
+      "password": "password"
+    }
+  ]
 }

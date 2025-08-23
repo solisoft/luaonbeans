@@ -1,38 +1,38 @@
 {
-	"system": {
-		"db_name": "_system",
-		"url": "http://127.0.0.1:8529",
-		"username": "root",
-		"password": "password"
-	},
-	"development": [
-		{
-			"name": "primary",
-			"engine": "arangodb",
-			"db_name": "luaonbeans_dev",
-			"url": "http://127.0.0.1:8529",
-			"username": "root",
-			"password": "password"
-		}
-	],
-	"production": [
-		{
-			"name": "primary",
-			"engine": "arangodb",
-			"db_name": "luaonbeans_dev",
-			"url": "http://127.0.0.1:8529",
-			"username": "root",
-			"password": "password"
-		}
-	],
-	"test": [
-		{
-			"name": "primary",
-			"engine": "arangodb",
-			"db_name": "luaonbeans_test",
-			"url": "http://127.0.0.1:8529",
-			"username": "root",
-			"password": "password"
-		}
-	]
+  "system": {
+    "db_name": "_system",
+    "url": "http://127.0.0.1:8529",
+    "username": "root",
+    "password": "password"
+  },
+  "development": [
+    {
+      "name": "primary",
+      "engine": "arangodb",
+      "db_name": "luaonbeans_dev",
+      "url": "http://127.0.0.1:8529",
+      "username": "root",
+      "password": "password"
+    }
+  ],
+  "production": [
+    {
+      "name": "primary",
+      "engine": "arangodb",
+      "db_name": "luaonbeans_dev",
+      "url": "http://127.0.0.1:8529",
+      "username": "root",
+      "password": "password"
+    }
+  ],
+  "test": [
+    {
+      "name": "primary",
+      "engine": "arangodb",
+      "db_name": "luaonbeans_test",
+      "url": "http://127.0.0.1:8529",
+      "username": "root",
+      "password": "password"
+    }
+  ]
 }

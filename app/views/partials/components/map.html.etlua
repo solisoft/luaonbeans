@@ -1,25 +1,25 @@
 <% component.width = component.width or {4, 6, 12} %>
 <% id = UuidV4() %>
 <div class="flex flex-col gap-4 item-center lg:col-span-<%= component.width[1] or 4 %> md:col-span-<%= component.width[2] or 6 %> col-span-<%= component.width[3] or 12%>">
-	<% if component.title then %>
-		<h1 class="text-2xl text-center font-bold"><%= component.title %></h1>
-	<% end %>
-	<div id="map_<%= id %>" class="w-full" style="height: <%= component.height or 250 %>px"></div>
+  <% if component.title then %>
+    <h1 class="text-2xl text-center font-bold"><%= component.title %></h1>
+  <% end %>
+  <div id="map_<%= id %>" class="w-full" style="height: <%= component.height or 250 %>px"></div>
 </div>
 <script>
-	window["map_<%= id %>"] = L.map('map_<%= id %>').setView([<%= component.latitude or 51.505 %>, <%= component.longitude or -0.09 %>], <%= component.zoom or 13 %>);
+  window["map_<%= id %>"] = L.map('map_<%= id %>').setView([<%= component.latitude or 51.505 %>, <%= component.longitude or -0.09 %>], <%= component.zoom or 13 %>);
 
-	L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-	}).addTo(window["map_<%= id %>"]);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(window["map_<%= id %>"]);
 
-	<% if component.markers then %>
-		<% for i, marker in pairs(component.markers) do %>
-			window["marker_<%= id %>_" + <%= i %>] = L.marker([<%= marker.latitude %>, <%= marker.longitude %>]);
-			window["marker_<%= id %>_" + <%= i %>].addTo(window["map_<%= id %>"]);
-			<% if marker.content then %>
-				window["marker_<%= id %>_" + <%= i %>].on("click", () => window["marker_<%= id %>_" + <%= i %>].bindPopup("<%= marker.content %>").openPopup());
-			<% end %>
-		<% end %>
-	<% end %>
+  <% if component.markers then %>
+    <% for i, marker in pairs(component.markers) do %>
+      window["marker_<%= id %>_" + <%= i %>] = L.marker([<%= marker.latitude %>, <%= marker.longitude %>]);
+      window["marker_<%= id %>_" + <%= i %>].addTo(window["map_<%= id %>"]);
+      <% if marker.content then %>
+        window["marker_<%= id %>_" + <%= i %>].on("click", () => window["marker_<%= id %>_" + <%= i %>].bindPopup("<%= marker.content %>").openPopup());
+      <% end %>
+    <% end %>
+  <% end %>
 </script>

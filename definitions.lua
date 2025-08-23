@@ -6,405 +6,405 @@ error("Tried to evaluate definition file.")
 
 SYNOPSIS
 
-	redbean [-?BVabdfghjkmsuvz] [-p PORT] [-D DIR] [-- SCRIPTARGS...]
+  redbean [-?BVabdfghjkmsuvz] [-p PORT] [-D DIR] [-- SCRIPTARGS...]
 
 DESCRIPTION
 
-	redbean - single-file distributable web server
+  redbean - single-file distributable web server
 
 OVERVIEW
 
-	redbean makes it possible to share web applications that run offline
-	as a single-file Actually Portable Executable PKZIP archive which
-	contains your assets.
+  redbean makes it possible to share web applications that run offline
+  as a single-file Actually Portable Executable PKZIP archive which
+  contains your assets.
 
-	redbean can serve 1 million+ gzip encoded responses per second on a
-	cheap personal computer. That performance is thanks to zip and gzip
-	using the same compression format, which enables kernelspace copies.
-	Another reason redbean goes fast is that it's a tiny static binary,
-	which makes fork memory paging nearly free.
+  redbean can serve 1 million+ gzip encoded responses per second on a
+  cheap personal computer. That performance is thanks to zip and gzip
+  using the same compression format, which enables kernelspace copies.
+  Another reason redbean goes fast is that it's a tiny static binary,
+  which makes fork memory paging nearly free.
 
-	redbean is also easy to modify to suit your own needs. The program
-	itself is written as a single .c file. It embeds the Lua programming
-	language and SQLite which let you write dynamic pages.
+  redbean is also easy to modify to suit your own needs. The program
+  itself is written as a single .c file. It embeds the Lua programming
+  language and SQLite which let you write dynamic pages.
 
 FEATURES
 
-	- Lua v5.4
-	- SQLite 3.35.5
-	- TLS v1.2 / v1.1 / v1.0
-	- HTTP v1.1 / v1.0 / v0.9
-	- Chromium-Zlib Compression
-	- Statusz Monitoring Statistics
-	- Self-Modifying PKZIP Object Store
-	- Linux + Windows + Mac + FreeBSD + OpenBSD + NetBSD
+  - Lua v5.4
+  - SQLite 3.35.5
+  - TLS v1.2 / v1.1 / v1.0
+  - HTTP v1.1 / v1.0 / v0.9
+  - Chromium-Zlib Compression
+  - Statusz Monitoring Statistics
+  - Self-Modifying PKZIP Object Store
+  - Linux + Windows + Mac + FreeBSD + OpenBSD + NetBSD
 
 FLAGS
 
-	-h or -?	help
-	-d				daemonize
-	-u				uniprocess
-	-z				print port
-	-m				log messages
-	-i				interpreter mode
-	-b				log message bodies
-	-a				log resource usage
-	-g				log handler latency
-	-E				show crash reports to public ips
-	-j				enable ssl client verify
-	-k				disable ssl fetch verify
-	-Z				log worker system calls
-	-f				log worker function calls
-	-B				only use stronger cryptography
-	-X				disable ssl server and client support
-	-*				permit self-modification of executable
-	-J				disable non-ssl server and client support
-	-%				hasten startup by not generating an rsa key
-	-s				increase silence									[repeatable]
-	-v				increase verbosity								[repeatable]
-	-V				increase ssl verbosity						[repeatable]
-	-S				increase pledge sandboxing				[repeatable]
-	-e CODE	 eval Lua code in arg							[repeatable]
-	-F PATH	 eval Lua code in file						 [repeatable]
-	-H K:V		sets http header globally				 [repeatable]
-	-D DIR		overlay assets in local directory [repeatable]
-	-r /X=/Y	redirect X to Y									 [repeatable]
-	-R /X=/Y	rewrites X to Y									 [repeatable]
-	-K PATH	 tls private key path							[repeatable]
-	-C PATH	 tls certificate(s) path					 [repeatable]
-	-A PATH	 add assets with path (recursive)	[repeatable]
-	-M INT		tunes max message payload size		[def. 65536]
-	-t INT		timeout ms or keepalive sec if <0 [def. 60000]
-	-p PORT	 listen port											 [def. 8080; repeatable]
-	-l ADDR	 listen addr											 [def. 0.0.0.0; repeatable]
-	-c SEC		configures static cache-control
-	-W TTY		use tty path to monitor memory pages
-	-L PATH	 log file location
-	-P PATH	 pid file location
-	-U INT		daemon set user id
-	-G INT		daemon set group id
-	-w PATH	 launch browser on startup
-	--strace	enables system call tracing (see also -Z)
-	--ftrace	enables function call tracing (see also -f)
+  -h or -?  help
+  -d        daemonize
+  -u        uniprocess
+  -z        print port
+  -m        log messages
+  -i        interpreter mode
+  -b        log message bodies
+  -a        log resource usage
+  -g        log handler latency
+  -E        show crash reports to public ips
+  -j        enable ssl client verify
+  -k        disable ssl fetch verify
+  -Z        log worker system calls
+  -f        log worker function calls
+  -B        only use stronger cryptography
+  -X        disable ssl server and client support
+  -*        permit self-modification of executable
+  -J        disable non-ssl server and client support
+  -%        hasten startup by not generating an rsa key
+  -s        increase silence                  [repeatable]
+  -v        increase verbosity                [repeatable]
+  -V        increase ssl verbosity            [repeatable]
+  -S        increase pledge sandboxing        [repeatable]
+  -e CODE   eval Lua code in arg              [repeatable]
+  -F PATH   eval Lua code in file             [repeatable]
+  -H K:V    sets http header globally         [repeatable]
+  -D DIR    overlay assets in local directory [repeatable]
+  -r /X=/Y  redirect X to Y                   [repeatable]
+  -R /X=/Y  rewrites X to Y                   [repeatable]
+  -K PATH   tls private key path              [repeatable]
+  -C PATH   tls certificate(s) path           [repeatable]
+  -A PATH   add assets with path (recursive)  [repeatable]
+  -M INT    tunes max message payload size    [def. 65536]
+  -t INT    timeout ms or keepalive sec if <0 [def. 60000]
+  -p PORT   listen port                       [def. 8080; repeatable]
+  -l ADDR   listen addr                       [def. 0.0.0.0; repeatable]
+  -c SEC    configures static cache-control
+  -W TTY    use tty path to monitor memory pages
+  -L PATH   log file location
+  -P PATH   pid file location
+  -U INT    daemon set user id
+  -G INT    daemon set group id
+  -w PATH   launch browser on startup
+  --strace  enables system call tracing (see also -Z)
+  --ftrace  enables function call tracing (see also -f)
 
 KEYBOARD
 
-	CTRL-D				 EXIT
-	CTRL-C CTRL-C	EXIT
-	CTRL-E				 END
-	CTRL-A				 START
-	CTRL-B				 BACK
-	CTRL-F				 FORWARD
-	CTRL-L				 CLEAR
-	CTRL-H				 BACKSPACE
-	CTRL-D				 DELETE
-	CTRL-N				 NEXT HISTORY
-	CTRL-P				 PREVIOUS HISTORY
-	CTRL-R				 SEARCH HISTORY
-	CTRL-G				 CANCEL SEARCH
-	ALT-<					BEGINNING OF HISTORY
-	ALT->					END OF HISTORY
-	ALT-F					FORWARD WORD
-	ALT-B					BACKWARD WORD
-	CTRL-RIGHT		 FORWARD WORD
-	CTRL-LEFT			BACKWARD WORD
-	CTRL-K				 KILL LINE FORWARDS
-	CTRL-U				 KILL LINE BACKWARDS
-	ALT-H					KILL WORD BACKWARDS
-	CTRL-W				 KILL WORD BACKWARDS
-	CTRL-ALT-H		 KILL WORD BACKWARDS
-	ALT-D					KILL WORD FORWARDS
-	CTRL-Y				 YANK
-	ALT-Y					ROTATE KILL RING AND YANK AGAIN
-	CTRL-T				 TRANSPOSE
-	ALT-T					TRANSPOSE WORD
-	ALT-U					UPPERCASE WORD
-	ALT-L					LOWERCASE WORD
-	ALT-C					CAPITALIZE WORD
-	CTRL-\				 QUIT PROCESS
-	CTRL-S				 PAUSE OUTPUT
-	CTRL-Q				 UNPAUSE OUTPUT (IF PAUSED)
-	CTRL-Q				 ESCAPED INSERT
-	CTRL-ALT-F		 FORWARD EXPR
-	CTRL-ALT-B		 BACKWARD EXPR
-	ALT-RIGHT			FORWARD EXPR
-	ALT-LEFT			 BACKWARD EXPR
-	ALT-SHIFT-B		BARF EXPR
-	ALT-SHIFT-S		SLURP EXPR
-	CTRL-SPACE		 SET MARK
-	CTRL-X CTRL-X	GOTO MARK
-	CTRL-Z				 SUSPEND PROCESS
-	ALT-\					SQUEEZE ADJACENT WHITESPACE
-	PROTIP				 REMAP CAPS LOCK TO CTRL
+  CTRL-D         EXIT
+  CTRL-C CTRL-C  EXIT
+  CTRL-E         END
+  CTRL-A         START
+  CTRL-B         BACK
+  CTRL-F         FORWARD
+  CTRL-L         CLEAR
+  CTRL-H         BACKSPACE
+  CTRL-D         DELETE
+  CTRL-N         NEXT HISTORY
+  CTRL-P         PREVIOUS HISTORY
+  CTRL-R         SEARCH HISTORY
+  CTRL-G         CANCEL SEARCH
+  ALT-<          BEGINNING OF HISTORY
+  ALT->          END OF HISTORY
+  ALT-F          FORWARD WORD
+  ALT-B          BACKWARD WORD
+  CTRL-RIGHT     FORWARD WORD
+  CTRL-LEFT      BACKWARD WORD
+  CTRL-K         KILL LINE FORWARDS
+  CTRL-U         KILL LINE BACKWARDS
+  ALT-H          KILL WORD BACKWARDS
+  CTRL-W         KILL WORD BACKWARDS
+  CTRL-ALT-H     KILL WORD BACKWARDS
+  ALT-D          KILL WORD FORWARDS
+  CTRL-Y         YANK
+  ALT-Y          ROTATE KILL RING AND YANK AGAIN
+  CTRL-T         TRANSPOSE
+  ALT-T          TRANSPOSE WORD
+  ALT-U          UPPERCASE WORD
+  ALT-L          LOWERCASE WORD
+  ALT-C          CAPITALIZE WORD
+  CTRL-\         QUIT PROCESS
+  CTRL-S         PAUSE OUTPUT
+  CTRL-Q         UNPAUSE OUTPUT (IF PAUSED)
+  CTRL-Q         ESCAPED INSERT
+  CTRL-ALT-F     FORWARD EXPR
+  CTRL-ALT-B     BACKWARD EXPR
+  ALT-RIGHT      FORWARD EXPR
+  ALT-LEFT       BACKWARD EXPR
+  ALT-SHIFT-B    BARF EXPR
+  ALT-SHIFT-S    SLURP EXPR
+  CTRL-SPACE     SET MARK
+  CTRL-X CTRL-X  GOTO MARK
+  CTRL-Z         SUSPEND PROCESS
+  ALT-\          SQUEEZE ADJACENT WHITESPACE
+  PROTIP         REMAP CAPS LOCK TO CTRL
 
 ────────────────────────────────────────────────────────────────────────────────
 USAGE
 
-	This executable is also a ZIP file that contains static assets.
-	You can run redbean interactively in your terminal as follows:
+  This executable is also a ZIP file that contains static assets.
+  You can run redbean interactively in your terminal as follows:
 
-		./redbean -vvvmbag				# starts server verbosely
-		open http://127.0.0.1:8080/	 # shows zip listing page
-		CTRL-C												# 1x: graceful shutdown
-		CTRL-C												# 2x: forceful shutdown
+    ./redbean -vvvmbag        # starts server verbosely
+    open http://127.0.0.1:8080/   # shows zip listing page
+    CTRL-C                        # 1x: graceful shutdown
+    CTRL-C                        # 2x: forceful shutdown
 
-	You can override the default listing page by adding:
+  You can override the default listing page by adding:
 
-		zip redbean index.lua		 # lua server pages take priority
-		zip redbean index.html		# default page for directory
+    zip redbean index.lua     # lua server pages take priority
+    zip redbean index.html    # default page for directory
 
-	The listing page only applies to the root directory. However the
-	default index page applies to subdirectories too. In order for it
-	to work, there needs to be an empty directory entry in the zip.
-	That should already be the default practice of your zip editor.
+  The listing page only applies to the root directory. However the
+  default index page applies to subdirectories too. In order for it
+  to work, there needs to be an empty directory entry in the zip.
+  That should already be the default practice of your zip editor.
 
-		wget										 \
-			--mirror							 \
-			--convert-links				\
-			--adjust-extension		 \
-			--page-requisites			\
-			--no-parent						\
-			--no-if-modified-since \
-			http://a.example/index.html
-		zip -r redbean a.example/	# default page for directory
+    wget                     \
+      --mirror               \
+      --convert-links        \
+      --adjust-extension     \
+      --page-requisites      \
+      --no-parent            \
+      --no-if-modified-since \
+      http://a.example/index.html
+    zip -r redbean a.example/  # default page for directory
 
-	redbean normalizes the trailing slash for you automatically:
+  redbean normalizes the trailing slash for you automatically:
 
-		$ printf 'GET /a.example HTTP/1.0\n\n' | nc 127.0.0.1 8080
-		HTTP/1.0 307 Temporary Redirect
-		Location: /a.example/
+    $ printf 'GET /a.example HTTP/1.0\n\n' | nc 127.0.0.1 8080
+    HTTP/1.0 307 Temporary Redirect
+    Location: /a.example/
 
-	Virtual hosting is accomplished this way too. The Host is simply
-	prepended to the path, and if it doesn't exist, it gets removed.
+  Virtual hosting is accomplished this way too. The Host is simply
+  prepended to the path, and if it doesn't exist, it gets removed.
 
-		$ printf 'GET / HTTP/1.1\nHost:a.example\n\n' | nc 127.0.0.1 8080
-		HTTP/1.1 200 OK
-		Link: <http://127.0.0.1/a.example/index.html>; rel="canonical"
+    $ printf 'GET / HTTP/1.1\nHost:a.example\n\n' | nc 127.0.0.1 8080
+    HTTP/1.1 200 OK
+    Link: <http://127.0.0.1/a.example/index.html>; rel="canonical"
 
-	If you mirror a lot of websites within your redbean then you can
-	actually tell your browser that redbean is your proxy server, in
-	which redbean will act as your private version of the Internet.
+  If you mirror a lot of websites within your redbean then you can
+  actually tell your browser that redbean is your proxy server, in
+  which redbean will act as your private version of the Internet.
 
-		$ printf 'GET http://a.example HTTP/1.0\n\n' | nc 127.0.0.1 8080
-		HTTP/1.0 200 OK
-		Link: <http://127.0.0.1/a.example/index.html>; rel="canonical"
+    $ printf 'GET http://a.example HTTP/1.0\n\n' | nc 127.0.0.1 8080
+    HTTP/1.0 200 OK
+    Link: <http://127.0.0.1/a.example/index.html>; rel="canonical"
 
-	If you use a reverse proxy, then redbean recognizes the following
-	provided that the proxy forwards requests over the local network:
+  If you use a reverse proxy, then redbean recognizes the following
+  provided that the proxy forwards requests over the local network:
 
-		X-Forwarded-For: 203.0.113.42:31337
-		X-Forwarded-Host: foo.example:80
+    X-Forwarded-For: 203.0.113.42:31337
+    X-Forwarded-Host: foo.example:80
 
-	There's a text/plain statistics page called /statusz that makes
-	it easy to track and monitor the health of your redbean:
+  There's a text/plain statistics page called /statusz that makes
+  it easy to track and monitor the health of your redbean:
 
-		printf 'GET /statusz\n\n' | nc 127.0.0.1 8080
+    printf 'GET /statusz\n\n' | nc 127.0.0.1 8080
 
-	redbean will display an error page using the /redbean.png logo
-	by default, embedded as a bas64 data uri. You can override the
-	custom page for various errors by adding files to the zip root.
+  redbean will display an error page using the /redbean.png logo
+  by default, embedded as a bas64 data uri. You can override the
+  custom page for various errors by adding files to the zip root.
 
-		zip redbean 404.html			# custom not found page
+    zip redbean 404.html      # custom not found page
 
-	Audio video content should not be compressed in your ZIP files.
-	Uncompressed assets enable browsers to send Range HTTP request.
-	On the other hand compressed assets are best for gzip encoding.
+  Audio video content should not be compressed in your ZIP files.
+  Uncompressed assets enable browsers to send Range HTTP request.
+  On the other hand compressed assets are best for gzip encoding.
 
-		zip redbean index.html		# adds file
-		zip -0 redbean video.mp4	# adds without compression
+    zip redbean index.html    # adds file
+    zip -0 redbean video.mp4  # adds without compression
 
-	You can have redbean run as a daemon by doing the following:
+  You can have redbean run as a daemon by doing the following:
 
-		sudo ./redbean -vvdp80 -p443 -L redbean.log -P redbean.pid
-		kill -TERM $(cat redbean.pid) # 1x: graceful shutdown
-		kill -TERM $(cat redbean.pid) # 2x: forceful shutdown
+    sudo ./redbean -vvdp80 -p443 -L redbean.log -P redbean.pid
+    kill -TERM $(cat redbean.pid) # 1x: graceful shutdown
+    kill -TERM $(cat redbean.pid) # 2x: forceful shutdown
 
-	redbean currently has a 32kb limit on request messages and 64kb
-	including the payload. redbean will grow to whatever the system
-	limits allow. Should fork() or accept() fail redbean will react
-	by going into "meltdown mode" which closes lingering workers.
-	You can trigger this at any time using:
+  redbean currently has a 32kb limit on request messages and 64kb
+  including the payload. redbean will grow to whatever the system
+  limits allow. Should fork() or accept() fail redbean will react
+  by going into "meltdown mode" which closes lingering workers.
+  You can trigger this at any time using:
 
-		kill -USR2 $(cat redbean.pid)
+    kill -USR2 $(cat redbean.pid)
 
-	Another failure condition is running out of disk space in which
-	case redbean reacts by truncating the log file. Lastly, redbean
-	does the best job possible reporting on resource usage when the
-	logger is in debug mode noting that NetBSD is the best at this.
+  Another failure condition is running out of disk space in which
+  case redbean reacts by truncating the log file. Lastly, redbean
+  does the best job possible reporting on resource usage when the
+  logger is in debug mode noting that NetBSD is the best at this.
 
-	Your redbean is an actually portable executable, that's able to
-	run on six different operating systems. To do that, it needs to
-	extract a 4kb loader program to ${TMPDIR:-${HOME:-.}}/.ape that'll
-	map your redbean into memory. It does however check to see if `ape`
-	is on the system path beforehand. You can also "assimilate" any
-	redbean into the platform-local executable format by running:
+  Your redbean is an actually portable executable, that's able to
+  run on six different operating systems. To do that, it needs to
+  extract a 4kb loader program to ${TMPDIR:-${HOME:-.}}/.ape that'll
+  map your redbean into memory. It does however check to see if `ape`
+  is on the system path beforehand. You can also "assimilate" any
+  redbean into the platform-local executable format by running:
 
-			$ file redbean
-			redbean: DOS/MBR boot sector
-			$ ./redbean --assimilate
-			$ file redbean
-			redbean: ELF 64-bit LSB executable
+      $ file redbean
+      redbean: DOS/MBR boot sector
+      $ ./redbean --assimilate
+      $ file redbean
+      redbean: ELF 64-bit LSB executable
 
 ────────────────────────────────────────────────────────────────────────────────
 SECURITY
 
-	redbean uses a protocol polyglot for serving HTTP and HTTPS on
-	the same port numbers. For example, both of these are valid:
+  redbean uses a protocol polyglot for serving HTTP and HTTPS on
+  the same port numbers. For example, both of these are valid:
 
-		http://127.0.0.1:8080/
-		https://127.0.0.1:8080/
+    http://127.0.0.1:8080/
+    https://127.0.0.1:8080/
 
-	SSL verbosity is controlled as follows for troubleshooting:
+  SSL verbosity is controlled as follows for troubleshooting:
 
-		-V			 log ssl errors
-		-VV			log ssl state changes too
-		-VVV		 log ssl informational messages too
-		-VVVV		log ssl verbose details too
+    -V       log ssl errors
+    -VV      log ssl state changes too
+    -VVV     log ssl informational messages too
+    -VVVV    log ssl verbose details too
 
-	Redbean supports sandboxing flags on Linux and OpenBSD.
+  Redbean supports sandboxing flags on Linux and OpenBSD.
 
-		-S (online policy)
+    -S (online policy)
 
-			This causes unix.pledge("stdio rpath inet dns") to be called on
-			workers after fork() is called. This permits read-only operations
-			and APIs like Fetch() that let workers send and receive data with
-			private and public Internet hosts. Access to the unix module is
-			somewhat restricted, disallowing its more powerful APIs like exec.
+      This causes unix.pledge("stdio rpath inet dns") to be called on
+      workers after fork() is called. This permits read-only operations
+      and APIs like Fetch() that let workers send and receive data with
+      private and public Internet hosts. Access to the unix module is
+      somewhat restricted, disallowing its more powerful APIs like exec.
 
-		-SS (offline policy)
+    -SS (offline policy)
 
-			This causes unix.pledge("stdio rpath") to be called on workers
-			after after fork() is called. This prevents workers from talking
-			to the network (other than the client) and allows read-only file
-			system access (e.g. `-D DIR` flag).
+      This causes unix.pledge("stdio rpath") to be called on workers
+      after after fork() is called. This prevents workers from talking
+      to the network (other than the client) and allows read-only file
+      system access (e.g. `-D DIR` flag).
 
-		-SSS (contained policy)
+    -SSS (contained policy)
 
-			This causes unix.pledge("stdio") to be called on workers after
-			after fork() is called. This prevents workers from communicating
-			with the network (other than the client connection) and prevents
-			file system access (with some exceptions like logging). Redbean
-			should only be able to serve from its own zip file in this mode.
-			Lua script access to the unix module is highly restricted.
+      This causes unix.pledge("stdio") to be called on workers after
+      after fork() is called. This prevents workers from communicating
+      with the network (other than the client connection) and prevents
+      file system access (with some exceptions like logging). Redbean
+      should only be able to serve from its own zip file in this mode.
+      Lua script access to the unix module is highly restricted.
 
-	See http://redbean.dev for further details.
+  See http://redbean.dev for further details.
 
 ────────────────────────────────────────────────────────────────────────────────
 LUA SERVER PAGES
 
-	Any files with the extension .lua will be dynamically served by redbean.
-	Here's the simplest possible example:
+  Any files with the extension .lua will be dynamically served by redbean.
+  Here's the simplest possible example:
 
-		Write('<b>Hello World</b>')
+    Write('<b>Hello World</b>')
 
-	The Lua Server Page above should be able to perform at 700,000 responses
-	per second on a Core i9, without any sort of caching. If you want a Lua
-	handler that can do 1,000,000 responses per second, then try adding the
-	following global handler to your /.init.lua file:
+  The Lua Server Page above should be able to perform at 700,000 responses
+  per second on a Core i9, without any sort of caching. If you want a Lua
+  handler that can do 1,000,000 responses per second, then try adding the
+  following global handler to your /.init.lua file:
 
-		function OnHttpRequest()
-			 Write('<b>Hello World</b>')
-		end
+    function OnHttpRequest()
+       Write('<b>Hello World</b>')
+    end
 
-	Here's an example of a more typical workflow for Lua Server Pages using
-	the redbean API:
+  Here's an example of a more typical workflow for Lua Server Pages using
+  the redbean API:
 
-		SetStatus(200)
-		SetHeader('Content-Type', 'text/plain; charset=utf-8')
-		Write('<p>Hello ')
-		Write(EscapeHtml(GetParam('name')))
+    SetStatus(200)
+    SetHeader('Content-Type', 'text/plain; charset=utf-8')
+    Write('<p>Hello ')
+    Write(EscapeHtml(GetParam('name')))
 
-	We didn't need the first two lines in the previous example, because
-	they're implied by redbean automatically if you don't set them. Responses
-	are also buffered until the script finishes executing. That enables
-	redbean to make HTTP as easy as possible. In the future, API capabilities
-	will be expanded to make possible things like websockets.
+  We didn't need the first two lines in the previous example, because
+  they're implied by redbean automatically if you don't set them. Responses
+  are also buffered until the script finishes executing. That enables
+  redbean to make HTTP as easy as possible. In the future, API capabilities
+  will be expanded to make possible things like websockets.
 
-	redbean embeds the Lua standard library. You can use packages such as io
-	to persist and share state across requests and connections, as well as the
-	StoreAsset function, and the lsqlite3 module.
+  redbean embeds the Lua standard library. You can use packages such as io
+  to persist and share state across requests and connections, as well as the
+  StoreAsset function, and the lsqlite3 module.
 
-	Your Lua interpreter begins its life in the main process at startup in the
-	.init.lua, which is likely where you'll want to perform all your expensive
-	one-time operations like importing modules. Then, as requests roll in,
-	isolated processes are cloned from the blueprint you created.
+  Your Lua interpreter begins its life in the main process at startup in the
+  .init.lua, which is likely where you'll want to perform all your expensive
+  one-time operations like importing modules. Then, as requests roll in,
+  isolated processes are cloned from the blueprint you created.
 
 ────────────────────────────────────────────────────────────────────────────────
 REPL
 
-	Your redbean displays a Read-Eval-Print-Loop that lets you modify the
-	state of the main server process while your server is running. Any
-	changes will propagate into forked clients.
+  Your redbean displays a Read-Eval-Print-Loop that lets you modify the
+  state of the main server process while your server is running. Any
+  changes will propagate into forked clients.
 
-	Your REPL is displayed only when redbean is run as a non-daemon in a
-	Unix terminal or the Windows 10 command prompt or PowerShell. Since
-	the REPL is a Lua REPL it's not included in a redbean-static builds.
+  Your REPL is displayed only when redbean is run as a non-daemon in a
+  Unix terminal or the Windows 10 command prompt or PowerShell. Since
+  the REPL is a Lua REPL it's not included in a redbean-static builds.
 
-	redbean uses the same keyboard shortcuts as GNU Readline and Emacs.
-	Some of its keyboard commands (listed in a previous section) were
-	inspired by Paredit.
+  redbean uses the same keyboard shortcuts as GNU Readline and Emacs.
+  Some of its keyboard commands (listed in a previous section) were
+  inspired by Paredit.
 
-	A history of your commands is saved to `~/.redbean_history`.
+  A history of your commands is saved to `~/.redbean_history`.
 
-	If you love the redbean repl and want to use it as your language
-	interpreter then you can pass the `-i` flag to put redbean into
-	interpreter mode.
+  If you love the redbean repl and want to use it as your language
+  interpreter then you can pass the `-i` flag to put redbean into
+  interpreter mode.
 
-			redbean -i binarytrees.lua 15
+      redbean -i binarytrees.lua 15
 
-	When the `-i` flag is passed (for interpreter mode), redbean won't
-	start a web server and instead functions like the `lua` command. The
-	first command line argument becomes the script you want to run. If you
-	don't supply a script, then the repl without a web server is
-	displayed. This is useful for testing since redbean extensions and
-	modules for the Lua language, are still made available. You can also
-	write redbean scripts with shebang lines:
+  When the `-i` flag is passed (for interpreter mode), redbean won't
+  start a web server and instead functions like the `lua` command. The
+  first command line argument becomes the script you want to run. If you
+  don't supply a script, then the repl without a web server is
+  displayed. This is useful for testing since redbean extensions and
+  modules for the Lua language, are still made available. You can also
+  write redbean scripts with shebang lines:
 
-			#!/usr/bin/redbean -i
-			print('hello world')
+      #!/usr/bin/redbean -i
+      print('hello world')
 
-	However UNIX operating systems usually require that interpreters be
-	encoded in its preferred executable format. You can assimilate your
-	redbean into the local format using the following commands:
+  However UNIX operating systems usually require that interpreters be
+  encoded in its preferred executable format. You can assimilate your
+  redbean into the local format using the following commands:
 
-			$ file redbean
-			redbean: DOS/MBR boot sector
-			$ ./redbean --assimilate
-			$ file redbean
-			redbean: ELF 64-bit LSB executable
-			$ sudo cp redbean /usr/bin/redbean
+      $ file redbean
+      redbean: DOS/MBR boot sector
+      $ ./redbean --assimilate
+      $ file redbean
+      redbean: ELF 64-bit LSB executable
+      $ sudo cp redbean /usr/bin/redbean
 
-	By following the above steps, redbean can be installed systemwide for
-	multiple user accounts. It's also possible to chmod the binary to have
-	setuid privileges. Please note that, if you do this, the UNIX section
-	provides further details on APIs like `unix.setuid` that will help you
-	remove root privileges from the process in the appropriate manner.
+  By following the above steps, redbean can be installed systemwide for
+  multiple user accounts. It's also possible to chmod the binary to have
+  setuid privileges. Please note that, if you do this, the UNIX section
+  provides further details on APIs like `unix.setuid` that will help you
+  remove root privileges from the process in the appropriate manner.
 
 
 ────────────────────────────────────────────────────────────────────────────────
 LUA ENHANCEMENTS
 
-	We've made some enhancements to the Lua language that should make it
-	more comfortable for C/C++ and Python developers. Some of these
+  We've made some enhancements to the Lua language that should make it
+  more comfortable for C/C++ and Python developers. Some of these
 
-		- redbean supports a printf modulus operator, like Python. For
-			example, you can say `"hello %s" % {"world"}` instead of
-			`string.format("hello %s", "world")`.
+    - redbean supports a printf modulus operator, like Python. For
+      example, you can say `"hello %s" % {"world"}` instead of
+      `string.format("hello %s", "world")`.
 
-			--
-			- redbean supports a string multiply operator, like Python. For
-			example, you can say `"hi" * 2` instead of `string.rep("hi", 2)`.
+      --
+      - redbean supports a string multiply operator, like Python. For
+      example, you can say `"hi" * 2` instead of `string.rep("hi", 2)`.
 
-			- redbean supports octal (base 8) integer literals. For example
-			`0644 == 420` is the case in redbean, whereas in upstream Lua
-			`0644 == 644` would be the case.
+      - redbean supports octal (base 8) integer literals. For example
+      `0644 == 420` is the case in redbean, whereas in upstream Lua
+      `0644 == 644` would be the case.
 
-			- redbean supports binary (base 2) integer literals. For example
-			`0b1010 == 10` is the case in redbean, whereas in upstream Lua
-			`0b1010` would result in an error.
+      - redbean supports binary (base 2) integer literals. For example
+      `0b1010 == 10` is the case in redbean, whereas in upstream Lua
+      `0b1010` would result in an error.
 
-			- redbean supports the GNU syntax for the ASCII ESC character in
-			string literals. For example, `"\e"` is the same as `"\x1b"`.
+      - redbean supports the GNU syntax for the ASCII ESC character in
+      string literals. For example, `"\e"` is the same as `"\x1b"`.
 
 ]]
 
@@ -421,26 +421,26 @@ LUA ENHANCEMENTS
 ---
 --- For example, if you launch your redbean as follows:
 ---
----		 redbean -v arg1 arg2
+---     redbean -v arg1 arg2
 ---
 --- Then your `/.init.lua` file will have the `arg` array like:
 ---
----		 arg[-1] = '/usr/bin/redbean'
----		 arg[ 0] = '/zip/.init.lua'
----		 arg[ 1] = 'arg1'
----		 arg[ 2] = 'arg2'
+---     arg[-1] = '/usr/bin/redbean'
+---     arg[ 0] = '/zip/.init.lua'
+---     arg[ 1] = 'arg1'
+---     arg[ 2] = 'arg2'
 ---
 --- If you launch redbean in interpreter mode (rather than web
 --- server) mode, then an invocation like this:
 ---
----		 ./redbean -i script.lua arg1 arg2
+---     ./redbean -i script.lua arg1 arg2
 ---
 --- Would have an `arg` array like this:
 ---
----		 arg[-1] = './redbean'
----		 arg[ 0] = 'script.lua'
----		 arg[ 1] = 'arg1'
----		 arg[ 2] = 'arg2'
+---     arg[-1] = './redbean'
+---     arg[ 0] = 'script.lua'
+---     arg[ 1] = 'arg1'
+---     arg[ 2] = 'arg2'
 ---@type string[]
 arg = nil
 
@@ -453,25 +453,25 @@ argv = nil
 SPECIAL PATHS
 
 /
-				redbean will generate a zip central directory listing for this
-				page, and this page only, but only if there isn't an /index.lua or
-				/index.html file defined.
+        redbean will generate a zip central directory listing for this
+        page, and this page only, but only if there isn't an /index.lua or
+        /index.html file defined.
 
 /.init.lua
-				This script is run once in the main process at startup. This lets
-				you modify the state of the Lua interpreter before connection
-				processes are forked off. For example, it's a good idea to do
-				expensive one-time computations here. You can also use this file
-				to call the ProgramFOO() functions below. The init module load
-				happens after redbean's arguments and zip assets have been parsed,
-				but before calling functions like socket() and fork(). Note that
-				this path is a hidden file so that it can't be unintentionally run
-				by the network client.
+        This script is run once in the main process at startup. This lets
+        you modify the state of the Lua interpreter before connection
+        processes are forked off. For example, it's a good idea to do
+        expensive one-time computations here. You can also use this file
+        to call the ProgramFOO() functions below. The init module load
+        happens after redbean's arguments and zip assets have been parsed,
+        but before calling functions like socket() and fork(). Note that
+        this path is a hidden file so that it can't be unintentionally run
+        by the network client.
 
 /.reload.lua (deprecated; use OnServerReload instead)
-				This script is run from the main process when SIGHUP is received.
-				This only applies to redbean when running in daemon mode. Any
-		    changes that are made to the Lua interpreter state will be
+        This script is run from the main process when SIGHUP is received.
+        This only applies to redbean when running in daemon mode. Any
+        changes that are made to the Lua interpreter state will be
         inherited by future forked connection processes. Note that this
         path is a hidden file so that it can't be unintentionally run by
         the network client.

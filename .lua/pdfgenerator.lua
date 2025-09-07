@@ -1162,6 +1162,312 @@ function PDFGenerator:totalPage()
 	return #self.page_list
 end
 
+-- Fit an SVG path into a width x height block at current position
+-- signature: pdf:drawSvgPath(width, height, pathData, options)
+function PDFGenerator:drawSvgPath(width, height, pathData, options)
+	options = options or {}
+	options.strokeColor = options.strokeColor or "000000"
+	options.fillColor   = options.fillColor or nil
+	options.borderWidth = options.borderWidth or 1
+	options.align = options.align or "min"      -- "min" or "center"
+	if options.scaleStroke == nil then options.scaleStroke = true end
+
+	local x = (self.current_x) + self.margin_x[1]
+	local y = self.page_height - self.current_y - self.margin_y[1] - height
+	local nts = numberToString or function(n) return ("%.4f"):format(n) end
+	local hexToRGB = (self.hexToRGB) and function(h) return self:hexToRGB(h) end or function(h) return {0,0,0} end
+	local strokeRGB = hexToRGB(options.strokeColor)
+	local fillRGB   = options.fillColor and hexToRGB(options.fillColor) or nil
+	local content = self.contents[self.current_page_obj]
+
+	-- helper to parse numbers
+	local function parseNumbers(str)
+		local nums = {}
+		for n in str:gmatch("([+-]?%d*%.?%d+)") do table.insert(nums, tonumber(n)) end
+		return nums
+	end
+
+	-- Compute bounding box from path
+	local function computeBounds(path)
+		local cx, cy = 0, 0
+		local sx, sy = 0, 0
+		local cpx, cpy = 0,0
+		local qx,qy = nil,nil
+		local lastCmd
+		local minx, miny = math.huge, math.huge
+		local maxx, maxy = -math.huge, -math.huge
+		local function updateBounds(...) local args = {...} for i=1,#args,2 do local px,py=args[i],args[i+1] if px and py then minx=math.min(minx,px) miny=math.min(miny,py) maxx=math.max(maxx,px) maxy=math.max(maxy,py) end end end
+
+		for cmd,argsStr in path:gmatch("([MLHVCSQTZmlhvcsqtz])([^MLHVCSQTZmlhvcsqtz]*)") do
+			local nums = parseNumbers(argsStr)
+			local i=1
+			local function lastWasCubic() return lastCmd and (lastCmd:lower()=="c" or lastCmd:lower()=="s") end
+			local function lastWasQuad()  return lastCmd and (lastCmd:lower()=="q" or lastCmd:lower()=="t") end
+
+			if cmd=="M" then while i<=#nums do cx,cy=nums[i],nums[i+1];i=i+2; sx,sy=cx,cy; updateBounds(cx,cy); lastCmd="M" end
+			elseif cmd=="m" then while i<=#nums do cx,cy=cx+nums[i],cy+nums[i+1];i=i+2; sx,sy=cx,cy; updateBounds(cx,cy); lastCmd="m" end
+			elseif cmd=="L" then while i<=#nums do cx,cy=nums[i],nums[i+1];i=i+2; updateBounds(cx,cy); lastCmd="L" end
+			elseif cmd=="l" then while i<=#nums do cx,cy=cx+nums[i],cy+nums[i+1];i=i+2; updateBounds(cx,cy); lastCmd="l" end
+			elseif cmd=="H" then while i<=#nums do cx=nums[i];i=i+1; updateBounds(cx,cy); lastCmd="H" end
+			elseif cmd=="h" then while i<=#nums do cx=cx+nums[i];i=i+1; updateBounds(cx,cy); lastCmd="h" end
+			elseif cmd=="V" then while i<=#nums do cy=nums[i];i=i+1; updateBounds(cx,cy); lastCmd="V" end
+			elseif cmd=="v" then while i<=#nums do cy=cy+nums[i];i=i+1; updateBounds(cx,cy); lastCmd="v" end
+			elseif cmd=="C" then while i<=#nums do local x1,y1,x2,y2,x,y=nums[i],nums[i+1],nums[i+2],nums[i+3],nums[i+4],nums[i+5]; i=i+6; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="C" end
+			elseif cmd=="c" then while i<=#nums do local x1,y1=cx+nums[i],cy+nums[i+1]; local x2,y2=cx+nums[i+2],cy+nums[i+3]; local x,y=cx+nums[i+4],cy+nums[i+5]; i=i+6; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="c" end
+			elseif cmd=="S" then while i<=#nums do local x2,y2,x,y=nums[i],nums[i+1],nums[i+2],nums[i+3]; i=i+4; local x1,y1 = lastWasCubic() and (2*cx-cpx), (2*cy-cpy) or cx,cy; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="S" end
+			elseif cmd=="s" then while i<=#nums do local x2,y2,x,y=cx+nums[i],cy+nums[i+1],cx+nums[i+2],cy+nums[i+3]; i=i+4; local x1,y1 = lastWasCubic() and (2*cx-cpx), (2*cy-cpy) or cx,cy; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="s" end
+			elseif cmd=="Q" then while i<=#nums do local x1,y1,x,y=nums[i],nums[i+1],nums[i+2],nums[i+3];i=i+4; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="Q" end
+			elseif cmd=="q" then while i<=#nums do local x1,y1,x,y=cx+nums[i],cy+nums[i+1],cx+nums[i+2],cy+nums[i+3];i=i+4; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="q" end
+			elseif cmd=="T" then while i<=#nums do local x,y=nums[i],nums[i+1];i=i+2; local x1,y1 = lastWasQuad() and qx and (2*cx-qx),(2*cy-qy) or cx,cy; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="T" end
+			elseif cmd=="t" then while i<=#nums do local x,y=cx+nums[i],cy+nums[i+1];i=i+2; local x1,y1 = lastWasQuad() and qx and (2*cx-qx),(2*cy-qy) or cx,cy; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="t" end
+			elseif cmd=="Z" or cmd=="z" then updateBounds(sx,sy); cx,cy=sx,sy; lastCmd=cmd end
+		end
+		if minx==math.huge then minx,miny,maxx,maxy=0,0,0,0 end
+		return minx,miny,maxx,maxy
+	end
+
+	local minx,miny,maxx,maxy = computeBounds(pathData)
+	local origW,origH = maxx-minx,maxy-miny
+	if origW==0 then origW=1 end
+	if origH==0 then origH=1 end
+	local scale = math.min(width/origW, height/origH)
+	local offsetX, offsetY = x - minx*scale, y - miny*scale
+	if options.align=="center" then
+		offsetX = offsetX + (width - origW*scale)/2
+		offsetY = offsetY + (height - origH*scale)/2
+	end
+
+	local function transform(px,py) return px*scale+offsetX, py*scale+offsetY end
+
+	-- === emit path ===
+	local strokeW = options.borderWidth
+	if options.scaleStroke then strokeW=strokeW*scale end
+	if strokeW<=0 then strokeW=options.borderWidth end
+	content.stream = content.stream.."q\n"
+	content.stream = content.stream..string.format("%s w\n", nts(strokeW))
+	if strokeRGB then content.stream = content.stream..string.format("%s %s %s RG\n", nts(strokeRGB[1]), nts(strokeRGB[2]), nts(strokeRGB[3])) end
+	if fillRGB then content.stream = content.stream..string.format("%s %s %s rg\n", nts(fillRGB[1]), nts(fillRGB[2]), nts(fillRGB[3])) end
+
+	-- parse & render
+	local cx,cy = 0,0
+	local sx,sy = 0,0
+	local cpx,cpy=0,0
+	local qx,qy=nil,nil
+	local lastCmd=nil
+	for cmd,argsStr in pathData:gmatch("([MLHVCSQTZmlhvcsqtz])([^MLHVCSQTZmlhvcsqtz]*)") do
+		local nums=parseNumbers(argsStr)
+		local i=1
+		local function lastWasCubic() return lastCmd and (lastCmd:lower()=="c" or lastCmd:lower()=="s") end
+		local function lastWasQuad() return lastCmd and (lastCmd:lower()=="q" or lastCmd:lower()=="t") end
+
+		if cmd == "M" then
+			-- first pair is move, subsequent pairs are L
+			if #nums >= 2 then
+				cx, cy = nums[1], nums[2]; i = 3
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s m\n", nts(tx), nts(ty))
+				sx, sy = cx, cy
+				lastCmd = "M"
+			end
+			while i <= #nums do
+				cx, cy = nums[i], nums[i+1]; i = i + 2
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "L"
+			end
+
+		elseif cmd == "m" then
+			if #nums >= 2 then
+				cx, cy = cx + nums[1], cy + nums[2]; i = 3
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s m\n", nts(tx), nts(ty))
+				sx, sy = cx, cy
+				lastCmd = "m"
+			end
+			while i <= #nums do
+				cx, cy = cx + nums[i], cy + nums[i+1]; i = i + 2
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "l"
+			end
+
+		elseif cmd == "L" then
+			while i <= #nums do
+				cx, cy = nums[i], nums[i+1]; i = i + 2
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "L"
+			end
+		elseif cmd == "l" then
+			while i <= #nums do
+				cx, cy = cx + nums[i], cy + nums[i+1]; i = i + 2
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "l"
+			end
+
+		elseif cmd == "H" then
+			while i <= #nums do
+				cx = nums[i]; i = i + 1
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "H"
+			end
+		elseif cmd == "h" then
+			while i <= #nums do
+				cx = cx + nums[i]; i = i + 1
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "h"
+			end
+
+		elseif cmd == "V" then
+			while i <= #nums do
+				cy = nums[i]; i = i + 1
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "V"
+			end
+		elseif cmd == "v" then
+			while i <= #nums do
+				cy = cy + nums[i]; i = i + 1
+				local tx, ty = transform(cx, cy)
+				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				lastCmd = "v"
+			end
+
+		elseif cmd == "C" then
+			while i <= #nums do
+				local x1,y1,x2,y2,x,y = nums[i],nums[i+1],nums[i+2],nums[i+3],nums[i+4],nums[i+5]; i = i + 6
+				local tx1,ty1 = transform(x1,y1)
+				local tx2,ty2 = transform(x2,y2)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				cpx, cpy = x2, y2
+				cx, cy = x, y
+				lastCmd = "C"
+			end
+		elseif cmd == "c" then
+			while i <= #nums do
+				local x1,y1 = cx + nums[i], cy + nums[i+1]
+				local x2,y2 = cx + nums[i+2], cy + nums[i+3]
+				local x,y   = cx + nums[i+4], cy + nums[i+5]; i = i + 6
+				local tx1,ty1 = transform(x1,y1)
+				local tx2,ty2 = transform(x2,y2)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				cpx, cpy = x2, y2
+				cx, cy = x, y
+				lastCmd = "c"
+			end
+
+		elseif cmd == "S" then
+			while i <= #nums do
+				local x2,y2,x,y = nums[i],nums[i+1],nums[i+2],nums[i+3]; i = i + 4
+				local x1,y1
+				if lastWasCubic() then x1,y1 = 2*cx - cpx, 2*cy - cpy else x1,y1 = cx, cy end
+				local tx1,ty1 = transform(x1,y1)
+				local tx2,ty2 = transform(x2,y2)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				cpx, cpy = x2, y2
+				cx, cy = x, y
+				lastCmd = "S"
+			end
+		elseif cmd == "s" then
+			while i <= #nums do
+				local x2,y2,x,y = cx + nums[i], cy + nums[i+1], cx + nums[i+2], cy + nums[i+3]; i = i + 4
+				local x1,y1
+				if lastWasCubic() then x1,y1 = 2*cx - cpx, 2*cy - cpy else x1,y1 = cx, cy end
+				local tx1,ty1 = transform(x1,y1)
+				local tx2,ty2 = transform(x2,y2)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				cpx, cpy = x2, y2
+				cx, cy = x, y
+				lastCmd = "s"
+			end
+
+		elseif cmd == "Q" then
+			while i <= #nums do
+				local x1,y1,x,y = nums[i],nums[i+1],nums[i+2],nums[i+3]; i = i + 4
+				-- convert quadratic to cubic:
+				local c1x = cx + (2/3) * (x1 - cx)
+				local c1y = cy + (2/3) * (y1 - cy)
+				local c2x = x  + (2/3) * (x1 - x)
+				local c2y = y  + (2/3) * (y1 - y)
+				local tx1,ty1 = transform(c1x,c1y)
+				local tx2,ty2 = transform(c2x,c2y)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				qx, qy = x1, y1
+				cx, cy = x, y
+				lastCmd = "Q"
+			end
+		elseif cmd == "q" then
+			while i <= #nums do
+				local x1,y1,x,y = cx + nums[i], cy + nums[i+1], cx + nums[i+2], cy + nums[i+3]; i = i + 4
+				local c1x = cx + (2/3) * (x1 - cx)
+				local c1y = cy + (2/3) * (y1 - cy)
+				local c2x = x  + (2/3) * (x1 - x)
+				local c2y = y  + (2/3) * (y1 - y)
+				local tx1,ty1 = transform(c1x,c1y)
+				local tx2,ty2 = transform(c2x,c2y)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				qx, qy = x1, y1
+				cx, cy = x, y
+				lastCmd = "q"
+			end
+
+		elseif cmd == "T" then
+			while i <= #nums do
+				local x,y = nums[i], nums[i+1]; i = i + 2
+				local x1,y1
+				if lastWasQuad() and qx then x1,y1 = 2*cx - qx, 2*cy - qy else x1,y1 = cx, cy end
+				local c1x = cx + (2/3) * (x1 - cx)
+				local c1y = cy + (2/3) * (y1 - cy)
+				local c2x = x  + (2/3) * (x1 - x)
+				local c2y = y  + (2/3) * (y1 - y)
+				local tx1,ty1 = transform(c1x,c1y)
+				local tx2,ty2 = transform(c2x,c2y)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				qx, qy = x1, y1
+				cx, cy = x, y
+				lastCmd = "T"
+			end
+		elseif cmd == "t" then
+			while i <= #nums do
+				local x,y = cx + nums[i], cy + nums[i+1]; i = i + 2
+				local x1,y1
+				if lastWasQuad() and qx then x1,y1 = 2*cx - qx, 2*cy - qy else x1,y1 = cx, cy end
+				local c1x = cx + (2/3) * (x1 - cx)
+				local c1y = cy + (2/3) * (y1 - cy)
+				local c2x = x  + (2/3) * (x1 - x)
+				local c2y = y  + (2/3) * (y1 - y)
+				local tx1,ty1 = transform(c1x,c1y)
+				local tx2,ty2 = transform(c2x,c2y)
+				local tx, ty  = transform(x,y)
+				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				qx, qy = x1, y1
+				cx, cy = x, y
+				lastCmd = "t"
+			end
+
+		elseif cmd == "Z" or cmd == "z" then
+			-- emit closepath; PDF 'h' closes current subpath
+			content.stream = content.stream .. "h\n"
+			cx, cy = sx, sy
+			lastCmd = cmd
+		end
+	end
+
+	if fillRGB then content.stream = content.stream.."B\n" else content.stream = content.stream.."S\n" end
+	content.stream = content.stream.."Q\n"
+	return self
+end
+
 -- Generate PDF and return as string
 function PDFGenerator:generate()
 	local output = {}

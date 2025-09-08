@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.17.0](https://github.com/solisoft/luaonbeans/compare/v0.16.0...v0.17.0) (2025-09-07)
+
+
+### Features
+
+* allow variants depending on user agent ([f94362e](https://github.com/solisoft/luaonbeans/commit/f94362e76e49166ab1651604bc60988eacf31b4d))
+* improve performances on production + add basic support for svg content in PDF ([59d0179](https://github.com/solisoft/luaonbeans/commit/59d0179444dd2ca2952556787a3ec21d386b0bf7))
+* move db drivers in db folder ([9e749ff](https://github.com/solisoft/luaonbeans/commit/9e749ff1addc381ec759c536b9c4875c147a21af))
+* no need a DB to start the server ([e626f44](https://github.com/solisoft/luaonbeans/commit/e626f44e3ac15ba9769362cbe35e83379a6a7ffb))
+* pdf allow table row vertical_alignement ([03a4da6](https://github.com/solisoft/luaonbeans/commit/03a4da6a86087f97f1d9088751c4d710c5fc02a4))
+* PDF Draw Bar Chart method ([5602958](https://github.com/solisoft/luaonbeans/commit/5602958cd49118ed9d9a3c3fe7a714beade1c365))
+* pdf generator support SVG path ([90c3a1f](https://github.com/solisoft/luaonbeans/commit/90c3a1f9fb09ba6247613858ca724a3aa283a894))
+* pgrest_model WIP ([85174b9](https://github.com/solisoft/luaonbeans/commit/85174b99851032812bbe677e4a52c69a276217c1))
+
+
+### Bug Fixes
+
+* docker compose bad yaml definition ([6fedad9](https://github.com/solisoft/luaonbeans/commit/6fedad9ededff4e20239cd4b229318819ef0e6fb))
+* Fix PGRest & Redis ([8e4e272](https://github.com/solisoft/luaonbeans/commit/8e4e272ed58beb1ef8c399a806ba343a971c3d1a))
+* improve logger and use Params instead of creating a new global variable ([c7546d8](https://github.com/solisoft/luaonbeans/commit/c7546d81d8f21264a3ecc197f5e13513299d3858))
+* improve pdf sample and add charts ([a71a570](https://github.com/solisoft/luaonbeans/commit/a71a57020e2465334b5a05bea4f363cdc60cdfd1))
+* indentation ([e6ea708](https://github.com/solisoft/luaonbeans/commit/e6ea708f5aaf12ade24d9b934c791ce5adf6c73a))
+* remove apple stuff in pdf demo content ([3fab786](https://github.com/solisoft/luaonbeans/commit/3fab786d701e32c072df4918aeefab60188aed24))
+* use better variable name for global use ([207ecff](https://github.com/solisoft/luaonbeans/commit/207ecff0367ec15d5edc7004301cfbc3d2c2c2fd))
+* WIP try to fix redis issue when benchmarking ([ae328a0](https://github.com/solisoft/luaonbeans/commit/ae328a05a8ba73dc0223c32a131a5e55dca6dfdc))
+
 ## [0.16.0](https://github.com/solisoft/luaonbeans/compare/v0.15.0...v0.16.0) (2025-07-19)
 
 

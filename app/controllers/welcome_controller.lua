@@ -149,8 +149,6 @@ local app = {
     pdf:moveY(10)
     pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dotted" }) -- green dotted
     pdf:moveY(10)
-    pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dotted", opacity = 0.5 })
-    pdf:moveY(10)
     pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dotted", cap = "round"  }) -- green dotted
     pdf:moveY(10)
     pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dashed", cap = "round"  }) -- green dotted

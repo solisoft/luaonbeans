@@ -741,7 +741,6 @@ function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 	options.color   = options.color   or "000000"
 	options.style   = options.style   or "solid"   -- "solid", "dashed", "dotted"
 	options.cap     = options.cap     or "butt"    -- "butt", "round", "square"
-	options.opacity = options.opacity or 1.0       -- 0.0 to 1.0
 
 	width = width or 1
 	local rgb = PDFGenerator:hexToRGB(options.color)
@@ -772,24 +771,6 @@ function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 		table.insert(content.streams, "2 J\n")
 	else
 		table.insert(content.streams, "0 J\n")
-	end
-
-	-- Set opacity (only if < 1.0)
-	if options.opacity < 1.0 then
-		local gsName = "GS" .. tostring(math.floor(options.opacity * 100))
-		if not self.extGStates then self.extGStates = {} end
-		if not self.extGStates[gsName] then
-			-- Create ExtGState object
-			local objNum = getNewObjNum()
-			self.extGStates[gsName] = objNum
-			table.insert(self.objects, {
-				num = objNum,
-				data = string.format("<< /Type /ExtGState /CA %s /ca %s >>",
-					numberToString(options.opacity),
-					numberToString(options.opacity))
-			})
-		end
-		table.insert(content.streams, string.format("/%s gs\n", gsName))
 	end
 
 	-- Draw the line

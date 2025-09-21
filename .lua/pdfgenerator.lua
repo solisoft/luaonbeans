@@ -552,7 +552,10 @@ function PDFGenerator:drawTable(options, table_options)
 	self.current_table.header_options = options.header_options
 	self.current_table.data_options = options.data_options
 
-	self:drawRowTable(options.header_columns, options.header_options)
+	if options.header_columns then
+		self:drawRowTable(options.header_columns, options.header_options)
+	end
+
 	for line, column in ipairs(options.data_columns) do
 		if options.data_options.oddFillColor and line % 2 == 0 then
 			options.data_options.fillColor = options.data_options.oddFillColor

@@ -737,10 +737,10 @@ end
 
 -- Draw line on current page
 function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
-	option = options or {}
-	option.color = option.color or "000000"
+	options = options or {}
+	options.color = options.color or "000000"
 	width = width or 1
-	local rgb = PDFGenerator:hexToRGB(option.color)
+	local rgb = PDFGenerator:hexToRGB(options.color)
 	local content = self.contents[self.current_page_obj]
 	table.insert(content.streams, string.format(
 			"%s w\n%s %s %s RG\n%s %s m\n%s %s l\nS\n",

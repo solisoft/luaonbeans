@@ -527,18 +527,22 @@ function PDFGenerator:addParagraph(text, options)
 	self.last_font = self.last_font or {}
 	self.last_font.fontWeight = options.fontWeight
 
-	local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
-	for i, line in ipairs(lines) do
-		if options.newLine == true then
-			self.current_y = self.current_y + options.fontSize * 1.2 + options.paddingY
+	splittedText = string.split(text, "\n")
+
+	for _, text in ipairs(splittedText) do
+		local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
+		for i, line in ipairs(lines) do
+			if options.newLine == true then
+				self.current_y = self.current_y + options.fontSize * 1.2 + options.paddingY
+			end
+			if
+				self.out_of_page == false
+				and self.page_height - self.current_y - self.header_height < self.margin_y[1] + self.margin_y[2]
+			then
+				self:addPage()
+			end
+			self:addText(line, options.fontSize, options.color, options.alignment, options.width)
 		end
-		if
-			self.out_of_page == false
-			and self.page_height - self.current_y - self.header_height < self.margin_y[1] + self.margin_y[2]
-		then
-			self:addPage()
-		end
-		self:addText(line, options.fontSize, options.color, options.alignment, options.width)
 	end
 	return self
 end
@@ -645,6 +649,7 @@ function PDFGenerator:drawTableCell(text, options)
 	options = options or {}
 	options.width = options.width or self.page_width - self.margin_x[1] - self.margin_x[2]
 	options.fontSize = options.fontSize or 12
+	options.fontWeight = options.fontWeight or "normal"
 	options.textColor = options.textColor or "000"
 	options.borderWidth = options.borderWidth or 1
 	options.alignment = options.alignment or "left"
@@ -686,6 +691,7 @@ function PDFGenerator:drawTableCell(text, options)
 
 	self:addParagraph(text, {
 		fontSize = options.fontSize,
+		fontWeight = options.fontWeight,
 		alignment = options.alignment,
 		width = options.width,
 		color = options.textColor,

@@ -56,6 +56,7 @@ function PDFGenerator.new(options)
 		resources = {},
 		font_metrics = {},
 		fonts = {},
+		rgb_colors = {},
 		last_font = { fontFamily = "Helvetica", fontWeight = "normal" },
 		current_table = {
 			current_row = {
@@ -782,6 +783,7 @@ function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 
 	return self
 end
+
 -- Draw circle on current page
 -- borderColor and fillColor should be hex color codes (e.g., "000000" for black)
 function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, fillColor)
@@ -879,6 +881,11 @@ end
 
 -- Convert hex color to RGB values (0-1)
 function PDFGenerator:hexToRGB(hex)
+	self.rgb_colors = self.rgb_colors or {}
+	if self.rgb_colors[hex] then
+		return self.rgb_colors[hex]
+	end
+
 	-- Remove '#' if present
 	hex = hex:gsub("#", "")
 	-- If hex is 3 characters (shorthand), expand it to 6 characters
@@ -890,7 +897,8 @@ function PDFGenerator:hexToRGB(hex)
 	local g = tonumber(hex:sub(3, 4), 16) / 255
 	local b = tonumber(hex:sub(5, 6), 16) / 255
 
-	return { r, g, b }
+	self.rgb_colors[hex] = { r, g, b }
+	return self.rgb_colors[hex]
 end
 
 -- Draw rectangle on current page

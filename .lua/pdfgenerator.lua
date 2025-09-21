@@ -117,7 +117,7 @@ function PDFGenerator:addPage(width, height)
 	self.current_page = self.current_page + 1
 
 	-- Create content stream
-	self.contents[pageObj] = { id = contentObj, stream = "" }
+	self.contents[pageObj] = { id = contentObj, streams = {}}
 
 	-- Add page object definition
 	self.objects[pageObj] = string.format(
@@ -480,8 +480,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 		if word_spacing > 30 then
 			word_spacing = 1
 		end
-		content.stream = content.stream
-			.. string.format(
+		table.insert(content.streams, string.format(
 				"BT\n/%s %s Tf\n%s %s %s rg\n%s Tw\n%s %s Td\n(%s) Tj\nET\n",
 				fontName,
 				numberToString(fontSize),
@@ -492,14 +491,13 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 				numberToString(x_pos),
 				numberToString(self.currentYPos(self)),
 				self:escapePdfText(text)
-			)
+			))
 		return self
 	end
 
 	-- For left, center, and right alignment
 	-- Check if text width exceeds available space for left/right alignment
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"BT\n/%s %s Tf\n%s %s %s rg\n0 Tw\n%s %s Td\n(%s) Tj\nET\n",
 			fontName,
 			numberToString(fontSize),
@@ -509,7 +507,7 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 			numberToString(x_pos),
 			numberToString(self.currentYPos(self)),
 			self:escapePdfText(text)
-		)
+		))
 
 	return self
 end
@@ -732,15 +730,14 @@ end
 function PDFGenerator:drawLine(x1, y1, x2, y2, width)
 	width = width or 1
 	local content = self.contents[self.current_page_obj]
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s w\n%s %s m\n%s %s l\nS\n",
 			numberToString(width),
 			numberToString(x1),
 			numberToString(y1),
 			numberToString(x2),
 			numberToString(y2)
-		)
+		))
 	return self
 end
 
@@ -759,44 +756,41 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 	local content = self.contents[self.current_page_obj]
 
 	-- Save graphics state
-	content.stream = content.stream .. "q\n"
+	table.insert(content.streams, "q\n")
 
 	-- Set border color
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s RG\n",
 			numberToString(borderColor[1]),
 			numberToString(borderColor[2]),
 			numberToString(borderColor[3])
-		)
+		))
 
 	-- Set fill color
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s rg\n",
 			numberToString(fillColor[1]),
 			numberToString(fillColor[2]),
 			numberToString(fillColor[3])
-		)
+		))
 
 	-- Set line width
-	content.stream = content.stream .. string.format("%s w\n", numberToString(borderWidth))
+	table.insert(content.streams, string.format("%s w\n", numberToString(borderWidth)))
 
 	-- Set dash pattern if needed
 	if borderStyle == "dashed" then
-		content.stream = content.stream .. "[3 3] 0 d\n"
+		table.insert(content.streams, "[3 3] 0 d\n")
 	end
 
 	-- Draw circle using Bézier curves
 	-- Move to start point
-	content.stream = content.stream .. string.format("%s %s m\n", numberToString(x + radius), numberToString(y))
+	table.insert(content.streams, string.format("%s %s m\n", numberToString(x + radius), numberToString(y)))
 
 	-- Add four Bézier curves to approximate a circle
 	local k = 0.552284749831 -- Magic number to make Bézier curves approximate a circle
 	local kr = k * radius
 
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x + radius),
 			numberToString(y + kr),
@@ -804,10 +798,9 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y + radius),
 			numberToString(x),
 			numberToString(y + radius)
-		)
+		))
 
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x - kr),
 			numberToString(y + radius),
@@ -815,10 +808,9 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y + kr),
 			numberToString(x - radius),
 			numberToString(y)
-		)
+		))
 
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x - radius),
 			numberToString(y - kr),
@@ -826,10 +818,9 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y - radius),
 			numberToString(x),
 			numberToString(y - radius)
-		)
+		))
 
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x + kr),
 			numberToString(y - radius),
@@ -837,13 +828,10 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y - kr),
 			numberToString(x + radius),
 			numberToString(y)
-		)
+		))
 
-	-- Fill and stroke the path
-	content.stream = content.stream .. "B\n"
-
-	-- Restore graphics state
-	content.stream = content.stream .. "Q\n"
+	-- Fill and stroke the path and Restore graphics state
+	table.insert(content.streams, "B\nQ\n")
 
 	return self
 end
@@ -892,94 +880,87 @@ function PDFGenerator:drawRectangle(options)
 	local content = self.contents[self.current_page_obj]
 
 	-- Save graphics state
-	content.stream = content.stream .. "q\n"
+	table.insert(content.streams, "q\n")
 
 	-- Set border color
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s RG\n",
 			numberToString(options.borderColor[1]),
 			numberToString(options.borderColor[2]),
 			numberToString(options.borderColor[3])
-		)
+		))
 
 	-- Set line width
-	content.stream = content.stream .. string.format("%s w\n", numberToString(options.borderWidth))
+	table.insert(content.streams, string.format("%s w\n", numberToString(options.borderWidth)))
 
 	-- Set dash pattern if needed
 	if options.borderStyle == "dashed" then
-		content.stream = content.stream .. "[3 3] 0 d\n"
+		table.insert(content.streams, "[3 3] 0 d\n")
 	end
 
 	-- If fill color is provided, set it and draw filled rectangle
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s rg\n",
 			numberToString(options.fillColor[1]),
 			numberToString(options.fillColor[2]),
 			numberToString(options.fillColor[3])
-		)
+		))
 	-- Draw filled and stroked rectangle
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s %s re\nf\n",
 			numberToString(self.margin_x[1] + self.current_x),
 			numberToString(self.currentYPos(self) - options.height),
 			numberToString(options.width),
 			numberToString(options.height)
-		)
+		))
 
 	-- Draw left border
 	if options.borderSides.left == true then
-		content.stream = content.stream
-			.. string.format(
+		table.insert(content.streams, string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self) - options.height),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self))
-			)
+			))
 	end
 
 	if options.borderSides.right == true then
-		content.stream = content.stream
-			.. string.format(
+		table.insert(content.streams, string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self) - options.height),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self))
-			)
+			))
 	end
 
 	if options.borderSides.top == true then
-		content.stream = content.stream
-			.. string.format(
+		table.insert(content.streams, string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self)),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self))
-			)
+			))
 	end
 
 	if options.borderSides.bottom == true then
-		content.stream = content.stream
-			.. string.format(
+		table.insert(content.streams, string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self) - options.height),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self) - options.height)
-			)
+			))
 	end
 
 	-- Restore graphics state
-	content.stream = content.stream .. "Q\n"
+	table.insert(content.streams, "Q\n")
 
 	return self
 end
@@ -998,32 +979,30 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
 	local content = self.contents[self.current_page_obj]
 
 	-- Save graphics state
-	content.stream = content.stream .. "q\n"
+	table.insert(content.streams, "q\n")
 
 	-- Set border color
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s RG\n",
 			numberToString(borderColor[1]),
 			numberToString(borderColor[2]),
 			numberToString(borderColor[3])
-		)
+		))
 
 	-- Set fill color
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"%s %s %s rg\n",
 			numberToString(fillColor[1]),
 			numberToString(fillColor[2]),
 			numberToString(fillColor[3])
-		)
+		))
 
 	-- Set line width
-	content.stream = content.stream .. string.format("%s w\n", numberToString(borderWidth))
+	table.insert(content.streams, string.format("%s w\n", numberToString(borderWidth)))
 
 	-- Set dash pattern if needed
 	if borderStyle == "dashed" then
-		content.stream = content.stream .. "[3 3] 0 d\n"
+		table.insert(content.streams, "[3 3] 0 d\n")
 	end
 
 	-- Calculate star points
@@ -1039,19 +1018,14 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
 	end
 
 	-- Draw the star
-	content.stream = content.stream
-		.. string.format("%s %s m\n", numberToString(points[1][1]), numberToString(points[1][2]))
+	table.insert(content.streams, string.format("%s %s m\n", numberToString(points[1][1]), numberToString(points[1][2])))
 
 	for i = 2, #points do
-		content.stream = content.stream
-			.. string.format("%s %s l\n", numberToString(points[i][1]), numberToString(points[i][2]))
+		table.insert(content.streams, string.format("%s %s l\n", numberToString(points[i][1]), numberToString(points[i][2])))
 	end
 
 	-- Close the path and fill/stroke
-	content.stream = content.stream .. "h\nB\n"
-
-	-- Restore graphics state
-	content.stream = content.stream .. "Q\n"
+	table.insert(content.streams, "h\nB\nQ\n")
 
 	return self
 end
@@ -1113,15 +1087,14 @@ function PDFGenerator:drawImage(imgName, width)
 	-- Draw image with corrected coordinate system
 	local content = self.contents[self.current_page_obj]
 	local height = image.height * width / image.width
-	content.stream = content.stream
-		.. string.format(
+	table.insert(content.streams, string.format(
 			"q\n%s 0 0 %s %s %s cm\n/%s Do\nQ\n",
 			numberToString(width),
 			numberToString(height),
 			numberToString(self.current_x + self.margin_x[1]),
 			numberToString(self.currentYPos(self) - height),
 			imgName
-		)
+		))
 
 	self:moveY(height)
 	return self
@@ -1318,10 +1291,10 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 	local strokeW = options.borderWidth
 	if options.scaleStroke then strokeW=strokeW*scale end
 	if strokeW<=0 then strokeW=options.borderWidth end
-	content.stream = content.stream.."q\n"
-	content.stream = content.stream..string.format("%s w\n", nts(strokeW))
-	if strokeRGB then content.stream = content.stream..string.format("%s %s %s RG\n", nts(strokeRGB[1]), nts(strokeRGB[2]), nts(strokeRGB[3])) end
-	if fillRGB then content.stream = content.stream..string.format("%s %s %s rg\n", nts(fillRGB[1]), nts(fillRGB[2]), nts(fillRGB[3])) end
+	table.insert(content.streams, "q\n")
+	table.insert(content.streams, string.format("%s w\n", nts(strokeW)))
+	if strokeRGB then table.insert(content.streams, string.format("%s %s %s RG\n", nts(strokeRGB[1]), nts(strokeRGB[2]), nts(strokeRGB[3]))) end
+	if fillRGB then table.insert(content.streams, string.format("%s %s %s rg\n", nts(fillRGB[1]), nts(fillRGB[2]), nts(fillRGB[3]))) end
 
 	-- parse & render
 	local cx,cy = 0,0
@@ -1340,14 +1313,14 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			if #nums >= 2 then
 				cx, cy = nums[1], nums[2]; i = 3
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s m\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s m\n", nts(tx), nts(ty)))
 				sx, sy = cx, cy
 				lastCmd = "M"
 			end
 			while i <= #nums do
 				cx, cy = nums[i], nums[i+1]; i = i + 2
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "L"
 			end
 
@@ -1355,14 +1328,14 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			if #nums >= 2 then
 				cx, cy = cx + nums[1], cy + nums[2]; i = 3
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s m\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s m\n", nts(tx), nts(ty)))
 				sx, sy = cx, cy
 				lastCmd = "m"
 			end
 			while i <= #nums do
 				cx, cy = cx + nums[i], cy + nums[i+1]; i = i + 2
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "l"
 			end
 
@@ -1370,7 +1343,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			while i <= #nums do
 				cx, cy = nums[i], nums[i+1]; i = i + 2
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "L"
 			end
 
@@ -1378,7 +1351,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			while i <= #nums do
 				cx, cy = cx + nums[i], cy + nums[i+1]; i = i + 2
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "l"
 			end
 
@@ -1386,7 +1359,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			while i <= #nums do
 				cx = nums[i]; i = i + 1
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "H"
 			end
 
@@ -1394,7 +1367,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			while i <= #nums do
 				cx = cx + nums[i]; i = i + 1
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "h"
 			end
 
@@ -1402,7 +1375,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			while i <= #nums do
 				cy = nums[i]; i = i + 1
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "V"
 			end
 
@@ -1410,7 +1383,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			while i <= #nums do
 				cy = cy + nums[i]; i = i + 1
 				local tx, ty = transform(cx, cy)
-				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
+				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "v"
 			end
 
@@ -1420,7 +1393,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(x1,y1)
 				local tx2,ty2 = transform(x2,y2)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "C"
@@ -1434,7 +1407,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(x1,y1)
 				local tx2,ty2 = transform(x2,y2)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "c"
@@ -1448,7 +1421,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(x1,y1)
 				local tx2,ty2 = transform(x2,y2)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "S"
@@ -1462,7 +1435,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(x1,y1)
 				local tx2,ty2 = transform(x2,y2)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "s"
@@ -1479,7 +1452,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(c1x,c1y)
 				local tx2,ty2 = transform(c2x,c2y)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "Q"
@@ -1495,7 +1468,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(c1x,c1y)
 				local tx2,ty2 = transform(c2x,c2y)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "q"
@@ -1513,7 +1486,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(c1x,c1y)
 				local tx2,ty2 = transform(c2x,c2y)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "T"
@@ -1531,7 +1504,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local tx1,ty1 = transform(c1x,c1y)
 				local tx2,ty2 = transform(c2x,c2y)
 				local tx, ty  = transform(x,y)
-				content.stream = content.stream .. string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty))
+				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "t"
@@ -1555,10 +1528,10 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 
 				for _, b in ipairs(beziers) do
 						local x1, y1, x2, y2, x3, y3 = table.unpack(b)
-						content.stream = content.stream .. string.format(
+						table.insert(content.streams, string.format(
 								"%s %s %s %s %s %s c\n",
 								nts(x1), nts(y1), nts(x2), nts(y2), nts(x3), nts(y3)
-						)
+						))
 				end
 
 				cx, cy = x, y
@@ -1567,14 +1540,17 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 
 		elseif cmd == "Z" or cmd == "z" then
 			-- emit closepath; PDF 'h' closes current subpath
-			content.stream = content.stream .. "h\n"
+			table.insert(content.streams, "h\n")
 			cx, cy = sx, sy
 			lastCmd = cmd
 		end
 	end
 
-	if fillRGB then content.stream = content.stream.."B\n" else content.stream = content.stream.."S\n" end
-	content.stream = content.stream.."Q\n"
+	if fillRGB then
+		table.insert(content.streams, "B\nQ\n")
+	else
+		table.insert(content.streams, "S\nQ\n")
+	end
 	return self
 end
 
@@ -1608,11 +1584,13 @@ function PDFGenerator:generate()
 
 	-- Write content streams
 	for pageId, content in pairs(self.contents) do
+		local stream = table.concat(content.streams)
+
 		self.objects[content.id] = string.format(
 			"%d 0 obj\n<< /Length %d >>\nstream\n%s\nendstream\nendobj\n",
 			content.id,
-			#content.stream,
-			content.stream
+			#stream,
+			stream
 		)
 	end
 

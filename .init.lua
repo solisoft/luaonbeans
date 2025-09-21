@@ -53,6 +53,8 @@ function OnError(status, message, details)
 	Params.message = message
 	Params.details = details
 	Params.env = BeansEnv
+
+	SetStatus(status)
 	Page("errors/index", "app")
 end
 

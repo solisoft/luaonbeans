@@ -2,7 +2,7 @@
 
 return {
   run = function()
-    describe('luaonbeans', function()
+  describe('luaonbeans', function()
       lester.before(function()
         -- This function is run before every test.
       end)

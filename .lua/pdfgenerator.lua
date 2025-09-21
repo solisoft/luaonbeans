@@ -775,13 +775,10 @@ function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 
 	-- Draw the line
 	table.insert(content.streams, string.format(
-		"%s %s m\n%s %s l\nS\n",
+		"%s %s m\n%s %s l\nS\nQ\n",
 		numberToString(x1), numberToString(y1),
 		numberToString(x2), numberToString(y2)
 	))
-
-	-- Restore graphics state
-	table.insert(content.streams, "Q\n")
 
 	return self
 end

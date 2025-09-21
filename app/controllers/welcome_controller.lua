@@ -142,6 +142,19 @@ local app = {
         strokeColor = "000000", borderWidth = 1, align = "center", fillColor="cccccc"
     })
 
+    pdf:moveY(500)
+    pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 2, { color = "ff0000", style = "solid" })   -- red solid
+    pdf:moveY(10)
+    pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 2, { color = "0000ff", style = "dashed" }) -- blue dashed
+    pdf:moveY(10)
+    pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dotted" }) -- green dotted
+    pdf:moveY(10)
+    pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dotted", opacity = 0.5 })
+    pdf:moveY(10)
+    pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dotted", cap = "round"  }) -- green dotted
+    pdf:moveY(10)
+    pdf:drawLine(55, pdf:currentYPos(), 545, pdf:currentYPos(), 1, { color = "00aa00", style = "dashed", cap = "round"  }) -- green dotted
+
     SetHeader("Content-Type", "application/pdf")
     Write(pdf:generate())
   end,

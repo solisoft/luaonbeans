@@ -738,24 +738,72 @@ end
 -- Draw line on current page
 function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 	options = options or {}
-	options.color = options.color or "000000"
+	options.color   = options.color   or "000000"
+	options.style   = options.style   or "solid"   -- "solid", "dashed", "dotted"
+	options.cap     = options.cap     or "butt"    -- "butt", "round", "square"
+	options.opacity = options.opacity or 1.0       -- 0.0 to 1.0
+
 	width = width or 1
 	local rgb = PDFGenerator:hexToRGB(options.color)
 	local content = self.contents[self.current_page_obj]
+
+	-- Save graphics state
+	table.insert(content.streams, "q\n")
+
+	-- Set line width and color
+	table.insert(content.streams, string.format("%s w\n", numberToString(width)))
+	table.insert(content.streams, string.format("%s %s %s RG\n",
+		numberToString(rgb[1]), numberToString(rgb[2]), numberToString(rgb[3])))
+
+	-- Set line style (dash pattern)
+	if options.style == "dashed" then
+		table.insert(content.streams, "[6 3] 0 d\n")
+	elseif options.style == "dotted" then
+		table.insert(content.streams, string.format("[%s %s] 0 d\n",
+			numberToString(width), numberToString(width * 2)))
+	else
+		table.insert(content.streams, "[] 0 d\n")
+	end
+
+	-- Set line cap
+	if options.cap == "round" then
+		table.insert(content.streams, "1 J\n")
+	elseif options.cap == "square" then
+		table.insert(content.streams, "2 J\n")
+	else
+		table.insert(content.streams, "0 J\n")
+	end
+
+	-- Set opacity (only if < 1.0)
+	if options.opacity < 1.0 then
+		local gsName = "GS" .. tostring(math.floor(options.opacity * 100))
+		if not self.extGStates then self.extGStates = {} end
+		if not self.extGStates[gsName] then
+			-- Create ExtGState object
+			local objNum = getNewObjNum()
+			self.extGStates[gsName] = objNum
+			table.insert(self.objects, {
+				num = objNum,
+				data = string.format("<< /Type /ExtGState /CA %s /ca %s >>",
+					numberToString(options.opacity),
+					numberToString(options.opacity))
+			})
+		end
+		table.insert(content.streams, string.format("/%s gs\n", gsName))
+	end
+
+	-- Draw the line
 	table.insert(content.streams, string.format(
-			"%s w\n%s %s %s RG\n%s %s m\n%s %s l\nS\n",
-			numberToString(width),
-			numberToString(rgb[1]),
-			numberToString(rgb[2]),
-			numberToString(rgb[3]),
-			numberToString(x1),
-			numberToString(y1),
-			numberToString(x2),
-			numberToString(y2)
-		))
+		"%s %s m\n%s %s l\nS\n",
+		numberToString(x1), numberToString(y1),
+		numberToString(x2), numberToString(y2)
+	))
+
+	-- Restore graphics state
+	table.insert(content.streams, "Q\n")
+
 	return self
 end
-
 -- Draw circle on current page
 -- borderColor and fillColor should be hex color codes (e.g., "000000" for black)
 function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, fillColor)

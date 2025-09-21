@@ -1226,6 +1226,81 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 		return minx,miny,maxx,maxy
 	end
 
+	-- Based on SVG spec (https://www.w3.org/TR/SVG/implnote.html)
+	local function arcToBeziers(x1, y1, rx, ry, angle, largeArc, sweep, x2, y2)
+		local rad = math.rad(angle or 0)
+		local cosA, sinA = math.cos(rad), math.sin(rad)
+
+		-- Step 1: Compute transformed coords
+		local dx2, dy2 = (x1 - x2) / 2, (y1 - y2) / 2
+		local x1p = cosA * dx2 + sinA * dy2
+		local y1p = -sinA * dx2 + cosA * dy2
+
+		rx = math.abs(rx)
+		ry = math.abs(ry)
+
+		-- Correct radii
+		local rCheck = (x1p^2) / (rx^2) + (y1p^2) / (ry^2)
+		if rCheck > 1 then
+			local scale = math.sqrt(rCheck)
+			rx, ry = rx*scale, ry*scale
+		end
+
+		-- Step 2: Compute center
+		local sign = (largeArc == sweep) and -1 or 1
+		local num = rx^2*ry^2 - rx^2*y1p^2 - ry^2*x1p^2
+		local den = rx^2*y1p^2 + ry^2*x1p^2
+		local coef = sign * math.sqrt(math.max(0, num/den))
+		local cxp = coef * (rx*y1p)/ry
+		local cyp = coef * (-ry*x1p)/rx
+
+		-- Center in absolute coords
+		local cx = cosA*cxp - sinA*cyp + (x1+x2)/2
+		local cy = sinA*cxp + cosA*cyp + (y1+y2)/2
+
+		-- Step 3: Angles
+		local function angleBetween(ux,uy,vx,vy)
+			local dot = ux*vx + uy*vy
+			local len = math.sqrt((ux^2+uy^2)*(vx^2+vy^2))
+			local ang = math.acos(math.min(math.max(dot/len,-1),1))
+			if ux*vy-uy*vx < 0 then ang = -ang end
+			return ang
+		end
+
+		local theta1 = angleBetween(1,0,(x1p-cxp)/rx,(y1p-cyp)/ry)
+		local deltaTheta = angleBetween((x1p-cxp)/rx,(y1p-cyp)/ry, (-x1p-cxp)/rx,(-y1p-cyp)/ry)
+
+		if not sweep and deltaTheta > 0 then deltaTheta = deltaTheta - 2*math.pi end
+		if sweep and deltaTheta < 0 then deltaTheta = deltaTheta + 2*math.pi end
+
+		-- Step 4: Split arc into ≤90° pieces
+		local segments = math.ceil(math.abs(deltaTheta / (math.pi/2)))
+		local result = {}
+		local delta = deltaTheta/segments
+		for i=0,segments-1 do
+			local t1 = theta1 + i*delta
+			local t2 = t1 + delta
+			local cosT1, sinT1 = math.cos(t1), math.sin(t1)
+			local cosT2, sinT2 = math.cos(t2), math.sin(t2)
+
+			-- endpoints
+			local p1x = cx + rx*cosA*cosT1 - ry*sinA*sinT1
+			local p1y = cy + rx*sinA*cosT1 + ry*cosA*sinT1
+			local p2x = cx + rx*cosA*cosT2 - ry*sinA*sinT2
+			local p2y = cy + rx*sinA*cosT2 + ry*cosA*sinT2
+
+			-- control points
+			local alpha = math.tan((t2-t1)/4)*4/3
+			local q1x = p1x - alpha*(rx*cosA*sinT1 + ry*sinA*cosT1)
+			local q1y = p1y - alpha*(rx*sinA*sinT1 - ry*cosA*cosT1)
+			local q2x = p2x + alpha*(rx*cosA*sinT2 + ry*sinA*cosT2)
+			local q2y = p2y + alpha*(rx*sinA*sinT2 - ry*cosA*cosT2)
+
+			table.insert(result, {q1x,q1y,q2x,q2y,p2x,p2y})
+		end
+		return result
+	end
+
 	local minx,miny,maxx,maxy = computeBounds(pathData)
 	local origW,origH = maxx-minx,maxy-miny
 	if origW==0 then origW=1 end
@@ -1254,7 +1329,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 	local cpx,cpy=0,0
 	local qx,qy=nil,nil
 	local lastCmd=nil
-	for cmd,argsStr in pathData:gmatch("([MLHVCSQTZmlhvcsqtz])([^MLHVCSQTZmlhvcsqtz]*)") do
+	for cmd,argsStr in pathData:gmatch("([AMLHVCSQTZamlhvcsqtz])([^AMLHVCSQTZamlhvcsqtz]*)") do
 		local nums=parseNumbers(argsStr)
 		local i=1
 		local function lastWasCubic() return lastCmd and (lastCmd:lower()=="c" or lastCmd:lower()=="s") end
@@ -1298,6 +1373,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
 				lastCmd = "L"
 			end
+
 		elseif cmd == "l" then
 			while i <= #nums do
 				cx, cy = cx + nums[i], cy + nums[i+1]; i = i + 2
@@ -1313,6 +1389,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
 				lastCmd = "H"
 			end
+
 		elseif cmd == "h" then
 			while i <= #nums do
 				cx = cx + nums[i]; i = i + 1
@@ -1328,6 +1405,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				content.stream = content.stream .. string.format("%s %s l\n", nts(tx), nts(ty))
 				lastCmd = "V"
 			end
+
 		elseif cmd == "v" then
 			while i <= #nums do
 				cy = cy + nums[i]; i = i + 1
@@ -1347,6 +1425,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				cx, cy = x, y
 				lastCmd = "C"
 			end
+
 		elseif cmd == "c" then
 			while i <= #nums do
 				local x1,y1 = cx + nums[i], cy + nums[i+1]
@@ -1374,6 +1453,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				cx, cy = x, y
 				lastCmd = "S"
 			end
+
 		elseif cmd == "s" then
 			while i <= #nums do
 				local x2,y2,x,y = cx + nums[i], cy + nums[i+1], cx + nums[i+2], cy + nums[i+3]; i = i + 4
@@ -1404,6 +1484,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				cx, cy = x, y
 				lastCmd = "Q"
 			end
+
 		elseif cmd == "q" then
 			while i <= #nums do
 				local x1,y1,x,y = cx + nums[i], cy + nums[i+1], cx + nums[i+2], cy + nums[i+3]; i = i + 4
@@ -1437,6 +1518,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				cx, cy = x, y
 				lastCmd = "T"
 			end
+
 		elseif cmd == "t" then
 			while i <= #nums do
 				local x,y = cx + nums[i], cy + nums[i+1]; i = i + 2
@@ -1453,6 +1535,34 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "t"
+			end
+
+		elseif cmd == "A" or cmd == "a" then
+			while i + 6 <= #nums do
+				local rx, ry        = nums[i], nums[i+1]
+				local xAxisRot      = nums[i+2]
+				local largeArcFlag  = nums[i+3]
+				local sweepFlag     = nums[i+4]
+				local x, y
+
+				if cmd == "a" then
+						x, y = cx + nums[i+5], cy + nums[i+6]
+				else
+						x, y = nums[i+5], nums[i+6]
+				end
+
+				local beziers = arcToBeziers(cx, cy, rx, ry, xAxisRot, largeArcFlag ~= 0, sweepFlag ~= 0, x, y)
+
+				for _, b in ipairs(beziers) do
+						local x1, y1, x2, y2, x3, y3 = table.unpack(b)
+						content.stream = content.stream .. string.format(
+								"%s %s %s %s %s %s c\n",
+								nts(x1), nts(y1), nts(x2), nts(y2), nts(x3), nts(y3)
+						)
+				end
+
+				cx, cy = x, y
+				i = i + 7
 			end
 
 		elseif cmd == "Z" or cmd == "z" then

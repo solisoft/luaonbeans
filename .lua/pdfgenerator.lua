@@ -55,7 +55,7 @@ function PDFGenerator:addPage(width, height)
 	self.current_page = self.current_page + 1
 
 	-- Create content stream
-	self.contents[pageObj] = { id = contentObj, streams = {}}
+	self.contents[pageObj] = { id = contentObj, streams = {} }
 
 	-- Add page object definition
 	self.objects[pageObj] = string.format(
@@ -389,7 +389,9 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 		if word_spacing > 30 then
 			word_spacing = 1
 		end
-		table.insert(content.streams, string.format(
+		table.insert(
+			content.streams,
+			string.format(
 				"BT\n/%s %s Tf\n%s %s %s rg\n%s Tw\n%s %s Td\n(%s) Tj\nET\n",
 				fontName,
 				numberToString(fontSize),
@@ -400,13 +402,16 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 				numberToString(x_pos),
 				numberToString(self.currentYPos(self)),
 				self:escapePdfText(text)
-			))
+			)
+		)
 		return self
 	end
 
 	-- For left, center, and right alignment
 	-- Check if text width exceeds available space for left/right alignment
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"BT\n/%s %s Tf\n%s %s %s rg\n0 Tw\n%s %s Td\n(%s) Tj\nET\n",
 			fontName,
 			numberToString(fontSize),
@@ -416,7 +421,8 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 			numberToString(x_pos),
 			numberToString(self.currentYPos(self)),
 			self:escapePdfText(text)
-		))
+		)
+	)
 
 	return self
 end
@@ -647,9 +653,9 @@ end
 -- Draw line on current page
 function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 	options = options or {}
-	options.color   = options.color   or "000000"
-	options.style   = options.style   or "solid"   -- "solid", "dashed", "dotted"
-	options.cap     = options.cap     or "butt"    -- "butt", "round", "square"
+	options.color = options.color or "000000"
+	options.style = options.style or "solid" -- "solid", "dashed", "dotted"
+	options.cap = options.cap or "butt" -- "butt", "round", "square"
 
 	width = width or 1
 	local rgb = PDFGenerator:hexToRGB(options.color)
@@ -660,15 +666,16 @@ function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 
 	-- Set line width and color
 	table.insert(content.streams, string.format("%s w\n", numberToString(width)))
-	table.insert(content.streams, string.format("%s %s %s RG\n",
-		numberToString(rgb[1]), numberToString(rgb[2]), numberToString(rgb[3])))
+	table.insert(
+		content.streams,
+		string.format("%s %s %s RG\n", numberToString(rgb[1]), numberToString(rgb[2]), numberToString(rgb[3]))
+	)
 
 	-- Set line style (dash pattern)
 	if options.style == "dashed" then
 		table.insert(content.streams, "[6 3] 0 d\n")
 	elseif options.style == "dotted" then
-		table.insert(content.streams, string.format("[%s %s] 0 d\n",
-			numberToString(width), numberToString(width * 2)))
+		table.insert(content.streams, string.format("[%s %s] 0 d\n", numberToString(width), numberToString(width * 2)))
 	else
 		table.insert(content.streams, "[] 0 d\n")
 	end
@@ -683,11 +690,16 @@ function PDFGenerator:drawLine(x1, y1, x2, y2, width, options)
 	end
 
 	-- Draw the line
-	table.insert(content.streams, string.format(
-		"%s %s m\n%s %s l\nS\nQ\n",
-		numberToString(x1), numberToString(y1),
-		numberToString(x2), numberToString(y2)
-	))
+	table.insert(
+		content.streams,
+		string.format(
+			"%s %s m\n%s %s l\nS\nQ\n",
+			numberToString(x1),
+			numberToString(y1),
+			numberToString(x2),
+			numberToString(y2)
+		)
+	)
 
 	return self
 end
@@ -710,20 +722,26 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 	table.insert(content.streams, "q\n")
 
 	-- Set border color
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s RG\n",
 			numberToString(borderColor[1]),
 			numberToString(borderColor[2]),
 			numberToString(borderColor[3])
-		))
+		)
+	)
 
 	-- Set fill color
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s rg\n",
 			numberToString(fillColor[1]),
 			numberToString(fillColor[2]),
 			numberToString(fillColor[3])
-		))
+		)
+	)
 
 	-- Set line width
 	table.insert(content.streams, string.format("%s w\n", numberToString(borderWidth)))
@@ -741,7 +759,9 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 	local k = 0.552284749831 -- Magic number to make Bézier curves approximate a circle
 	local kr = k * radius
 
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x + radius),
 			numberToString(y + kr),
@@ -749,9 +769,12 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y + radius),
 			numberToString(x),
 			numberToString(y + radius)
-		))
+		)
+	)
 
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x - kr),
 			numberToString(y + radius),
@@ -759,9 +782,12 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y + kr),
 			numberToString(x - radius),
 			numberToString(y)
-		))
+		)
+	)
 
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x - radius),
 			numberToString(y - kr),
@@ -769,9 +795,12 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y - radius),
 			numberToString(x),
 			numberToString(y - radius)
-		))
+		)
+	)
 
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s %s %s %s c\n",
 			numberToString(x + kr),
 			numberToString(y - radius),
@@ -779,7 +808,8 @@ function PDFGenerator:drawCircle(radius, borderWidth, borderStyle, borderColor, 
 			numberToString(y - kr),
 			numberToString(x + radius),
 			numberToString(y)
-		))
+		)
+	)
 
 	-- Fill and stroke the path and Restore graphics state
 	table.insert(content.streams, "B\nQ\n")
@@ -840,12 +870,15 @@ function PDFGenerator:drawRectangle(options)
 	table.insert(content.streams, "q\n")
 
 	-- Set border color
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s RG\n",
 			numberToString(options.borderColor[1]),
 			numberToString(options.borderColor[2]),
 			numberToString(options.borderColor[3])
-		))
+		)
+	)
 
 	-- Set line width
 	table.insert(content.streams, string.format("%s w\n", numberToString(options.borderWidth)))
@@ -856,64 +889,82 @@ function PDFGenerator:drawRectangle(options)
 	end
 
 	-- If fill color is provided, set it and draw filled rectangle
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s rg\n",
 			numberToString(options.fillColor[1]),
 			numberToString(options.fillColor[2]),
 			numberToString(options.fillColor[3])
-		))
+		)
+	)
 	-- Draw filled and stroked rectangle
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s %s re\nf\n",
 			numberToString(self.margin_x[1] + self.current_x),
 			numberToString(self.currentYPos(self) - options.height),
 			numberToString(options.width),
 			numberToString(options.height)
-		))
+		)
+	)
 
 	-- Draw left border
 	if options.borderSides.left == true then
-		table.insert(content.streams, string.format(
+		table.insert(
+			content.streams,
+			string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self) - options.height),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self))
-			))
+			)
+		)
 	end
 
 	if options.borderSides.right == true then
-		table.insert(content.streams, string.format(
+		table.insert(
+			content.streams,
+			string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self) - options.height),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self))
-			))
+			)
+		)
 	end
 
 	if options.borderSides.top == true then
-		table.insert(content.streams, string.format(
+		table.insert(
+			content.streams,
+			string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self)),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self))
-			))
+			)
+		)
 	end
 
 	if options.borderSides.bottom == true then
-		table.insert(content.streams, string.format(
+		table.insert(
+			content.streams,
+			string.format(
 				"%s w\n%s %s m\n%s %s l\nS\n",
 				numberToString(options.borderWidth),
 				numberToString(self.margin_x[1] + self.current_x),
 				numberToString(self.currentYPos(self) - options.height),
 				numberToString(self.margin_x[1] + self.current_x + options.width),
 				numberToString(self.currentYPos(self) - options.height)
-			))
+			)
+		)
 	end
 
 	-- Restore graphics state
@@ -939,20 +990,26 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
 	table.insert(content.streams, "q\n")
 
 	-- Set border color
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s RG\n",
 			numberToString(borderColor[1]),
 			numberToString(borderColor[2]),
 			numberToString(borderColor[3])
-		))
+		)
+	)
 
 	-- Set fill color
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"%s %s %s rg\n",
 			numberToString(fillColor[1]),
 			numberToString(fillColor[2]),
 			numberToString(fillColor[3])
-		))
+		)
+	)
 
 	-- Set line width
 	table.insert(content.streams, string.format("%s w\n", numberToString(borderWidth)))
@@ -975,10 +1032,16 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
 	end
 
 	-- Draw the star
-	table.insert(content.streams, string.format("%s %s m\n", numberToString(points[1][1]), numberToString(points[1][2])))
+	table.insert(
+		content.streams,
+		string.format("%s %s m\n", numberToString(points[1][1]), numberToString(points[1][2]))
+	)
 
 	for i = 2, #points do
-		table.insert(content.streams, string.format("%s %s l\n", numberToString(points[i][1]), numberToString(points[i][2])))
+		table.insert(
+			content.streams,
+			string.format("%s %s l\n", numberToString(points[i][1]), numberToString(points[i][2]))
+		)
 	end
 
 	-- Close the path and fill/stroke
@@ -1044,14 +1107,17 @@ function PDFGenerator:drawImage(imgName, width)
 	-- Draw image with corrected coordinate system
 	local content = self.contents[self.current_page_obj]
 	local height = image.height * width / image.width
-	table.insert(content.streams, string.format(
+	table.insert(
+		content.streams,
+		string.format(
 			"q\n%s 0 0 %s %s %s cm\n/%s Do\nQ\n",
 			numberToString(width),
 			numberToString(height),
 			numberToString(self.current_x + self.margin_x[1]),
 			numberToString(self.currentYPos(self) - height),
 			imgName
-		))
+		)
+	)
 
 	self:moveY(height)
 	return self
@@ -1097,23 +1163,33 @@ end
 function PDFGenerator:drawSvgPath(width, height, pathData, options)
 	options = options or {}
 	options.strokeColor = options.strokeColor or "000000"
-	options.fillColor   = options.fillColor or nil
+	options.fillColor = options.fillColor or nil
 	options.borderWidth = options.borderWidth or 1
-	options.align = options.align or "min"      -- "min" or "center"
-	if options.scaleStroke == nil then options.scaleStroke = true end
+	options.align = options.align or "min" -- "min" or "center"
+	if options.scaleStroke == nil then
+		options.scaleStroke = true
+	end
 
-	local x = (self.current_x) + self.margin_x[1]
+	local x = self.current_x + self.margin_x[1]
 	local y = self.page_height - self.current_y - self.margin_y[1] - height
-	local nts = numberToString or function(n) return ("%.4f"):format(n) end
-	local hexToRGB = (self.hexToRGB) and function(h) return self:hexToRGB(h) end or function(h) return {0,0,0} end
+	local nts = numberToString or function(n)
+		return ("%.4f"):format(n)
+	end
+	local hexToRGB = self.hexToRGB and function(h)
+		return self:hexToRGB(h)
+	end or function(h)
+		return { 0, 0, 0 }
+	end
 	local strokeRGB = hexToRGB(options.strokeColor)
-	local fillRGB   = options.fillColor and hexToRGB(options.fillColor) or nil
+	local fillRGB = options.fillColor and hexToRGB(options.fillColor) or nil
 	local content = self.contents[self.current_page_obj]
 
 	-- helper to parse numbers
 	local function parseNumbers(str)
 		local nums = {}
-		for n in str:gmatch("([+-]?%d*%.?%d+)") do table.insert(nums, tonumber(n)) end
+		for n in str:gmatch("([+-]?%d*%.?%d+)") do
+			table.insert(nums, tonumber(n))
+		end
 		return nums
 	end
 
@@ -1121,39 +1197,181 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 	local function computeBounds(path)
 		local cx, cy = 0, 0
 		local sx, sy = 0, 0
-		local cpx, cpy = 0,0
-		local qx,qy = nil,nil
+		local cpx, cpy = 0, 0
+		local qx, qy = nil, nil
 		local lastCmd
 		local minx, miny = math.huge, math.huge
 		local maxx, maxy = -math.huge, -math.huge
-		local function updateBounds(...) local args = {...} for i=1,#args,2 do local px,py=args[i],args[i+1] if px and py then minx=math.min(minx,px) miny=math.min(miny,py) maxx=math.max(maxx,px) maxy=math.max(maxy,py) end end end
-
-		for cmd,argsStr in path:gmatch("([MLHVCSQTZmlhvcsqtz])([^MLHVCSQTZmlhvcsqtz]*)") do
-			local nums = parseNumbers(argsStr)
-			local i=1
-			local function lastWasCubic() return lastCmd and (lastCmd:lower()=="c" or lastCmd:lower()=="s") end
-			local function lastWasQuad()  return lastCmd and (lastCmd:lower()=="q" or lastCmd:lower()=="t") end
-
-			if cmd=="M" then while i<=#nums do cx,cy=nums[i],nums[i+1];i=i+2; sx,sy=cx,cy; updateBounds(cx,cy); lastCmd="M" end
-			elseif cmd=="m" then while i<=#nums do cx,cy=cx+nums[i],cy+nums[i+1];i=i+2; sx,sy=cx,cy; updateBounds(cx,cy); lastCmd="m" end
-			elseif cmd=="L" then while i<=#nums do cx,cy=nums[i],nums[i+1];i=i+2; updateBounds(cx,cy); lastCmd="L" end
-			elseif cmd=="l" then while i<=#nums do cx,cy=cx+nums[i],cy+nums[i+1];i=i+2; updateBounds(cx,cy); lastCmd="l" end
-			elseif cmd=="H" then while i<=#nums do cx=nums[i];i=i+1; updateBounds(cx,cy); lastCmd="H" end
-			elseif cmd=="h" then while i<=#nums do cx=cx+nums[i];i=i+1; updateBounds(cx,cy); lastCmd="h" end
-			elseif cmd=="V" then while i<=#nums do cy=nums[i];i=i+1; updateBounds(cx,cy); lastCmd="V" end
-			elseif cmd=="v" then while i<=#nums do cy=cy+nums[i];i=i+1; updateBounds(cx,cy); lastCmd="v" end
-			elseif cmd=="C" then while i<=#nums do local x1,y1,x2,y2,x,y=nums[i],nums[i+1],nums[i+2],nums[i+3],nums[i+4],nums[i+5]; i=i+6; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="C" end
-			elseif cmd=="c" then while i<=#nums do local x1,y1=cx+nums[i],cy+nums[i+1]; local x2,y2=cx+nums[i+2],cy+nums[i+3]; local x,y=cx+nums[i+4],cy+nums[i+5]; i=i+6; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="c" end
-			elseif cmd=="S" then while i<=#nums do local x2,y2,x,y=nums[i],nums[i+1],nums[i+2],nums[i+3]; i=i+4; local x1,y1 = lastWasCubic() and (2*cx-cpx), (2*cy-cpy) or cx,cy; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="S" end
-			elseif cmd=="s" then while i<=#nums do local x2,y2,x,y=cx+nums[i],cy+nums[i+1],cx+nums[i+2],cy+nums[i+3]; i=i+4; local x1,y1 = lastWasCubic() and (2*cx-cpx), (2*cy-cpy) or cx,cy; updateBounds(x1,y1,x2,y2,x,y); cpx,cpy=x2,y2; cx,cy=x,y; lastCmd="s" end
-			elseif cmd=="Q" then while i<=#nums do local x1,y1,x,y=nums[i],nums[i+1],nums[i+2],nums[i+3];i=i+4; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="Q" end
-			elseif cmd=="q" then while i<=#nums do local x1,y1,x,y=cx+nums[i],cy+nums[i+1],cx+nums[i+2],cy+nums[i+3];i=i+4; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="q" end
-			elseif cmd=="T" then while i<=#nums do local x,y=nums[i],nums[i+1];i=i+2; local x1,y1 = lastWasQuad() and qx and (2*cx-qx),(2*cy-qy) or cx,cy; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="T" end
-			elseif cmd=="t" then while i<=#nums do local x,y=cx+nums[i],cy+nums[i+1];i=i+2; local x1,y1 = lastWasQuad() and qx and (2*cx-qx),(2*cy-qy) or cx,cy; updateBounds(x1,y1,x,y); qx,qy=x1,y1; cx,cy=x,y; lastCmd="t" end
-			elseif cmd=="Z" or cmd=="z" then updateBounds(sx,sy); cx,cy=sx,sy; lastCmd=cmd end
+		local function updateBounds(...)
+			local args = { ... }
+			for i = 1, #args, 2 do
+				local px, py = args[i], args[i + 1]
+				if px and py then
+					minx = math.min(minx, px)
+					miny = math.min(miny, py)
+					maxx = math.max(maxx, px)
+					maxy = math.max(maxy, py)
+				end
+			end
 		end
-		if minx==math.huge then minx,miny,maxx,maxy=0,0,0,0 end
-		return minx,miny,maxx,maxy
+
+		for cmd, argsStr in path:gmatch("([MLHVCSQTZmlhvcsqtz])([^MLHVCSQTZmlhvcsqtz]*)") do
+			local nums = parseNumbers(argsStr)
+			local i = 1
+			local function lastWasCubic()
+				return lastCmd and (lastCmd:lower() == "c" or lastCmd:lower() == "s")
+			end
+			local function lastWasQuad()
+				return lastCmd and (lastCmd:lower() == "q" or lastCmd:lower() == "t")
+			end
+
+			if cmd == "M" then
+				while i <= #nums do
+					cx, cy = nums[i], nums[i + 1]
+					i = i + 2
+					sx, sy = cx, cy
+					updateBounds(cx, cy)
+					lastCmd = "M"
+				end
+			elseif cmd == "m" then
+				while i <= #nums do
+					cx, cy = cx + nums[i], cy + nums[i + 1]
+					i = i + 2
+					sx, sy = cx, cy
+					updateBounds(cx, cy)
+					lastCmd = "m"
+				end
+			elseif cmd == "L" then
+				while i <= #nums do
+					cx, cy = nums[i], nums[i + 1]
+					i = i + 2
+					updateBounds(cx, cy)
+					lastCmd = "L"
+				end
+			elseif cmd == "l" then
+				while i <= #nums do
+					cx, cy = cx + nums[i], cy + nums[i + 1]
+					i = i + 2
+					updateBounds(cx, cy)
+					lastCmd = "l"
+				end
+			elseif cmd == "H" then
+				while i <= #nums do
+					cx = nums[i]
+					i = i + 1
+					updateBounds(cx, cy)
+					lastCmd = "H"
+				end
+			elseif cmd == "h" then
+				while i <= #nums do
+					cx = cx + nums[i]
+					i = i + 1
+					updateBounds(cx, cy)
+					lastCmd = "h"
+				end
+			elseif cmd == "V" then
+				while i <= #nums do
+					cy = nums[i]
+					i = i + 1
+					updateBounds(cx, cy)
+					lastCmd = "V"
+				end
+			elseif cmd == "v" then
+				while i <= #nums do
+					cy = cy + nums[i]
+					i = i + 1
+					updateBounds(cx, cy)
+					lastCmd = "v"
+				end
+			elseif cmd == "C" then
+				while i <= #nums do
+					local x1, y1, x2, y2, x, y =
+						nums[i], nums[i + 1], nums[i + 2], nums[i + 3], nums[i + 4], nums[i + 5]
+					i = i + 6
+					updateBounds(x1, y1, x2, y2, x, y)
+					cpx, cpy = x2, y2
+					cx, cy = x, y
+					lastCmd = "C"
+				end
+			elseif cmd == "c" then
+				while i <= #nums do
+					local x1, y1 = cx + nums[i], cy + nums[i + 1]
+					local x2, y2 = cx + nums[i + 2], cy + nums[i + 3]
+					local x, y = cx + nums[i + 4], cy + nums[i + 5]
+					i = i + 6
+					updateBounds(x1, y1, x2, y2, x, y)
+					cpx, cpy = x2, y2
+					cx, cy = x, y
+					lastCmd = "c"
+				end
+			elseif cmd == "S" then
+				while i <= #nums do
+					local x2, y2, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+					i = i + 4
+					local x1, y1 = lastWasCubic() and (2 * cx - cpx), (2 * cy - cpy) or cx, cy
+					updateBounds(x1, y1, x2, y2, x, y)
+					cpx, cpy = x2, y2
+					cx, cy = x, y
+					lastCmd = "S"
+				end
+			elseif cmd == "s" then
+				while i <= #nums do
+					local x2, y2, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+					i = i + 4
+					local x1, y1 = lastWasCubic() and (2 * cx - cpx), (2 * cy - cpy) or cx, cy
+					updateBounds(x1, y1, x2, y2, x, y)
+					cpx, cpy = x2, y2
+					cx, cy = x, y
+					lastCmd = "s"
+				end
+			elseif cmd == "Q" then
+				while i <= #nums do
+					local x1, y1, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+					i = i + 4
+					updateBounds(x1, y1, x, y)
+					qx, qy = x1, y1
+					cx, cy = x, y
+					lastCmd = "Q"
+				end
+			elseif cmd == "q" then
+				while i <= #nums do
+					local x1, y1, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+					i = i + 4
+					updateBounds(x1, y1, x, y)
+					qx, qy = x1, y1
+					cx, cy = x, y
+					lastCmd = "q"
+				end
+			elseif cmd == "T" then
+				while i <= #nums do
+					local x, y = nums[i], nums[i + 1]
+					i = i + 2
+					local x1, y1 = lastWasQuad() and qx and (2 * cx - qx), (2 * cy - qy) or cx, cy
+					updateBounds(x1, y1, x, y)
+					qx, qy = x1, y1
+					cx, cy = x, y
+					lastCmd = "T"
+				end
+			elseif cmd == "t" then
+				while i <= #nums do
+					local x, y = cx + nums[i], cy + nums[i + 1]
+					i = i + 2
+					local x1, y1 = lastWasQuad() and qx and (2 * cx - qx), (2 * cy - qy) or cx, cy
+					updateBounds(x1, y1, x, y)
+					qx, qy = x1, y1
+					cx, cy = x, y
+					lastCmd = "t"
+				end
+			elseif cmd == "Z" or cmd == "z" then
+				updateBounds(sx, sy)
+				cx, cy = sx, sy
+				lastCmd = cmd
+			end
+		end
+		if minx == math.huge then
+			minx, miny, maxx, maxy = 0, 0, 0, 0
+		end
+		return minx, miny, maxx, maxy
 	end
 
 	-- Based on SVG spec (https://www.w3.org/TR/SVG/implnote.html)
@@ -1170,331 +1388,399 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 		ry = math.abs(ry)
 
 		-- Correct radii
-		local rCheck = (x1p^2) / (rx^2) + (y1p^2) / (ry^2)
+		local rCheck = (x1p ^ 2) / (rx ^ 2) + (y1p ^ 2) / (ry ^ 2)
 		if rCheck > 1 then
 			local scale = math.sqrt(rCheck)
-			rx, ry = rx*scale, ry*scale
+			rx, ry = rx * scale, ry * scale
 		end
 
 		-- Step 2: Compute center
 		local sign = (largeArc == sweep) and -1 or 1
-		local num = rx^2*ry^2 - rx^2*y1p^2 - ry^2*x1p^2
-		local den = rx^2*y1p^2 + ry^2*x1p^2
-		local coef = sign * math.sqrt(math.max(0, num/den))
-		local cxp = coef * (rx*y1p)/ry
-		local cyp = coef * (-ry*x1p)/rx
+		local num = rx ^ 2 * ry ^ 2 - rx ^ 2 * y1p ^ 2 - ry ^ 2 * x1p ^ 2
+		local den = rx ^ 2 * y1p ^ 2 + ry ^ 2 * x1p ^ 2
+		local coef = sign * math.sqrt(math.max(0, num / den))
+		local cxp = coef * (rx * y1p) / ry
+		local cyp = coef * (-ry * x1p) / rx
 
 		-- Center in absolute coords
-		local cx = cosA*cxp - sinA*cyp + (x1+x2)/2
-		local cy = sinA*cxp + cosA*cyp + (y1+y2)/2
+		local cx = cosA * cxp - sinA * cyp + (x1 + x2) / 2
+		local cy = sinA * cxp + cosA * cyp + (y1 + y2) / 2
 
 		-- Step 3: Angles
-		local function angleBetween(ux,uy,vx,vy)
-			local dot = ux*vx + uy*vy
-			local len = math.sqrt((ux^2+uy^2)*(vx^2+vy^2))
-			local ang = math.acos(math.min(math.max(dot/len,-1),1))
-			if ux*vy-uy*vx < 0 then ang = -ang end
+		local function angleBetween(ux, uy, vx, vy)
+			local dot = ux * vx + uy * vy
+			local len = math.sqrt((ux ^ 2 + uy ^ 2) * (vx ^ 2 + vy ^ 2))
+			local ang = math.acos(math.min(math.max(dot / len, -1), 1))
+			if ux * vy - uy * vx < 0 then
+				ang = -ang
+			end
 			return ang
 		end
 
-		local theta1 = angleBetween(1,0,(x1p-cxp)/rx,(y1p-cyp)/ry)
-		local deltaTheta = angleBetween((x1p-cxp)/rx,(y1p-cyp)/ry, (-x1p-cxp)/rx,(-y1p-cyp)/ry)
+		local theta1 = angleBetween(1, 0, (x1p - cxp) / rx, (y1p - cyp) / ry)
+		local deltaTheta = angleBetween((x1p - cxp) / rx, (y1p - cyp) / ry, (-x1p - cxp) / rx, (-y1p - cyp) / ry)
 
-		if not sweep and deltaTheta > 0 then deltaTheta = deltaTheta - 2*math.pi end
-		if sweep and deltaTheta < 0 then deltaTheta = deltaTheta + 2*math.pi end
+		if not sweep and deltaTheta > 0 then
+			deltaTheta = deltaTheta - 2 * math.pi
+		end
+		if sweep and deltaTheta < 0 then
+			deltaTheta = deltaTheta + 2 * math.pi
+		end
 
 		-- Step 4: Split arc into ≤90° pieces
-		local segments = math.ceil(math.abs(deltaTheta / (math.pi/2)))
+		local segments = math.ceil(math.abs(deltaTheta / (math.pi / 2)))
 		local result = {}
-		local delta = deltaTheta/segments
-		for i=0,segments-1 do
-			local t1 = theta1 + i*delta
+		local delta = deltaTheta / segments
+		for i = 0, segments - 1 do
+			local t1 = theta1 + i * delta
 			local t2 = t1 + delta
 			local cosT1, sinT1 = math.cos(t1), math.sin(t1)
 			local cosT2, sinT2 = math.cos(t2), math.sin(t2)
 
 			-- endpoints
-			local p1x = cx + rx*cosA*cosT1 - ry*sinA*sinT1
-			local p1y = cy + rx*sinA*cosT1 + ry*cosA*sinT1
-			local p2x = cx + rx*cosA*cosT2 - ry*sinA*sinT2
-			local p2y = cy + rx*sinA*cosT2 + ry*cosA*sinT2
+			local p1x = cx + rx * cosA * cosT1 - ry * sinA * sinT1
+			local p1y = cy + rx * sinA * cosT1 + ry * cosA * sinT1
+			local p2x = cx + rx * cosA * cosT2 - ry * sinA * sinT2
+			local p2y = cy + rx * sinA * cosT2 + ry * cosA * sinT2
 
 			-- control points
-			local alpha = math.tan((t2-t1)/4)*4/3
-			local q1x = p1x - alpha*(rx*cosA*sinT1 + ry*sinA*cosT1)
-			local q1y = p1y - alpha*(rx*sinA*sinT1 - ry*cosA*cosT1)
-			local q2x = p2x + alpha*(rx*cosA*sinT2 + ry*sinA*cosT2)
-			local q2y = p2y + alpha*(rx*sinA*sinT2 - ry*cosA*cosT2)
+			local alpha = math.tan((t2 - t1) / 4) * 4 / 3
+			local q1x = p1x - alpha * (rx * cosA * sinT1 + ry * sinA * cosT1)
+			local q1y = p1y - alpha * (rx * sinA * sinT1 - ry * cosA * cosT1)
+			local q2x = p2x + alpha * (rx * cosA * sinT2 + ry * sinA * cosT2)
+			local q2y = p2y + alpha * (rx * sinA * sinT2 - ry * cosA * cosT2)
 
-			table.insert(result, {q1x,q1y,q2x,q2y,p2x,p2y})
+			table.insert(result, { q1x, q1y, q2x, q2y, p2x, p2y })
 		end
 		return result
 	end
 
-	local minx,miny,maxx,maxy = computeBounds(pathData)
-	local origW,origH = maxx-minx,maxy-miny
-	if origW==0 then origW=1 end
-	if origH==0 then origH=1 end
-	local scale = math.min(width/origW, height/origH)
-	local offsetX, offsetY = x - minx*scale, y - miny*scale
-	if options.align=="center" then
-		offsetX = offsetX + (width - origW*scale)/2
-		offsetY = offsetY + (height - origH*scale)/2
+	local minx, miny, maxx, maxy = computeBounds(pathData)
+	local origW, origH = maxx - minx, maxy - miny
+	if origW == 0 then
+		origW = 1
+	end
+	if origH == 0 then
+		origH = 1
+	end
+	local scale = math.min(width / origW, height / origH)
+	local offsetX, offsetY = x - minx * scale, y - miny * scale
+	if options.align == "center" then
+		offsetX = offsetX + (width - origW * scale) / 2
+		offsetY = offsetY + (height - origH * scale) / 2
 	end
 
-	local function transform(px,py) return px*scale+offsetX, py*scale+offsetY end
+	local function transform(px, py)
+		return px * scale + offsetX, py * scale + offsetY
+	end
 
 	-- === emit path ===
 	local strokeW = options.borderWidth
-	if options.scaleStroke then strokeW=strokeW*scale end
-	if strokeW<=0 then strokeW=options.borderWidth end
+	if options.scaleStroke then
+		strokeW = strokeW * scale
+	end
+	if strokeW <= 0 then
+		strokeW = options.borderWidth
+	end
 	table.insert(content.streams, "q\n")
 	table.insert(content.streams, string.format("%s w\n", nts(strokeW)))
-	if strokeRGB then table.insert(content.streams, string.format("%s %s %s RG\n", nts(strokeRGB[1]), nts(strokeRGB[2]), nts(strokeRGB[3]))) end
-	if fillRGB then table.insert(content.streams, string.format("%s %s %s rg\n", nts(fillRGB[1]), nts(fillRGB[2]), nts(fillRGB[3]))) end
+	if strokeRGB then
+		table.insert(
+			content.streams,
+			string.format("%s %s %s RG\n", nts(strokeRGB[1]), nts(strokeRGB[2]), nts(strokeRGB[3]))
+		)
+	end
+	if fillRGB then
+		table.insert(content.streams, string.format("%s %s %s rg\n", nts(fillRGB[1]), nts(fillRGB[2]), nts(fillRGB[3])))
+	end
 
 	-- parse & render
-	local cx,cy = 0,0
-	local sx,sy = 0,0
-	local cpx,cpy=0,0
-	local qx,qy=nil,nil
-	local lastCmd=nil
-	for cmd,argsStr in pathData:gmatch("([AMLHVCSQTZamlhvcsqtz])([^AMLHVCSQTZamlhvcsqtz]*)") do
-		local nums=parseNumbers(argsStr)
-		local i=1
-		local function lastWasCubic() return lastCmd and (lastCmd:lower()=="c" or lastCmd:lower()=="s") end
-		local function lastWasQuad() return lastCmd and (lastCmd:lower()=="q" or lastCmd:lower()=="t") end
+	local cx, cy = 0, 0
+	local sx, sy = 0, 0
+	local cpx, cpy = 0, 0
+	local qx, qy = nil, nil
+	local lastCmd = nil
+	for cmd, argsStr in pathData:gmatch("([AMLHVCSQTZamlhvcsqtz])([^AMLHVCSQTZamlhvcsqtz]*)") do
+		local nums = parseNumbers(argsStr)
+		local i = 1
+		local function lastWasCubic()
+			return lastCmd and (lastCmd:lower() == "c" or lastCmd:lower() == "s")
+		end
+		local function lastWasQuad()
+			return lastCmd and (lastCmd:lower() == "q" or lastCmd:lower() == "t")
+		end
 
 		if cmd == "M" then
 			-- first pair is move, subsequent pairs are L
 			if #nums >= 2 then
-				cx, cy = nums[1], nums[2]; i = 3
+				cx, cy = nums[1], nums[2]
+				i = 3
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s m\n", nts(tx), nts(ty)))
 				sx, sy = cx, cy
 				lastCmd = "M"
 			end
 			while i <= #nums do
-				cx, cy = nums[i], nums[i+1]; i = i + 2
+				cx, cy = nums[i], nums[i + 1]
+				i = i + 2
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "L"
 			end
-
 		elseif cmd == "m" then
 			if #nums >= 2 then
-				cx, cy = cx + nums[1], cy + nums[2]; i = 3
+				cx, cy = cx + nums[1], cy + nums[2]
+				i = 3
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s m\n", nts(tx), nts(ty)))
 				sx, sy = cx, cy
 				lastCmd = "m"
 			end
 			while i <= #nums do
-				cx, cy = cx + nums[i], cy + nums[i+1]; i = i + 2
+				cx, cy = cx + nums[i], cy + nums[i + 1]
+				i = i + 2
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "l"
 			end
-
 		elseif cmd == "L" then
 			while i <= #nums do
-				cx, cy = nums[i], nums[i+1]; i = i + 2
+				cx, cy = nums[i], nums[i + 1]
+				i = i + 2
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "L"
 			end
-
 		elseif cmd == "l" then
 			while i <= #nums do
-				cx, cy = cx + nums[i], cy + nums[i+1]; i = i + 2
+				cx, cy = cx + nums[i], cy + nums[i + 1]
+				i = i + 2
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "l"
 			end
-
 		elseif cmd == "H" then
 			while i <= #nums do
-				cx = nums[i]; i = i + 1
+				cx = nums[i]
+				i = i + 1
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "H"
 			end
-
 		elseif cmd == "h" then
 			while i <= #nums do
-				cx = cx + nums[i]; i = i + 1
+				cx = cx + nums[i]
+				i = i + 1
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "h"
 			end
-
 		elseif cmd == "V" then
 			while i <= #nums do
-				cy = nums[i]; i = i + 1
+				cy = nums[i]
+				i = i + 1
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "V"
 			end
-
 		elseif cmd == "v" then
 			while i <= #nums do
-				cy = cy + nums[i]; i = i + 1
+				cy = cy + nums[i]
+				i = i + 1
 				local tx, ty = transform(cx, cy)
 				table.insert(content.streams, string.format("%s %s l\n", nts(tx), nts(ty)))
 				lastCmd = "v"
 			end
-
 		elseif cmd == "C" then
 			while i <= #nums do
-				local x1,y1,x2,y2,x,y = nums[i],nums[i+1],nums[i+2],nums[i+3],nums[i+4],nums[i+5]; i = i + 6
-				local tx1,ty1 = transform(x1,y1)
-				local tx2,ty2 = transform(x2,y2)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local x1, y1, x2, y2, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3], nums[i + 4], nums[i + 5]
+				i = i + 6
+				local tx1, ty1 = transform(x1, y1)
+				local tx2, ty2 = transform(x2, y2)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "C"
 			end
-
 		elseif cmd == "c" then
 			while i <= #nums do
-				local x1,y1 = cx + nums[i], cy + nums[i+1]
-				local x2,y2 = cx + nums[i+2], cy + nums[i+3]
-				local x,y   = cx + nums[i+4], cy + nums[i+5]; i = i + 6
-				local tx1,ty1 = transform(x1,y1)
-				local tx2,ty2 = transform(x2,y2)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local x1, y1 = cx + nums[i], cy + nums[i + 1]
+				local x2, y2 = cx + nums[i + 2], cy + nums[i + 3]
+				local x, y = cx + nums[i + 4], cy + nums[i + 5]
+				i = i + 6
+				local tx1, ty1 = transform(x1, y1)
+				local tx2, ty2 = transform(x2, y2)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "c"
 			end
-
 		elseif cmd == "S" then
 			while i <= #nums do
-				local x2,y2,x,y = nums[i],nums[i+1],nums[i+2],nums[i+3]; i = i + 4
-				local x1,y1
-				if lastWasCubic() then x1,y1 = 2*cx - cpx, 2*cy - cpy else x1,y1 = cx, cy end
-				local tx1,ty1 = transform(x1,y1)
-				local tx2,ty2 = transform(x2,y2)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local x2, y2, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+				i = i + 4
+				local x1, y1
+				if lastWasCubic() then
+					x1, y1 = 2 * cx - cpx, 2 * cy - cpy
+				else
+					x1, y1 = cx, cy
+				end
+				local tx1, ty1 = transform(x1, y1)
+				local tx2, ty2 = transform(x2, y2)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "S"
 			end
-
 		elseif cmd == "s" then
 			while i <= #nums do
-				local x2,y2,x,y = cx + nums[i], cy + nums[i+1], cx + nums[i+2], cy + nums[i+3]; i = i + 4
-				local x1,y1
-				if lastWasCubic() then x1,y1 = 2*cx - cpx, 2*cy - cpy else x1,y1 = cx, cy end
-				local tx1,ty1 = transform(x1,y1)
-				local tx2,ty2 = transform(x2,y2)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local x2, y2, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+				i = i + 4
+				local x1, y1
+				if lastWasCubic() then
+					x1, y1 = 2 * cx - cpx, 2 * cy - cpy
+				else
+					x1, y1 = cx, cy
+				end
+				local tx1, ty1 = transform(x1, y1)
+				local tx2, ty2 = transform(x2, y2)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				cpx, cpy = x2, y2
 				cx, cy = x, y
 				lastCmd = "s"
 			end
-
 		elseif cmd == "Q" then
 			while i <= #nums do
-				local x1,y1,x,y = nums[i],nums[i+1],nums[i+2],nums[i+3]; i = i + 4
+				local x1, y1, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+				i = i + 4
 				-- convert quadratic to cubic:
-				local c1x = cx + (2/3) * (x1 - cx)
-				local c1y = cy + (2/3) * (y1 - cy)
-				local c2x = x  + (2/3) * (x1 - x)
-				local c2y = y  + (2/3) * (y1 - y)
-				local tx1,ty1 = transform(c1x,c1y)
-				local tx2,ty2 = transform(c2x,c2y)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local c1x = cx + (2 / 3) * (x1 - cx)
+				local c1y = cy + (2 / 3) * (y1 - cy)
+				local c2x = x + (2 / 3) * (x1 - x)
+				local c2y = y + (2 / 3) * (y1 - y)
+				local tx1, ty1 = transform(c1x, c1y)
+				local tx2, ty2 = transform(c2x, c2y)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "Q"
 			end
-
 		elseif cmd == "q" then
 			while i <= #nums do
-				local x1,y1,x,y = cx + nums[i], cy + nums[i+1], cx + nums[i+2], cy + nums[i+3]; i = i + 4
-				local c1x = cx + (2/3) * (x1 - cx)
-				local c1y = cy + (2/3) * (y1 - cy)
-				local c2x = x  + (2/3) * (x1 - x)
-				local c2y = y  + (2/3) * (y1 - y)
-				local tx1,ty1 = transform(c1x,c1y)
-				local tx2,ty2 = transform(c2x,c2y)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local x1, y1, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+				i = i + 4
+				local c1x = cx + (2 / 3) * (x1 - cx)
+				local c1y = cy + (2 / 3) * (y1 - cy)
+				local c2x = x + (2 / 3) * (x1 - x)
+				local c2y = y + (2 / 3) * (y1 - y)
+				local tx1, ty1 = transform(c1x, c1y)
+				local tx2, ty2 = transform(c2x, c2y)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "q"
 			end
-
 		elseif cmd == "T" then
 			while i <= #nums do
-				local x,y = nums[i], nums[i+1]; i = i + 2
-				local x1,y1
-				if lastWasQuad() and qx then x1,y1 = 2*cx - qx, 2*cy - qy else x1,y1 = cx, cy end
-				local c1x = cx + (2/3) * (x1 - cx)
-				local c1y = cy + (2/3) * (y1 - cy)
-				local c2x = x  + (2/3) * (x1 - x)
-				local c2y = y  + (2/3) * (y1 - y)
-				local tx1,ty1 = transform(c1x,c1y)
-				local tx2,ty2 = transform(c2x,c2y)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local x, y = nums[i], nums[i + 1]
+				i = i + 2
+				local x1, y1
+				if lastWasQuad() and qx then
+					x1, y1 = 2 * cx - qx, 2 * cy - qy
+				else
+					x1, y1 = cx, cy
+				end
+				local c1x = cx + (2 / 3) * (x1 - cx)
+				local c1y = cy + (2 / 3) * (y1 - cy)
+				local c2x = x + (2 / 3) * (x1 - x)
+				local c2y = y + (2 / 3) * (y1 - y)
+				local tx1, ty1 = transform(c1x, c1y)
+				local tx2, ty2 = transform(c2x, c2y)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "T"
 			end
-
 		elseif cmd == "t" then
 			while i <= #nums do
-				local x,y = cx + nums[i], cy + nums[i+1]; i = i + 2
-				local x1,y1
-				if lastWasQuad() and qx then x1,y1 = 2*cx - qx, 2*cy - qy else x1,y1 = cx, cy end
-				local c1x = cx + (2/3) * (x1 - cx)
-				local c1y = cy + (2/3) * (y1 - cy)
-				local c2x = x  + (2/3) * (x1 - x)
-				local c2y = y  + (2/3) * (y1 - y)
-				local tx1,ty1 = transform(c1x,c1y)
-				local tx2,ty2 = transform(c2x,c2y)
-				local tx, ty  = transform(x,y)
-				table.insert(content.streams, string.format("%s %s %s %s %s %s c\n", nts(tx1),nts(ty1), nts(tx2),nts(ty2), nts(tx),nts(ty)))
+				local x, y = cx + nums[i], cy + nums[i + 1]
+				i = i + 2
+				local x1, y1
+				if lastWasQuad() and qx then
+					x1, y1 = 2 * cx - qx, 2 * cy - qy
+				else
+					x1, y1 = cx, cy
+				end
+				local c1x = cx + (2 / 3) * (x1 - cx)
+				local c1y = cy + (2 / 3) * (y1 - cy)
+				local c2x = x + (2 / 3) * (x1 - x)
+				local c2y = y + (2 / 3) * (y1 - y)
+				local tx1, ty1 = transform(c1x, c1y)
+				local tx2, ty2 = transform(c2x, c2y)
+				local tx, ty = transform(x, y)
+				table.insert(
+					content.streams,
+					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
+				)
 				qx, qy = x1, y1
 				cx, cy = x, y
 				lastCmd = "t"
 			end
-
 		elseif cmd == "A" or cmd == "a" then
 			while i + 6 <= #nums do
-				local rx, ry        = nums[i], nums[i+1]
-				local xAxisRot      = nums[i+2]
-				local largeArcFlag  = nums[i+3]
-				local sweepFlag     = nums[i+4]
+				local rx, ry = nums[i], nums[i + 1]
+				local xAxisRot = nums[i + 2]
+				local largeArcFlag = nums[i + 3]
+				local sweepFlag = nums[i + 4]
 				local x, y
 
 				if cmd == "a" then
-						x, y = cx + nums[i+5], cy + nums[i+6]
+					x, y = cx + nums[i + 5], cy + nums[i + 6]
 				else
-						x, y = nums[i+5], nums[i+6]
+					x, y = nums[i + 5], nums[i + 6]
 				end
 
 				local beziers = arcToBeziers(cx, cy, rx, ry, xAxisRot, largeArcFlag ~= 0, sweepFlag ~= 0, x, y)
 
 				for _, b in ipairs(beziers) do
-						local x1, y1, x2, y2, x3, y3 = table.unpack(b)
-						table.insert(content.streams, string.format(
-								"%s %s %s %s %s %s c\n",
-								nts(x1), nts(y1), nts(x2), nts(y2), nts(x3), nts(y3)
-						))
+					local x1, y1, x2, y2, x3, y3 = table.unpack(b)
+					table.insert(
+						content.streams,
+						string.format("%s %s %s %s %s %s c\n", nts(x1), nts(y1), nts(x2), nts(y2), nts(x3), nts(y3))
+					)
 				end
 
 				cx, cy = x, y
 				i = i + 7
 			end
-
 		elseif cmd == "Z" or cmd == "z" then
 			-- emit closepath; PDF 'h' closes current subpath
 			table.insert(content.streams, "h\n")
@@ -1650,12 +1936,12 @@ function PDFGenerator:generate()
 	table.insert(output, "%PDF-1.7\n%âãÏÓ\n")
 
 	-- Add pages tree
-	local pageTree = string.format("%d 0 obj\n<< /Type /Pages /Kids [", self.pages_obj)
+	local pageTree = { string.format("%d 0 obj\n<< /Type /Pages /Kids [", self.pages_obj) }
 	for _, page in ipairs(self.page_list) do
-		pageTree = pageTree .. string.format("%d 0 R ", page)
+		table.insert(pageTree, string.format("%d 0 R ", page))
 	end
-	pageTree = pageTree .. string.format("] /Count %d >>\nendobj\n", #self.page_list)
-	self.objects[self.pages_obj] = pageTree
+	table.insert(pageTree, string.format("] /Count %d >>\nendobj\n", #self.page_list))
+	self.objects[self.pages_obj] = table.concat(pageTree)
 
 	-- Add catalog
 	self.objects[self.root] =
@@ -1665,12 +1951,8 @@ function PDFGenerator:generate()
 	for pageId, content in pairs(self.contents) do
 		local stream = table.concat(content.streams)
 
-		self.objects[content.id] = string.format(
-			"%d 0 obj\n<< /Length %d >>\nstream\n%s\nendstream\nendobj\n",
-			content.id,
-			#stream,
-			stream
-		)
+		self.objects[content.id] =
+			string.format("%d 0 obj\n<< /Length %d >>\nstream\n%s\nendstream\nendobj\n", content.id, #stream, stream)
 	end
 
 	-- Write objects and collect xref information

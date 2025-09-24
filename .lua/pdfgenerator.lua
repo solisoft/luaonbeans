@@ -32,77 +32,9 @@ local numCache = setmetatable({}, {__mode="kv"})
 local function numberToString(num)
 	local cached = numCache[num]
 	if cached then return cached end
-	local s = string.format("%.2f", num)
+	local s = "%.2f" % {num} -- redbean specific
 	numCache[num] = s
 	return s
-end
-
--- Create new PDF document
-function PDFGenerator.new(options)
-	objCounter = 1
-	local self = {
-		objects = {},
-		current_page = 0,
-		current_page_obj = nil,
-		page_list = {}, -- Array to store page objects
-		pages_obj = nil, -- Object number for pages tree
-		images = {},
-		contents = {},
-		catalog = nil,
-		info = nil,
-		root = nil,
-		page_width = 595,
-		page_height = 842,
-		header_height = 0,
-		margin_x = { 50, 50 },
-		margin_y = { 50, 80 },
-		current_x = 0,
-		current_y = 0,
-		resources = {},
-		font_metrics = {},
-		fonts = {},
-		rgb_colors = {},
-		last_font = { fontFamily = "Helvetica", fontWeight = "normal" },
-		current_table = {
-			current_row = {
-				height = nil,
-			},
-			padding_x = 5,
-			padding_y = 5,
-			header_columns = nil,
-			data_columns = nil,
-			header_options = nil,
-			data_options = nil,
-		},
-		out_of_page = false,
-	}
-
-	self = table.merge(self, options or {})
-
-	self.header = function(pageId) end
-	self.footer = function(pageId)
-		self.moveY(self, 5)
-		self:addParagraph("Page %s of %s" % { pageId, #self.page_list }, { fontSize = 8, alignment = "right" })
-	end
-
-	-- Initialize document
-	self.info = getNewObjNum()
-	self.root = getNewObjNum()
-	self.pages_obj = getNewObjNum()
-	self.basic_font_obj = getNewObjNum()
-	self.basic_bold_font_obj = getNewObjNum()
-
-	-- Initialize resources
-	self.resources = { fonts = {}, images = {} }
-
-	-- Add required PDF objects
-	self.objects[self.info] = string.format(
-		"%d 0 obj\n<< /Producer (Lua PDF Generator 1.0) /CreationDate (D:%s) >>\nendobj\n",
-		self.info,
-		os.date("!%Y%m%d%H%M%S")
-	)
-
-	return setmetatable(self, { __index = PDFGenerator })
 end
 
 -- Start a new page
@@ -185,8 +117,6 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
 	self.custom_fonts[fullFontName] = fontObj
 
 	self.font_metrics[fullFontName] = decodeJson(fontMetrics)
-	-- Validate and normalize font metrics for better compatibility
-	self:validateFontMetrics(fullFontName)
 
 	-- Improved font descriptor object with better Firefox compatibility
 	self.objects[fontDescObj] = string.format(
@@ -275,44 +205,17 @@ function PDFGenerator:escapePdfText(text)
 	escaped = escaped:gsub("%%", "\\%")
 
 	-- Handle non-ASCII characters by converting to octal
-	local result = ""
+	local result = {}
 	for i = 1, #escaped do
 		local byte = string.byte(escaped, i)
 		if byte >= 32 and byte <= 126 then
-			result = result .. string.char(byte)
+			table.insert(result, string.char(byte))
 		else
-			result = result .. string.format("\\%03o", byte)
+			table.insert(result, string.format("\\%03o", byte))
 		end
 	end
 
-	return result
-end
-
--- Validate and normalize font metrics for better cross-browser compatibility
-function PDFGenerator:validateFontMetrics(fontName)
-	local metrics = self.font_metrics[fontName]
-	if not metrics then
-		return
-	end
-
-	-- Ensure all required characters have valid widths
-	for i = 32, 255 do
-		if not metrics["" .. i] or metrics["" .. i] <= 0 then
-			metrics["" .. i] = 556
-		end
-	end
-
-	-- Normalize widths to ensure they're reasonable
-	for i = 32, 255 do
-		if metrics["" .. i] then
-			-- Ensure width is within reasonable bounds (100-2000 font units)
-			if metrics["" .. i] < 100 then
-				metrics["" .. i] = 100
-			elseif metrics["" .. i] > 2000 then
-				metrics["" .. i] = 2000
-			end
-		end
-	end
+	return table.concat(result)
 end
 
 -- Use custom font for text
@@ -1608,6 +1511,128 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 	return self
 end
 
+-- ChartBar
+function PDFGenerator:BarChart(barData, labels)
+	local chartWidth = 555 - 100
+	local chartHeight = 60
+	local barWidth = chartWidth / #barData - 5
+	local maxValue = 100
+	local startX = 25
+	-- Draw chart background
+	self:drawRectangle({
+		width = chartWidth + 40,
+		height = chartHeight + 40 + 10,
+		borderWidth = 1,
+		borderColor = "cccccc",
+		fillColor = "f8f9fa",
+	})
+
+	local startY = self.current_y + 20
+
+	-- Draw bars
+	for i, value in ipairs(barData) do
+		local barHeight = (value / maxValue) * chartHeight
+		local x = startX + (i - 1) * (barWidth + 5) - 2
+		local y = startY + chartHeight - barHeight
+
+		-- Bar color based on value
+		local color = value > 80 and "4CAF50" or (value > 60 and "FF9800" or "F44336")
+
+		self:setX(x)
+		self:setY(startY + chartHeight - barHeight)
+		self:drawRectangle({
+			width = barWidth,
+			height = barHeight,
+			borderWidth = 0.3,
+			borderColor = "333333",
+			fillColor = color,
+		})
+
+		-- Value label on top of bar
+		self:setX(x)
+		self:setY(startY + chartHeight - barHeight - 5)
+		self:addText(tostring(value) .. " ", 8, "000000", "center", barWidth)
+
+		-- Month label below bar
+		self:setX(x)
+		self:setY(startY + chartHeight + 10)
+		self:addText(labels[i] .. " 2025", 6, "000000", "center", barWidth)
+		self:moveY(20)
+	end
+
+	self:setX(0)
+	self:moveY(5)
+end
+-- /ChartBar
+
+-- Create new PDF document
+function PDFGenerator.new(options)
+	objCounter = 1
+	local self = {
+		objects = {},
+		current_page = 0,
+		current_page_obj = nil,
+		page_list = {}, -- Array to store page objects
+		pages_obj = nil, -- Object number for pages tree
+		images = {},
+		contents = {},
+		catalog = nil,
+		info = nil,
+		root = nil,
+		page_width = 595,
+		page_height = 842,
+		header_height = 0,
+		margin_x = { 50, 50 },
+		margin_y = { 50, 80 },
+		current_x = 0,
+		current_y = 0,
+		resources = {},
+		font_metrics = {},
+		fonts = {},
+		rgb_colors = {},
+		last_font = { fontFamily = "Helvetica", fontWeight = "normal" },
+		current_table = {
+			current_row = {
+				height = nil,
+			},
+			padding_x = 5,
+			padding_y = 5,
+			header_columns = nil,
+			data_columns = nil,
+			header_options = nil,
+			data_options = nil,
+		},
+		out_of_page = false,
+	}
+
+	self = table.merge(self, options or {})
+
+	self.header = function(pageId) end
+	self.footer = function(pageId)
+		self.moveY(self, 5)
+		self:addParagraph("Page %s of %s" % { pageId, #self.page_list }, { fontSize = 8, alignment = "right" })
+	end
+
+	-- Initialize document
+	self.info = getNewObjNum()
+	self.root = getNewObjNum()
+	self.pages_obj = getNewObjNum()
+	self.basic_font_obj = getNewObjNum()
+	self.basic_bold_font_obj = getNewObjNum()
+
+	-- Initialize resources
+	self.resources = { fonts = {}, images = {} }
+
+	-- Add required PDF objects
+	self.objects[self.info] = string.format(
+		"%d 0 obj\n<< /Producer (Lua PDF Generator 1.0) /CreationDate (D:%s) >>\nendobj\n",
+		self.info,
+		os.date("!%Y%m%d%H%M%S")
+	)
+
+	return setmetatable(self, { __index = PDFGenerator })
+end
+
 -- Generate PDF and return as string
 function PDFGenerator:generate()
 	local output = {}
@@ -1689,59 +1714,5 @@ function PDFGenerator:generate()
 	-- Concatenate all parts and return
 	return table.concat(output)
 end
-
--- ChartBar
-function PDFGenerator:BarChart(barData, labels)
-	local chartWidth = 555 - 100
-	local chartHeight = 60
-	local barWidth = chartWidth / #barData - 5
-	local maxValue = 100
-	local startX = 25
-	-- Draw chart background
-	self:drawRectangle({
-		width = chartWidth + 40,
-		height = chartHeight + 40 + 10,
-		borderWidth = 1,
-		borderColor = "cccccc",
-		fillColor = "f8f9fa",
-	})
-
-	local startY = self.current_y + 20
-
-	-- Draw bars
-	for i, value in ipairs(barData) do
-		local barHeight = (value / maxValue) * chartHeight
-		local x = startX + (i - 1) * (barWidth + 5) - 2
-		local y = startY + chartHeight - barHeight
-
-		-- Bar color based on value
-		local color = value > 80 and "4CAF50" or (value > 60 and "FF9800" or "F44336")
-
-		self:setX(x)
-		self:setY(startY + chartHeight - barHeight)
-		self:drawRectangle({
-			width = barWidth,
-			height = barHeight,
-			borderWidth = 0.3,
-			borderColor = "333333",
-			fillColor = color,
-		})
-
-		-- Value label on top of bar
-		self:setX(x)
-		self:setY(startY + chartHeight - barHeight - 5)
-		self:addText(tostring(value) .. " ", 8, "000000", "center", barWidth)
-
-		-- Month label below bar
-		self:setX(x)
-		self:setY(startY + chartHeight + 10)
-		self:addText(labels[i] .. " 2025", 6, "000000", "center", barWidth)
-		self:moveY(20)
-	end
-
-	self:setX(0)
-	self:moveY(5)
-end
--- /ChartBar
 
 return PDFGenerator

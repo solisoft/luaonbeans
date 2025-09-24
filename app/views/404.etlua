@@ -1,1 +1,6 @@
-<center>404 - Page not found</center>
+<div class="col-span-12">
+  <h1>
+    404
+  </h1>
+  <p>Page not found</p>
+</div>

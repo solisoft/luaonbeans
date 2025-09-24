@@ -28,8 +28,13 @@ function PDFGenerator:getHashValues(hash)
 end
 
 -- Convert number to PDF string format
+local numCache = setmetatable({}, {__mode="kv"})
 local function numberToString(num)
-	return string.format("%.2f", num)
+	local cached = numCache[num]
+	if cached then return cached end
+	local s = string.format("%.2f", num)
+	numCache[num] = s
+	return s
 end
 
 -- Create new PDF document

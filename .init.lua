@@ -35,6 +35,7 @@ end
 function OnServerReload() end
 
 function OnServerHeartbeat()
+	-- It will run in daemon mode
 	LoadCronsJobs()
 end
 

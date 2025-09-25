@@ -19,7 +19,6 @@ local function getNewObjNum()
 	return num
 end
 
-
 -- Create new PDF document
 function PDFGenerator.new(options)
 	objCounter = 1
@@ -97,11 +96,13 @@ function PDFGenerator:getHashValues(hash)
 end
 
 -- Convert number to PDF string format
-local numCache = setmetatable({}, {__mode="kv"})
+local numCache = setmetatable({}, { __mode = "kv" })
 local function numberToString(num)
 	local cached = numCache[num]
-	if cached then return cached end
-	local s = "%.2f" % {num} -- redbean specific
+	if cached then
+		return cached
+	end
+	local s = "%.2f" % { num } -- redbean specific
 	numCache[num] = s
 	return s
 end
@@ -167,8 +168,8 @@ function PDFGenerator:addBasicFont()
 	)
 
 	self.custom_fonts = {
-		['helvetica-normal'] = self.basic_bold_font_obj,
-		['helvetica-bold'] = self.basic_bold_font_obj
+		["helvetica-normal"] = self.basic_bold_font_obj,
+		["helvetica-bold"] = self.basic_bold_font_obj,
 	}
 end
 
@@ -370,7 +371,9 @@ function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
 	self.font_metrics = self.font_metrics or {}
 	local fontMetrics = self.font_metrics[self.last_font.fontFamily .. "-" .. fontWeight]
 
-	if(fontMetrics == nil) then return end
+	if fontMetrics == nil then
+		return
+	end
 	local width = 0
 	for i = 1, #text do
 		local charCode = string.byte(text, i)
@@ -1126,46 +1129,45 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
 end
 
 local function get_jpeg_dimensions(data)
-		local byte = string.byte
-		local len = #data
+	local byte = string.byte
+	local len = #data
 
-		-- Must start with SOI marker (0xFFD8)
-		if len < 4 or byte(data, 1) ~= 0xFF or byte(data, 2) ~= 0xD8 then
-				return nil, nil, "Not a valid JPEG file"
+	-- Must start with SOI marker (0xFFD8)
+	if len < 4 or byte(data, 1) ~= 0xFF or byte(data, 2) ~= 0xD8 then
+		return nil, nil, "Not a valid JPEG file"
+	end
+
+	local pos = 3
+	while pos < len do
+		if byte(data, pos) ~= 0xFF then
+			return nil, nil, "Invalid JPEG marker"
 		end
 
-		local pos = 3
-		while pos < len do
-				if byte(data, pos) ~= 0xFF then
-						return nil, nil, "Invalid JPEG marker"
-				end
+		local marker = byte(data, pos + 1)
+		pos = pos + 2
 
-				local marker = byte(data, pos + 1)
-				pos = pos + 2
-
-				-- SOF markers (baseline/progressive/etc.)
-				if marker >= 0xC0 and marker <= 0xCF
-					 and marker ~= 0xC4 and marker ~= 0xC8 and marker ~= 0xCC then
-						-- Ensure enough bytes remain
-						if pos + 7 > len then
-								return nil, nil, "Truncated SOF segment"
-						end
-						-- skip: segment length(2) + precision(1)
-						local h1, h2, w1, w2 = byte(data, pos + 3, pos + 6)
-						local height = h1 * 256 + h2
-						local width  = w1 * 256 + w2
-						return width, height
-				else
-						if pos + 1 > len then
-								return nil, nil, "Unexpected end of file"
-						end
-						local s1, s2 = byte(data, pos, pos + 1)
-						local segment_length = s1 * 256 + s2
-						pos = pos + segment_length
-				end
+		-- SOF markers (baseline/progressive/etc.)
+		if marker >= 0xC0 and marker <= 0xCF and marker ~= 0xC4 and marker ~= 0xC8 and marker ~= 0xCC then
+			-- Ensure enough bytes remain
+			if pos + 7 > len then
+				return nil, nil, "Truncated SOF segment"
+			end
+			-- skip: segment length(2) + precision(1)
+			local h1, h2, w1, w2 = byte(data, pos + 3, pos + 6)
+			local height = h1 * 256 + h2
+			local width = w1 * 256 + w2
+			return width, height
+		else
+			if pos + 1 > len then
+				return nil, nil, "Unexpected end of file"
+			end
+			local s1, s2 = byte(data, pos, pos + 1)
+			local segment_length = s1 * 256 + s2
+			pos = pos + segment_length
 		end
+	end
 
-		return nil, nil, "No SOF marker found"
+	return nil, nil, "No SOF marker found"
 end
 
 -- Add image to PDF (imgData should be binary data)

@@ -520,7 +520,7 @@ function PDFGenerator:addParagraph(text, options)
 	self.last_font = self.last_font or {}
 	self.last_font.fontWeight = options.fontWeight
 
-	splittedText = string.split(text, "\n")
+	local splittedText = string.split(text, "\n")
 
 	for _, text in ipairs(splittedText) do
 		local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
@@ -585,17 +585,23 @@ function PDFGenerator:calculateMaxHeight(items)
 		local padding_y = item.padding_y or self.current_table.padding_y or 5
 
 		-- Split text into lines considering the available width
-		local lines = self:splitTextToLines(text, fontSize, width - (padding_x * 2))
+		local lines = string.split(text, "\n")
+		local number_of_lines = 0
+
+		for _, line in ipairs(lines) do
+			local splitted_text = self:splitTextToLines(line, fontSize, width - (padding_x * 2))
+			number_of_lines = number_of_lines + #splitted_text
+		end
 
 		-- Calculate height for this item
-		local line_height = fontSize * 1.5 -- Standard line height
-		local text_height = #lines * line_height + (padding_y * 2) -- Include padding
+		local line_height = fontSize * 1.5 - (number_of_lines / 1.5) -- Standard line height
+		local text_height = number_of_lines * line_height + (padding_y * 2) -- Include padding
 		-- Update max_height if this item is taller
 		if text_height > max_height then
 			max_height = text_height
 		end
-		item.lines = #lines
-		item.height = #lines * line_height
+		item.lines = number_of_lines
+		item.height = number_of_lines * line_height
 	end
 
 	self.current_table.current_row.height = max_height
@@ -625,9 +631,9 @@ function PDFGenerator:drawRowTable(columns, row_options)
 	for _, column in ipairs(columns) do
 		-- Draw the cell using existing method
 		local options = table.merge(row_options, column)
-		options.text = nil
-		options.height = column.height
-		self:drawTableCell(column.text, options)
+		-- options.text = nil
+		-- options.height = column.height
+		self:drawTableCell(column.text , options)
 	end
 
 	-- Reset cursor position
@@ -671,7 +677,7 @@ function PDFGenerator:drawTableCell(text, options)
 		self:moveX(-self.current_table.padding_x)
 	end
 
-	self:moveY(self.current_table.padding_y)
+	self:moveY(self.current_table.padding_y - 1)
 
 	local paddingY = 0
 	if options.vertical_alignment == "middle" then

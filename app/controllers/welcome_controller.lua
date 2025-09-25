@@ -70,9 +70,14 @@ local app = {
     }
 
     local dataColumns = {}
-    for i = 1, 3 do
+    for i = 1, 10 do
       table.insert(dataColumns, {
-        { text = "demo " .. i, width = 305, fontSize = 10, alignment = "left", borderSides = { right = "false" } },
+        --{ text = "demo " .. i, width = 305, fontSize = 10, alignment = "left", borderSides = { right = "false" } },
+        {
+          text = "Demo" .. i,
+          width = 305, fontSize = 10, alignment = "left",
+          borderSides = { right = "false" }
+        },
         { text = "$700", width = 70, fontSize = 10, alignment = "right", borderSides = { left = "false", right = "false" } },
         { text = "2", width = 50, fontSize = 10, alignment = "center", borderSides = { left = "false", right = "false" } },
         { text = "$1400", width = 70, fontSize = 10, alignment = "right", borderSides = { left = "false" } }
@@ -91,7 +96,7 @@ local app = {
     local dataColumns = {}
     for i = 1, 10 do
       table.insert(dataColumns, {
-        { text = "Pro Morbi ultrices pharetra risus sed pellentesque. Integer id semper erat. Duis l" .. i, width = 305, fontSize = 10, alignment = "left" },
+        { text = "Pro Morbi ultrices\npharetra risus sed pellentesque.\nInteger id semper erat. Duis l" .. i, width = 305, fontSize = 10, alignment = "left" },
         { text = "$700", width = 70, fontSize = 10, alignment = "right", vertical_alignment = "middle" },
         { text = "2", width = 50, fontSize = 10, alignment = "center", vertical_alignment = "middle" },
         { text = "$1400", width = 70, fontSize = 10, alignment = "right", vertical_alignment = "middle" }
@@ -103,7 +108,7 @@ local app = {
       data_columns = dataColumns,
       header_options = { fillColor = "000", borderColor = "000", textColor = "fff" },
       data_options = { fillColor = "fff", borderColor = "eee", oddFillColor = "fafafa", evenFillColor = "fff" }
-    }, { padding_x = 5, padding_y = 2 })
+    }, { padding_x = 5, padding_y = 5 })
 
     for i = 1, 1 do
       pdf:moveY(10)

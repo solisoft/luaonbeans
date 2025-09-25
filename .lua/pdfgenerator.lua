@@ -1125,44 +1125,42 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
 	return self
 end
 
-
 local function get_jpeg_dimensions(data)
-		-- Check for JPEG SOI marker (0xFFD8)
-		if data:byte(1) ~= 0xFF or data:byte(2) ~= 0xD8 then
+		local byte = string.byte
+		local len = #data
+
+		-- Must start with SOI marker (0xFFD8)
+		if len < 4 or byte(data, 1) ~= 0xFF or byte(data, 2) ~= 0xD8 then
 				return nil, nil, "Not a valid JPEG file"
 		end
 
-		-- Start parsing from byte 3
 		local pos = 3
-		local length = #data
-
-		-- Loop through the JPEG markers
-		while pos < length do
-				-- Look for marker (starts with 0xFF)
-				if data:byte(pos) ~= 0xFF then
+		while pos < len do
+				if byte(data, pos) ~= 0xFF then
 						return nil, nil, "Invalid JPEG marker"
 				end
 
-				-- Get marker type
-				local marker = data:byte(pos + 1)
+				local marker = byte(data, pos + 1)
 				pos = pos + 2
 
-				-- Check for SOF markers (0xC0 to 0xCF, excluding 0xC4, 0xC8, 0xCC)
-				if marker >= 0xC0 and marker <= 0xCF and marker ~= 0xC4 and marker ~= 0xC8 and marker ~= 0xCC then
-						-- Skip 2 bytes (length of block) and 1 byte (sample precision)
-						pos = pos + 3
-						-- Read height (2 bytes)
-						local height = data:byte(pos) * 256 + data:byte(pos + 1)
-						-- Read width (2 bytes)
-						local width = data:byte(pos + 2) * 256 + data:byte(pos + 3)
+				-- SOF markers (baseline/progressive/etc.)
+				if marker >= 0xC0 and marker <= 0xCF
+					 and marker ~= 0xC4 and marker ~= 0xC8 and marker ~= 0xCC then
+						-- Ensure enough bytes remain
+						if pos + 7 > len then
+								return nil, nil, "Truncated SOF segment"
+						end
+						-- skip: segment length(2) + precision(1)
+						local h1, h2, w1, w2 = byte(data, pos + 3, pos + 6)
+						local height = h1 * 256 + h2
+						local width  = w1 * 256 + w2
 						return width, height
 				else
-						-- Read the length of the segment (2 bytes)
-						if pos + 1 > length then
+						if pos + 1 > len then
 								return nil, nil, "Unexpected end of file"
 						end
-						local segment_length = data:byte(pos) * 256 + data:byte(pos + 1)
-						-- Skip the segment
+						local s1, s2 = byte(data, pos, pos + 1)
+						local segment_length = s1 * 256 + s2
 						pos = pos + segment_length
 				end
 		end

@@ -130,7 +130,6 @@ local app = {
       pdf:BarChart(barData, months)
     end
 
-
     pdf:addPage()
 
     -- Next block

@@ -19,6 +19,75 @@ local function getNewObjNum()
 	return num
 end
 
+
+-- Create new PDF document
+function PDFGenerator.new(options)
+	objCounter = 1
+	local self = {
+		objects = {},
+		current_page = 0,
+		current_page_obj = nil,
+		page_list = {}, -- Array to store page objects
+		pages_obj = nil, -- Object number for pages tree
+		images = {},
+		contents = {},
+		catalog = nil,
+		info = nil,
+		root = nil,
+		page_width = 595,
+		page_height = 842,
+		header_height = 0,
+		margin_x = { 50, 50 },
+		margin_y = { 50, 80 },
+		current_x = 0,
+		current_y = 0,
+		resources = {},
+		font_metrics = {},
+		fonts = {},
+		rgb_colors = {},
+		last_font = { fontFamily = "helvetica", fontWeight = "normal" },
+		current_table = {
+			current_row = {
+				height = nil,
+			},
+			padding_x = 5,
+			padding_y = 5,
+			header_columns = nil,
+			data_columns = nil,
+			header_options = nil,
+			data_options = nil,
+		},
+		out_of_page = false,
+	}
+
+	self = table.merge(self, options or {})
+
+	self.header = function(pageId) end
+	self.footer = function(pageId)
+		self.moveY(self, 5)
+		self:addParagraph("Page %s of %s" % { pageId, #self.page_list }, { fontSize = 8, alignment = "right" })
+	end
+
+	-- Initialize document
+	self.info = getNewObjNum()
+	self.root = getNewObjNum()
+	self.pages_obj = getNewObjNum()
+	self.basic_font_obj = getNewObjNum()
+	self.basic_bold_font_obj = getNewObjNum()
+
+	-- Initialize resources
+	self.resources = { fonts = {}, images = {} }
+
+	-- Add required PDF objects
+	self.objects[self.info] = string.format(
+		"%d 0 obj\n<< /Producer (Lua PDF Generator 1.0) /CreationDate (D:%s) >>\nendobj\n",
+		self.info,
+		os.date("!%Y%m%d%H%M%S")
+	)
+
+	return setmetatable(self, { __index = PDFGenerator })
+end
+
 function PDFGenerator:getHashValues(hash)
 	local values = {}
 	for _, value in pairs(hash) do
@@ -96,6 +165,11 @@ function PDFGenerator:addBasicFont()
 		"%d 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>\nendobj\n",
 		self.basic_bold_font_obj
 	)
+
+	self.custom_fonts = {
+		['helvetica-normal'] = self.basic_bold_font_obj,
+		['helvetica-bold'] = self.basic_bold_font_obj
+	}
 end
 
 -- Add custom font (TrueType)
@@ -296,6 +370,7 @@ function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
 	self.font_metrics = self.font_metrics or {}
 	local fontMetrics = self.font_metrics[self.last_font.fontFamily .. "-" .. fontWeight]
 
+	if(fontMetrics == nil) then return end
 	local width = 0
 	for i = 1, #text do
 		local charCode = string.byte(text, i)
@@ -1050,8 +1125,53 @@ function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, 
 	return self
 end
 
+
+local function get_jpeg_dimensions(data)
+		-- Check for JPEG SOI marker (0xFFD8)
+		if data:byte(1) ~= 0xFF or data:byte(2) ~= 0xD8 then
+				return nil, nil, "Not a valid JPEG file"
+		end
+
+		-- Start parsing from byte 3
+		local pos = 3
+		local length = #data
+
+		-- Loop through the JPEG markers
+		while pos < length do
+				-- Look for marker (starts with 0xFF)
+				if data:byte(pos) ~= 0xFF then
+						return nil, nil, "Invalid JPEG marker"
+				end
+
+				-- Get marker type
+				local marker = data:byte(pos + 1)
+				pos = pos + 2
+
+				-- Check for SOF markers (0xC0 to 0xCF, excluding 0xC4, 0xC8, 0xCC)
+				if marker >= 0xC0 and marker <= 0xCF and marker ~= 0xC4 and marker ~= 0xC8 and marker ~= 0xCC then
+						-- Skip 2 bytes (length of block) and 1 byte (sample precision)
+						pos = pos + 3
+						-- Read height (2 bytes)
+						local height = data:byte(pos) * 256 + data:byte(pos + 1)
+						-- Read width (2 bytes)
+						local width = data:byte(pos + 2) * 256 + data:byte(pos + 3)
+						return width, height
+				else
+						-- Read the length of the segment (2 bytes)
+						if pos + 1 > length then
+								return nil, nil, "Unexpected end of file"
+						end
+						local segment_length = data:byte(pos) * 256 + data:byte(pos + 1)
+						-- Skip the segment
+						pos = pos + segment_length
+				end
+		end
+
+		return nil, nil, "No SOF marker found"
+end
+
 -- Add image to PDF (imgData should be binary data)
-function PDFGenerator:addImage(imgData, width, height, format)
+function PDFGenerator:addImage(imgData, format)
 	format = format:lower()
 	if format ~= "jpeg" then
 		error("Unsupported image format: " .. format)
@@ -1060,6 +1180,8 @@ function PDFGenerator:addImage(imgData, width, height, format)
 	-- Create image object
 	local imageObj = getNewObjNum()
 	local imgName = string.format("Im%d", #self.resources.images + 1)
+
+	local width, height, err = get_jpeg_dimensions(imgData)
 
 	-- Store image information
 	self.resources.images[imgName] = {
@@ -1850,74 +1972,6 @@ function PDFGenerator:BarChart(barData, labels)
 	self:moveY(5)
 end
 -- /ChartBar
-
--- Create new PDF document
-function PDFGenerator.new(options)
-	objCounter = 1
-	local self = {
-		objects = {},
-		current_page = 0,
-		current_page_obj = nil,
-		page_list = {}, -- Array to store page objects
-		pages_obj = nil, -- Object number for pages tree
-		images = {},
-		contents = {},
-		catalog = nil,
-		info = nil,
-		root = nil,
-		page_width = 595,
-		page_height = 842,
-		header_height = 0,
-		margin_x = { 50, 50 },
-		margin_y = { 50, 80 },
-		current_x = 0,
-		current_y = 0,
-		resources = {},
-		font_metrics = {},
-		fonts = {},
-		rgb_colors = {},
-		last_font = { fontFamily = "Helvetica", fontWeight = "normal" },
-		current_table = {
-			current_row = {
-				height = nil,
-			},
-			padding_x = 5,
-			padding_y = 5,
-			header_columns = nil,
-			data_columns = nil,
-			header_options = nil,
-			data_options = nil,
-		},
-		out_of_page = false,
-	}
-
-	self = table.merge(self, options or {})
-
-	self.header = function(pageId) end
-	self.footer = function(pageId)
-		self.moveY(self, 5)
-		self:addParagraph("Page %s of %s" % { pageId, #self.page_list }, { fontSize = 8, alignment = "right" })
-	end
-
-	-- Initialize document
-	self.info = getNewObjNum()
-	self.root = getNewObjNum()
-	self.pages_obj = getNewObjNum()
-	self.basic_font_obj = getNewObjNum()
-	self.basic_bold_font_obj = getNewObjNum()
-
-	-- Initialize resources
-	self.resources = { fonts = {}, images = {} }
-
-	-- Add required PDF objects
-	self.objects[self.info] = string.format(
-		"%d 0 obj\n<< /Producer (Lua PDF Generator 1.0) /CreationDate (D:%s) >>\nendobj\n",
-		self.info,
-		os.date("!%Y%m%d%H%M%S")
-	)
-
-	return setmetatable(self, { __index = PDFGenerator })
-end
 
 -- Generate PDF and return as string
 function PDFGenerator:generate()

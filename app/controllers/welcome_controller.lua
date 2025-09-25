@@ -26,8 +26,7 @@ local app = {
     pdf:addCustomFont("fonts/TitilliumWeb-Regular.ttf", "titillium", "normal")
     pdf:addCustomFont("fonts/TitilliumWeb-Bold.ttf", "titillium", "bold")
 
-
-    local imgName = pdf:addImage(LoadAsset("greece.jpg"), 1600, 492, "jpeg")
+    local imgName = pdf:addImage(LoadAsset("greece.jpg"), "jpeg")
     pdf:drawImage(imgName)
 
     pdf:moveY(10)

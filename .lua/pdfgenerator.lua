@@ -149,7 +149,7 @@ function PDFGenerator:addPage(width, height)
 
 	-- Display table header
 	if self.current_table.header_columns then
-		self:drawRowTable(self.current_table.header_columns, self.current_table.header_options)
+		self:drawTableRow(self.current_table.header_columns, self.current_table.header_options)
 	end
 
 	return self
@@ -549,8 +549,20 @@ function PDFGenerator:drawTable(options, table_options)
 	self.current_table.header_options = options.header_options
 	self.current_table.data_options = options.data_options
 
-	if options.header_columns then
-		self:drawRowTable(options.header_columns, options.header_options)
+	local first_line_height = self:calculateMaxHeight(options.header_columns)
+	if options.data_columns[1] then
+		first_line_height = first_line_height + self:calculateMaxHeight(options.data_columns[1])
+	end
+	if
+		self.out_of_page == false
+		and self.page_height - self.current_y - first_line_height - self.header_height
+			< self.margin_y[1] + self.margin_y[2]
+	then
+		self:addPage()
+	else
+		if options.header_columns then
+			self:drawTableRow(options.header_columns, options.header_options)
+		end
 	end
 
 	for line, column in ipairs(options.data_columns) do
@@ -562,7 +574,16 @@ function PDFGenerator:drawTable(options, table_options)
 			options.data_options.fillColor = options.data_options.evenFillColor
 		end
 
-		self:drawRowTable(column, options.data_options)
+		self:calculateMaxHeight(column)
+		if
+			self.out_of_page == false
+			and self.page_height - self.current_y - self.current_table.current_row.height - self.header_height
+				< self.margin_y[1] + self.margin_y[2]
+		then
+			self:addPage()
+		end
+
+		self:drawTableRow(column, options.data_options)
 	end
 
 	self.current_table.header_columns = nil
@@ -610,18 +631,8 @@ function PDFGenerator:calculateMaxHeight(items)
 end
 
 -- Draw a row table with multiple columns
-function PDFGenerator:drawRowTable(columns, row_options)
+function PDFGenerator:drawTableRow(columns, row_options)
 	row_options = row_options or {}
-
-	self:calculateMaxHeight(columns)
-
-	if
-		self.out_of_page == false
-		and self.page_height - self.current_y - self.current_table.current_row.height - self.header_height
-			< self.margin_y[1] + self.margin_y[2]
-	then
-		self:addPage()
-	end
 
 	self:calculateMaxHeight(columns)
 

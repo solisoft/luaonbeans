@@ -70,7 +70,7 @@ local app = {
     }
 
     local dataColumns = {}
-    for i = 1, 10 do
+    for i = 1, 4 do
       table.insert(dataColumns, {
         --{ text = "demo " .. i, width = 305, fontSize = 10, alignment = "left", borderSides = { right = "false" } },
         {
@@ -96,7 +96,7 @@ local app = {
     local dataColumns = {}
     for i = 1, 10 do
       table.insert(dataColumns, {
-        { text = "Pro Morbi ultrices\npharetra risus sed pellentesque.\nInteger id semper erat. Duis l" .. i, width = 305, fontSize = 10, alignment = "left" },
+        { text = "Pro Morbi ultrices\npharetra risus sed pellentesque.\nInteger id semper erat. Duis l" .. i, width = 305, fontSize = 20, alignment = "left" },
         { text = "$700", width = 70, fontSize = 10, alignment = "right", vertical_alignment = "middle" },
         { text = "2", width = 50, fontSize = 10, alignment = "center", vertical_alignment = "middle" },
         { text = "$1400", width = 70, fontSize = 10, alignment = "right", vertical_alignment = "middle" }

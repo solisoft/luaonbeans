@@ -549,7 +549,7 @@ function PDFGenerator:drawTable(options, table_options)
 	self.current_table.header_options = options.header_options
 	self.current_table.data_options = options.data_options
 
-	local first_line_height = self:calculateMaxHeight(options.header_columns)
+	local first_line_height = self:calculateMaxHeight(options.header_columns or {})
 	if options.data_columns[1] then
 		first_line_height = first_line_height + self:calculateMaxHeight(options.data_columns[1])
 	end
@@ -613,7 +613,6 @@ function PDFGenerator:calculateTextHeight(column)
 	local line_height = fontSize * 1.5 - (number_of_lines / 1.5) -- Standard line height
 	local text_height = number_of_lines * line_height + padding_y * 2  -- Include padding
 	-- Update max_height if this item is taller
-	-- if column.text then text_height = text_height + padding_y * 2 end
 	column.lines = number_of_lines
 	column.height = number_of_lines * line_height
 
@@ -638,7 +637,6 @@ function PDFGenerator:calculateMaxHeight(columns)
 			for _, content in ipairs(column.content) do
 				if content.type == "text" then
 					text_height = text_height + self:calculateTextHeight(content) / 1.5
-					--text_height = text_height / 1.5
 				end
 
 				if content.type == "image" then

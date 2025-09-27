@@ -364,7 +364,12 @@ function PDFGenerator:setFont(fontName)
 end
 
 -- Get text width for current font and size using font metrics
+local wordCache = setmetatable({}, { __mode = "kv" })
 function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
+	local key = table.concat({text, fontSize, fontWeight})
+	if wordCache[key] then
+		return wordCache[key]
+	end
 	fontSize = fontSize or 12
 	fontWeight = fontWeight or "normal"
 
@@ -381,7 +386,8 @@ function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
 	end
 
 	-- Convert from font units (1/1000) to points
-	return (width * fontSize) / 1000
+	wordCache[key] = (width * fontSize) / 1000
+	return wordCache[key]
 end
 
 -- Split text into lines based on page width
@@ -623,34 +629,36 @@ end
 function PDFGenerator:calculateMaxHeight(columns)
 	local max_height = 0
 
+	local function getContentHeight(content)
+		if content.type == "text" then
+			-- preserve the original /1.5 behavior
+			return self:calculateTextHeight(content) / 1.5
+		elseif content.type == "image" then
+			local resource = self.resources.images[content.value]
+			if not resource then return 0 end
+			return (resource.height * content.width / resource.width) + 10
+		end
+		return 0
+	end
+
 	for _, column in ipairs(columns) do
-		if column.content == nil then
-			local text_height = self:calculateTextHeight(column)
-			-- Update max_height if this item is taller
-			if text_height > max_height then
-				max_height = text_height
+		local text_height = 0
+
+		if column.content then
+			for _, content in ipairs(column.content) do
+				text_height = text_height + getContentHeight(content)
 			end
+		else
+			-- keep the plain case unchanged (no /1.5 here)
+			text_height = self:calculateTextHeight(column)
 		end
 
-		if column.content ~= nil then
-			local text_height = 0
-			for _, content in ipairs(column.content) do
-				if content.type == "text" then
-					text_height = text_height + self:calculateTextHeight(content) / 1.5
-				end
-
-				if content.type == "image" then
-					local resource = self.resources.images[content.value]
-					text_height = text_height + (resource.height * content.width / resource.width) + 10
-				end
-			end
-
-			if text_height > max_height then max_height = text_height end
+		if text_height > max_height then
+			max_height = text_height
 		end
 	end
 
 	self.current_table.current_row.height = max_height
-
 	return max_height
 end
 

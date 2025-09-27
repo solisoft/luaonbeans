@@ -725,6 +725,8 @@ function PDFGenerator:drawTableCell(column, options)
 		paddingY = self.current_table.current_row.height - options.height - self.current_table.padding_y * 2
 	end
 
+	self:moveY(paddingY)
+
 	if column.content then
 		for i, content in ipairs(column.content) do
 			if i == 1 and content.fontSize > 12 then self:moveY(12 - (content.fontSize or options.fontSize) / 1.2) end

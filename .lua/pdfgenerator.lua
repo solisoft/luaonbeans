@@ -526,7 +526,7 @@ function PDFGenerator:addParagraph(text, options)
 		local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
 		for i, line in ipairs(lines) do
 			if options.newLine == true then
-				self.current_y = self.current_y + options.fontSize * 1.2 + options.paddingY
+				self.current_y = self.current_y + options.fontSize * 1.2
 			end
 			if
 				self.out_of_page == false
@@ -593,36 +593,62 @@ function PDFGenerator:drawTable(options, table_options)
 	self.current_table.current_row = { height = nil, padding_x = 5, padding_y = 5 }
 end
 
+function PDFGenerator:calculateTextHeight(column)
+	local text = column.text or column.value or ""
+	local fontSize = column.fontSize or 12
+	local width = column.width or (self.page_width - self.margin_x[1] - self.margin_x[2])
+	local padding_x = column.padding_x or self.current_table.padding_x or 5
+	local padding_y = column.padding_y or self.current_table.padding_y or 5
+
+	-- Split text into lines considering the available width
+	local lines = string.split(text, "\n")
+	local number_of_lines = 0
+
+	for _, line in ipairs(lines) do
+		local splitted_text = self:splitTextToLines(line, fontSize, width - (padding_x * 2))
+		number_of_lines = number_of_lines + #splitted_text
+	end
+
+	-- Calculate height for this item
+	local line_height = fontSize * 1.5 - (number_of_lines / 1.5) -- Standard line height
+	local text_height = number_of_lines * line_height + padding_y * 2  -- Include padding
+	-- Update max_height if this item is taller
+	-- if column.text then text_height = text_height + padding_y * 2 end
+	column.lines = number_of_lines
+	column.height = number_of_lines * line_height
+
+	return text_height
+end
+
 -- Calculate maximum height needed for a collection of text items
-function PDFGenerator:calculateMaxHeight(items)
+function PDFGenerator:calculateMaxHeight(columns)
 	local max_height = 0
 
-	for _, item in ipairs(items) do
-		-- Ensure required fields exist
-		local text = item.text or ""
-		local fontSize = item.fontSize or 12
-		local width = item.width or (self.page_width - self.margin_x[1] - self.margin_x[2])
-		local padding_x = item.padding_x or self.current_table.padding_x or 5
-		local padding_y = item.padding_y or self.current_table.padding_y or 5
-
-		-- Split text into lines considering the available width
-		local lines = string.split(text, "\n")
-		local number_of_lines = 0
-
-		for _, line in ipairs(lines) do
-			local splitted_text = self:splitTextToLines(line, fontSize, width - (padding_x * 2))
-			number_of_lines = number_of_lines + #splitted_text
+	for _, column in ipairs(columns) do
+		if column.content == nil then
+			local text_height = self:calculateTextHeight(column)
+			-- Update max_height if this item is taller
+			if text_height > max_height then
+				max_height = text_height
+			end
 		end
 
-		-- Calculate height for this item
-		local line_height = fontSize * 1.5 - (number_of_lines / 1.5) -- Standard line height
-		local text_height = number_of_lines * line_height + (padding_y * 2) -- Include padding
-		-- Update max_height if this item is taller
-		if text_height > max_height then
-			max_height = text_height
+		if column.content ~= nil then
+			local text_height = 0
+			for _, content in ipairs(column.content) do
+				if content.type == "text" then
+					text_height = text_height + self:calculateTextHeight(content) / 1.5
+					--text_height = text_height / 1.5
+				end
+
+				if content.type == "image" then
+					local resource = self.resources.images[content.value]
+					text_height = text_height + (resource.height * content.width / resource.width) + 10
+				end
+			end
+
+			if text_height > max_height then max_height = text_height end
 		end
-		item.lines = number_of_lines
-		item.height = number_of_lines * line_height
 	end
 
 	self.current_table.current_row.height = max_height
@@ -644,7 +670,7 @@ function PDFGenerator:drawTableRow(columns, row_options)
 		local options = table.merge(row_options, column)
 		-- options.text = nil
 		-- options.height = column.height
-		self:drawTableCell(column.text , options)
+		self:drawTableCell(column, options)
 	end
 
 	-- Reset cursor position
@@ -655,7 +681,7 @@ function PDFGenerator:drawTableRow(columns, row_options)
 end
 
 -- Draw a table cell with text and border
-function PDFGenerator:drawTableCell(text, options)
+function PDFGenerator:drawTableCell(column, options)
 	options = options or {}
 	options.width = options.width or self.page_width - self.margin_x[1] - self.margin_x[2]
 	options.fontSize = options.fontSize or 12
@@ -699,16 +725,36 @@ function PDFGenerator:drawTableCell(text, options)
 		paddingY = self.current_table.current_row.height - options.height - self.current_table.padding_y * 2
 	end
 
-	self:addParagraph(text, {
-		fontSize = options.fontSize,
-		fontWeight = options.fontWeight,
-		alignment = options.alignment,
-		width = options.width,
-		color = options.textColor,
-		paddingX = self.current_table.padding_x * 2,
-		paddingY = paddingY,
-	})
-
+	if column.content then
+		for i, content in ipairs(column.content) do
+			if i == 1 and content.fontSize > 12 then self:moveY(12 - (content.fontSize or options.fontSize) / 1.2) end
+			if content.type == "text" then
+				self:addParagraph(content.value, {
+					fontSize = content.fontSize or options.fontSize,
+					fontWeight = content.fontWeight or options.fontWeight,
+					alignment = content.alignment or options.alignment,
+					width = options.width,
+					color = content.textColor or options.textColor,
+					paddingX = self.current_table.padding_x * 2,
+					paddingY = paddingY,
+				})
+			end
+			if content.type == "image" then
+				self:moveY(5)
+				self:drawImage(content.value, content.width)
+			end
+		end
+	else
+		self:addParagraph(column.text, {
+			fontSize = options.fontSize,
+			fontWeight = options.fontWeight,
+			alignment = options.alignment,
+			width = options.width,
+			color = options.textColor,
+			paddingX = self.current_table.padding_x * 2,
+			paddingY = paddingY,
+		})
+	end
 	-- Restore cursor position after drawing text
 	self.current_x = saved_x
 	self.current_y = saved_y

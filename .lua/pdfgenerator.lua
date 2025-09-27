@@ -407,7 +407,7 @@ function PDFGenerator:splitTextToLines(text, fontSize, maxWidth)
 	local currentWidth = 0
 
 	for i, word in ipairs(words) do
-		local wordWidth = self:getTextWidth(word, fontSize, self.last_font.fontWeight)
+		local wordWidth = self:getTextWidth(word, fontSize, self.last_font.fontWeight) or 0
 		local spaceWidth = self:getTextWidth(" ", fontSize, self.last_font.fontWeight)
 
 		-- Check if adding this word would exceed maxWidth
@@ -466,7 +466,6 @@ function PDFGenerator:addText(text, fontSize, color, alignment, width)
 	-- For justified text, we need to calculate word spacing
 	if alignment == "justify" then
 		local spaces = text:gsub("[^ ]", ""):len() -- Count spaces
-		local words = select(2, text:gsub("%S+", "")) + 1 -- Count words
 		local available_width = self.page_width - self.margin_x[1] - self.margin_x[2]
 		local extra_space = available_width - text_width
 		local word_spacing = extra_space / spaces
@@ -530,7 +529,7 @@ function PDFGenerator:addParagraph(text, options)
 
 	for _, text in ipairs(splittedText) do
 		local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
-		for i, line in ipairs(lines) do
+		for _, line in ipairs(lines) do
 			if options.newLine == true then
 				self.current_y = self.current_y + options.fontSize * 1.2
 			end
@@ -2073,7 +2072,7 @@ function PDFGenerator:generate()
 		string.format("%d 0 obj\n<< /Type /Catalog /Pages %d 0 R >>\nendobj\n", self.root, self.pages_obj)
 
 	-- Write content streams
-	for pageId, content in pairs(self.contents) do
+	for _, content in pairs(self.contents) do
 		local stream = table.concat(content.streams)
 
 		self.objects[content.id] =

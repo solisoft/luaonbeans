@@ -1,10 +1,14 @@
 -- PDF Generator Library for PDF 1.7
 local PDFGenerator = {}
 
+-- Used for pre-fetching data from .init.lua (not sure it really help)
+Resources = Resources or {}
+
 -- PDF object counter
 local objCounter = 1
 
 local function loadAsset(path)
+	if Resources[path] then return Resources[path] end
 	return LoadAsset(path) -- TODO: update for another framework (e.g. Lapis / openresty)
 end
 
@@ -181,7 +185,7 @@ function PDFGenerator:addCustomFont(fontPath, fontName, fontWeight)
 
 	table.insert(self.fonts, { fontName, fontWeight })
 
-	fullFontName = fontName .. "-" .. fontWeight
+	local fullFontName = fontName .. "-" .. fontWeight
 
 	-- Read font file
 	local fontData = loadAsset(fontPath)
@@ -406,7 +410,7 @@ function PDFGenerator:splitTextToLines(text, fontSize, maxWidth)
 	local currentLine = ""
 	local currentWidth = 0
 
-	for i, word in ipairs(words) do
+	for _, word in ipairs(words) do
 		local wordWidth = self:getTextWidth(word, fontSize, self.last_font.fontWeight) or 0
 		local spaceWidth = self:getTextWidth(" ", fontSize, self.last_font.fontWeight)
 
@@ -527,8 +531,8 @@ function PDFGenerator:addParagraph(text, options)
 
 	local splittedText = string.split(text, "\n")
 
-	for _, text in ipairs(splittedText) do
-		local lines = self:splitTextToLines(text, options.fontSize, options.width - options.paddingX)
+	for _, textline in ipairs(splittedText) do
+		local lines = self:splitTextToLines(textline, options.fontSize, options.width - options.paddingX)
 		for _, line in ipairs(lines) do
 			if options.newLine == true then
 				self.current_y = self.current_y + options.fontSize * 1.2
@@ -1125,7 +1129,7 @@ end
 function PDFGenerator:drawStar(outerRadius, branches, borderWidth, borderStyle, borderColor, fillColor)
 	borderWidth = borderWidth or 1
 	branches = branches or 5
-	innerRadius = outerRadius * 0.382 -- Golden ratio for default inner radius
+	local innerRadius = outerRadius * 0.382 -- Golden ratio for default inner radius
 	borderStyle = borderStyle or "solid"
 	borderColor = borderColor or "000000" -- default black
 	borderColor = PDFGenerator:hexToRGB(borderColor)
@@ -1253,6 +1257,8 @@ function PDFGenerator:addImage(imgData, format)
 
 	local width, height, err = get_jpeg_dimensions(imgData)
 
+	assert(err == nil, err)
+
 	-- Store image information
 	self.resources.images[imgName] = {
 		obj = imageObj,
@@ -1369,7 +1375,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 	end
 	local hexToRGB = self.hexToRGB and function(h)
 		return self:hexToRGB(h)
-	end or function(h)
+	end or function(_)
 		return { 0, 0, 0 }
 	end
 	local strokeRGB = hexToRGB(options.strokeColor)
@@ -1477,81 +1483,81 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				end
 			elseif cmd == "C" then
 				while i <= #nums do
-					local x1, y1, x2, y2, x, y =
+					local x1, y1, x2, y2, xx, yy =
 						nums[i], nums[i + 1], nums[i + 2], nums[i + 3], nums[i + 4], nums[i + 5]
 					i = i + 6
-					updateBounds(x1, y1, x2, y2, x, y)
+					updateBounds(x1, y1, x2, y2, xx, yy)
 					cpx, cpy = x2, y2
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "C"
 				end
 			elseif cmd == "c" then
 				while i <= #nums do
 					local x1, y1 = cx + nums[i], cy + nums[i + 1]
 					local x2, y2 = cx + nums[i + 2], cy + nums[i + 3]
-					local x, y = cx + nums[i + 4], cy + nums[i + 5]
+					local xx, yy = cx + nums[i + 4], cy + nums[i + 5]
 					i = i + 6
-					updateBounds(x1, y1, x2, y2, x, y)
+					updateBounds(x1, y1, x2, y2, xx, yy)
 					cpx, cpy = x2, y2
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "c"
 				end
 			elseif cmd == "S" then
 				while i <= #nums do
-					local x2, y2, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+					local x2, y2, xx, yy = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
 					i = i + 4
 					local x1, y1 = lastWasCubic() and (2 * cx - cpx), (2 * cy - cpy) or cx, cy
-					updateBounds(x1, y1, x2, y2, x, y)
+					updateBounds(x1, y1, x2, y2, xx, yy)
 					cpx, cpy = x2, y2
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "S"
 				end
 			elseif cmd == "s" then
 				while i <= #nums do
-					local x2, y2, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+					local x2, y2, xx, yy = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
 					i = i + 4
 					local x1, y1 = lastWasCubic() and (2 * cx - cpx), (2 * cy - cpy) or cx, cy
 					updateBounds(x1, y1, x2, y2, x, y)
 					cpx, cpy = x2, y2
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "s"
 				end
 			elseif cmd == "Q" then
 				while i <= #nums do
-					local x1, y1, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+					local x1, y1, xx, yy = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
 					i = i + 4
-					updateBounds(x1, y1, x, y)
+					updateBounds(x1, y1, xx, yy)
 					qx, qy = x1, y1
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "Q"
 				end
 			elseif cmd == "q" then
 				while i <= #nums do
-					local x1, y1, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+					local x1, y1, xx, yy = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
 					i = i + 4
-					updateBounds(x1, y1, x, y)
+					updateBounds(x1, y1, xx, yy)
 					qx, qy = x1, y1
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "q"
 				end
 			elseif cmd == "T" then
 				while i <= #nums do
-					local x, y = nums[i], nums[i + 1]
+					local xx, yy = nums[i], nums[i + 1]
 					i = i + 2
 					local x1, y1 = lastWasQuad() and qx and (2 * cx - qx), (2 * cy - qy) or cx, cy
-					updateBounds(x1, y1, x, y)
+					updateBounds(x1, y1, xx, yy)
 					qx, qy = x1, y1
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "T"
 				end
 			elseif cmd == "t" then
 				while i <= #nums do
-					local x, y = cx + nums[i], cy + nums[i + 1]
+					local xx, yy = cx + nums[i], cy + nums[i + 1]
 					i = i + 2
 					local x1, y1 = lastWasQuad() and qx and (2 * cx - qx), (2 * cy - qy) or cx, cy
-					updateBounds(x1, y1, x, y)
+					updateBounds(x1, y1, xx, yy)
 					qx, qy = x1, y1
-					cx, cy = x, y
+					cx, cy = xx, yy
 					lastCmd = "t"
 				end
 			elseif cmd == "Z" or cmd == "z" then
@@ -1785,39 +1791,39 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 			end
 		elseif cmd == "C" then
 			while i <= #nums do
-				local x1, y1, x2, y2, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3], nums[i + 4], nums[i + 5]
+				local x1, y1, x2, y2, xx, yy = nums[i], nums[i + 1], nums[i + 2], nums[i + 3], nums[i + 4], nums[i + 5]
 				i = i + 6
 				local tx1, ty1 = transform(x1, y1)
 				local tx2, ty2 = transform(x2, y2)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				cpx, cpy = x2, y2
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "C"
 			end
 		elseif cmd == "c" then
 			while i <= #nums do
 				local x1, y1 = cx + nums[i], cy + nums[i + 1]
 				local x2, y2 = cx + nums[i + 2], cy + nums[i + 3]
-				local x, y = cx + nums[i + 4], cy + nums[i + 5]
+				local xx, yy = cx + nums[i + 4], cy + nums[i + 5]
 				i = i + 6
 				local tx1, ty1 = transform(x1, y1)
 				local tx2, ty2 = transform(x2, y2)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				cpx, cpy = x2, y2
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "c"
 			end
 		elseif cmd == "S" then
 			while i <= #nums do
-				local x2, y2, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+				local x2, y2, xx, yy = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
 				i = i + 4
 				local x1, y1
 				if lastWasCubic() then
@@ -1827,18 +1833,18 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				end
 				local tx1, ty1 = transform(x1, y1)
 				local tx2, ty2 = transform(x2, y2)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				cpx, cpy = x2, y2
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "S"
 			end
 		elseif cmd == "s" then
 			while i <= #nums do
-				local x2, y2, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+				local x2, y2, xx, yy = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
 				i = i + 4
 				local x1, y1
 				if lastWasCubic() then
@@ -1848,18 +1854,18 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				end
 				local tx1, ty1 = transform(x1, y1)
 				local tx2, ty2 = transform(x2, y2)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				cpx, cpy = x2, y2
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "s"
 			end
 		elseif cmd == "Q" then
 			while i <= #nums do
-				local x1, y1, x, y = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
+				local x1, y1, xx, yy = nums[i], nums[i + 1], nums[i + 2], nums[i + 3]
 				i = i + 4
 				-- convert quadratic to cubic:
 				local c1x = cx + (2 / 3) * (x1 - cx)
@@ -1868,18 +1874,18 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local c2y = y + (2 / 3) * (y1 - y)
 				local tx1, ty1 = transform(c1x, c1y)
 				local tx2, ty2 = transform(c2x, c2y)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				qx, qy = x1, y1
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "Q"
 			end
 		elseif cmd == "q" then
 			while i <= #nums do
-				local x1, y1, x, y = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
+				local x1, y1, xx, yy = cx + nums[i], cy + nums[i + 1], cx + nums[i + 2], cy + nums[i + 3]
 				i = i + 4
 				local c1x = cx + (2 / 3) * (x1 - cx)
 				local c1y = cy + (2 / 3) * (y1 - cy)
@@ -1887,18 +1893,18 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local c2y = y + (2 / 3) * (y1 - y)
 				local tx1, ty1 = transform(c1x, c1y)
 				local tx2, ty2 = transform(c2x, c2y)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				qx, qy = x1, y1
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "q"
 			end
 		elseif cmd == "T" then
 			while i <= #nums do
-				local x, y = nums[i], nums[i + 1]
+				local xx, yy = nums[i], nums[i + 1]
 				i = i + 2
 				local x1, y1
 				if lastWasQuad() and qx then
@@ -1912,18 +1918,18 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local c2y = y + (2 / 3) * (y1 - y)
 				local tx1, ty1 = transform(c1x, c1y)
 				local tx2, ty2 = transform(c2x, c2y)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				qx, qy = x1, y1
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "T"
 			end
 		elseif cmd == "t" then
 			while i <= #nums do
-				local x, y = cx + nums[i], cy + nums[i + 1]
+				local xx, yy = cx + nums[i], cy + nums[i + 1]
 				i = i + 2
 				local x1, y1
 				if lastWasQuad() and qx then
@@ -1937,13 +1943,13 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local c2y = y + (2 / 3) * (y1 - y)
 				local tx1, ty1 = transform(c1x, c1y)
 				local tx2, ty2 = transform(c2x, c2y)
-				local tx, ty = transform(x, y)
+				local tx, ty = transform(xx, yy)
 				table.insert(
 					content.streams,
 					string.format("%s %s %s %s %s %s c\n", nts(tx1), nts(ty1), nts(tx2), nts(ty2), nts(tx), nts(ty))
 				)
 				qx, qy = x1, y1
-				cx, cy = x, y
+				cx, cy = xx, yy
 				lastCmd = "t"
 			end
 		elseif cmd == "A" or cmd == "a" then
@@ -1952,15 +1958,15 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 				local xAxisRot = nums[i + 2]
 				local largeArcFlag = nums[i + 3]
 				local sweepFlag = nums[i + 4]
-				local x, y
+				local xx, yy
 
 				if cmd == "a" then
-					x, y = cx + nums[i + 5], cy + nums[i + 6]
+					xx, yy = cx + nums[i + 5], cy + nums[i + 6]
 				else
-					x, y = nums[i + 5], nums[i + 6]
+					xx, yy = nums[i + 5], nums[i + 6]
 				end
 
-				local beziers = arcToBeziers(cx, cy, rx, ry, xAxisRot, largeArcFlag ~= 0, sweepFlag ~= 0, x, y)
+				local beziers = arcToBeziers(cx, cy, rx, ry, xAxisRot, largeArcFlag ~= 0, sweepFlag ~= 0, xx, yy)
 
 				for _, b in ipairs(beziers) do
 					local x1, y1, x2, y2, x3, y3 = table.unpack(b)
@@ -1970,7 +1976,7 @@ function PDFGenerator:drawSvgPath(width, height, pathData, options)
 					)
 				end
 
-				cx, cy = x, y
+				cx, cy = xx, yy
 				i = i + 7
 			end
 		elseif cmd == "Z" or cmd == "z" then

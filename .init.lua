@@ -20,6 +20,13 @@ ProgramMaxPayloadSize(10485760) -- 10 MB
 Views = {}
 IsApi = false -- set it to true to return json for 404 errors
 
+-- Preload Font assets for PDF generation
+Resources = {
+	["fonts/TitilliumWeb-Regular.ttf"] = LoadAsset("fonts/TitilliumWeb-Regular.ttf"),
+	["fonts/TitilliumWeb-Regular.json"] = LoadAsset("fonts/TitilliumWeb-Regular.json"),
+	["fonts/TitilliumWeb-Bold.ttf"] = LoadAsset("fonts/TitilliumWeb-Bold.ttf"),
+	["fonts/TitilliumWeb-Bold.json"] = LoadAsset("fonts/TitilliumWeb-Bold.json")
+}
 -- LastModifiedAt is used to cache the last modified time of the assets
 -- so that we can use it to send the correct last modified time to the client
 -- and avoid sending the whole file to the client

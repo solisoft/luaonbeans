@@ -15,7 +15,7 @@ local app = {
     local pdf = PDFGenerator.new({header_height = 50})
 
     pdf:setHeader(function(pageId)
-      pdf:addParagraph("Header - redbean.com PDF Generator - %s on %d" % { pageId, pdf:totalPage(self) }, { fontSize = 16, alignment = "left", newPage = false })
+      pdf:addParagraph("Header - redbean.com PDF Generator - %s on %d" % { pageId, pdf:totalPage() }, { fontSize = 16, alignment = "left", newPage = false })
       pdf:drawLine(50, 842-50, 595 - 50, 842-50, 1)
     end)
 

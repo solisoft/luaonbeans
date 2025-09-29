@@ -8,7 +8,9 @@ Resources = Resources or {}
 local objCounter = 1
 
 local function loadAsset(path)
-	if Resources[path] then return Resources[path] end
+	if Resources[path] then
+		return Resources[path]
+	end
 	return LoadAsset(path) -- TODO: update for another framework (e.g. Lapis / openresty)
 end
 
@@ -370,7 +372,7 @@ end
 -- Get text width for current font and size using font metrics
 local wordCache = setmetatable({}, { __mode = "kv" })
 function PDFGenerator:getTextWidth(text, fontSize, fontWeight)
-	local key = table.concat({text, fontSize, fontWeight})
+	local key = table.concat({ text, fontSize, fontWeight })
 	if wordCache[key] then
 		return wordCache[key]
 	end
@@ -620,7 +622,7 @@ function PDFGenerator:calculateTextHeight(column)
 
 	-- Calculate height for this item
 	local line_height = fontSize * 1.5 - (number_of_lines / 1.5) -- Standard line height
-	local text_height = number_of_lines * line_height + padding_y * 2  -- Include padding
+	local text_height = number_of_lines * line_height + padding_y * 2 -- Include padding
 	-- Update max_height if this item is taller
 	column.lines = number_of_lines
 	column.height = number_of_lines * line_height
@@ -638,7 +640,9 @@ function PDFGenerator:calculateMaxHeight(columns)
 			return self:calculateTextHeight(content) / 1.5
 		elseif content.type == "image" then
 			local resource = self.resources.images[content.value]
-			if not resource then return 0 end
+			if not resource then
+				return 0
+			end
 			return (resource.height * content.width / resource.width) + 10
 		end
 		return 0
@@ -738,7 +742,9 @@ function PDFGenerator:drawTableCell(column, options)
 
 	if column.content then
 		for i, content in ipairs(column.content) do
-			if i == 1 and content.fontSize > 12 then self:moveY(12 - (content.fontSize or options.fontSize) / 1.2) end
+			if i == 1 and content.fontSize > 12 then
+				self:moveY(12 - (content.fontSize or options.fontSize) / 1.2)
+			end
 			if content.type == "text" then
 				self:addParagraph(content.value, {
 					fontSize = content.fontSize or options.fontSize,

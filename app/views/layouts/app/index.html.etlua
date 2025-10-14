@@ -80,5 +80,6 @@
     </div>
     <%- Partial("footer") %>
   </div>
+  <%- RefreshPageForDevMode() %>
 </body>
 </html>

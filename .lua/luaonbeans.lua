@@ -521,3 +521,12 @@ function LoadCronsJobs(path)
 		dir:close()
 	end
 end
+
+function RefreshPageForDevMode()
+	if BeansEnv == "development" then
+		return [[<script src="/live_reload.js"></script>]]
+	else
+		return ""
+	end
+end
+

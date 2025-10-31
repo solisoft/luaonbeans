@@ -21,8 +21,8 @@ local app = {
 
     -- Add a page (default A4 size)
     pdf:addPage()
-    --pdf:addCustomFont("fonts/Helvetica.ttf", "helvetica", "normal")
-    --pdf:addCustomFont("fonts/Helvetica-Bold.ttf", "helvetica", "bold")
+    pdf:addCustomFont("fonts/Helvetica.ttf", "helvetica", "normal")
+    pdf:addCustomFont("fonts/Helvetica-Bold.ttf", "helvetica", "bold")
     pdf:addCustomFont("fonts/TitilliumWeb-Regular.ttf", "titillium", "normal")
     pdf:addCustomFont("fonts/TitilliumWeb-Bold.ttf", "titillium", "bold")
 
@@ -30,6 +30,8 @@ local app = {
     pdf:drawImage(imgName)
 
     pdf:moveY(10)
+
+    --pdf:useFont("helveltica")
 
     -- Add some text
     pdf:addParagraph([[

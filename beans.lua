@@ -99,7 +99,7 @@ CreateModel = function(model_name)
   print("✅ specs/models/" .. words.singular .. "_spec.lua created")
 end
 
-if arg[1] == "create" then
+if arg[1] == "create" or arg[1] == "g" then
   if arg[2] == "migration" then
     CreateMigration(arg[3])
   end
@@ -153,7 +153,7 @@ SetupArangoDB = function(env)
 end
 
 if arg[1] == "db:setup" then
-  if DBConfig["engine"] == "arangodb" then
+  if DBConfig[BeansEnv][1]["engine"] == "arangodb" then
     SetupArangoDB(BeansEnv)
   end
 end
@@ -205,16 +205,18 @@ Sqlite_DBMigrate = function()
 end
 
 if arg[1] == "db:migrate" then
-  if DBConfig["engine"] == "arangodb" then
+  if DBConfig[BeansEnv][1]["engine"] == "arangodb" then
+    SetupArangoDB(BeansEnv)
     ArangoDB_DBMigrate()
-  elseif DBConfig["engine"] == "sqlite" then
+  elseif DBConfig[BeansEnv][1]["engine"] == "sqlite" then
     Sqlite_DBMigrate()
   end
 end
 
 if arg[1] == "db:rollback" then
-  if DBConfig["engine"] == "arangodb" then
-    local latest_version = Adb.primary.Aql("FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m").result[1]
+  if DBConfig[BeansEnv][1]["engine"] == "arangodb" then
+    SetupArangoDB(BeansEnv)
+    local latest_version = Adb.primary:Aql("FOR m IN migrations SORT TO_NUMBER(m._key) DESC LIMIT 1 RETURN m").result[1]
     if latest_version.filename ~= "0" then
       print("Processing " .. latest_version.filename)
       local migration = require(string.gsub(latest_version.filename, ".lua", ""))
@@ -224,7 +226,7 @@ if arg[1] == "db:rollback" then
     else
       print("Nothing to rollback!")
     end
-  elseif DBConfig["engine"] == "sqlite" then
+  elseif DBConfig[BeansEnv][1]["engine"] == "sqlite" then
     local sqlite3 = require "lsqlite3"
     local db = sqlite3.open(DBConfig[BeansEnv]["db_name"] .. ".sqlite3")
     local latest_version = ""

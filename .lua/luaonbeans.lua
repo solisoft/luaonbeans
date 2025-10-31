@@ -6,6 +6,8 @@ PGRest = {}
 Rest = {}
 Surreal = {}
 
+Blocks = {}
+
 function LoadViewsRecursively(path)
 	local dir = unix.opendir(path)
 	assert(dir ~= nil, "Error while opening path " .. path)
@@ -99,6 +101,22 @@ function Partial(partial, bindVars)
 	end
 
 	return Views["app/views/partials/" .. partial .. ".html.etlua"](bindVars)
+end
+
+---Helper method ContentFor
+---@param tag string name of the content
+---@param fn function the function to be executed
+---@return nil
+function ContentFor(tag, block)
+  Blocks[tag] = Blocks[tag] or {}
+  table.insert(Blocks[tag], block())
+end
+
+---Helper method YieldContent
+---@param tag string name of the content
+---@return string content
+function YieldContent(tag)
+  return table.concat(Blocks[tag], "\n")
 end
 
 local function assignRoute(method, name, options, value)
@@ -351,12 +369,13 @@ end
 
 function GetBodyParams()
 	local body_Params = {}
-	for i, data in pairs(Params) do
-		if type(data) == "table" then
+	for _, data in pairs(Params) do
+		if type(data) == "table" and #data > 1 then
 			body_Params[data[1]] = data[2]
 		end
 	end
 
+	Params = table.merge(Params, body_Params)
 	return body_Params
 end
 
@@ -404,14 +423,14 @@ function InitDB(db_config)
 			sqlite:exec([[PRAGMA journal_mode=WAL]])
 			sqlite:exec([[PRAGMA synchronous=NORMAL]])
 			sqlite:exec([[
-        CREATE TABLE IF NOT EXISTS "migrations"
-        (
-          id integer PRIMARY KEY,
-          filename VARCHAR
-        );
+				CREATE TABLE IF NOT EXISTS "migrations"
+				(
+					id integer PRIMARY KEY,
+					filename VARCHAR
+				);
 
-        CREATE UNIQUE INDEX idx_migrations_filename ON migrations (filename);
-      ]])
+				CREATE UNIQUE INDEX idx_migrations_filename ON migrations (filename);
+			]])
 		elseif config.engine == "surrealdb" then
 			local _Surreal = require("db.surrealdb")
 			Surreal[config.name] = _Surreal.new(config)
@@ -459,7 +478,10 @@ function LoadPublicAssetsRecursively(path)
 end
 
 RunCommand = function(command)
-	command = string.split(command)
+	if type(command) == "string" then
+		command = string.split(command)
+	end
+
 	local prog = assert(Unix.commandv(command[1]))
 
 	local output = ""
@@ -530,3 +552,39 @@ function RefreshPageForDevMode()
 	end
 end
 
+-- View form errors
+local function ExtractModelError(inputTable, allowedField)
+	local messages = {}
+
+	-- Collect messages for the allowed field
+	for _, v in ipairs(inputTable) do
+		if v.field == allowedField then
+			table.insert(messages, v.message)
+		end
+	end
+
+	return messages
+end
+
+local function DisplayErrorFor(model_errors, field, style)
+	style = style or "color:red"
+	local errors = ExtractModelError(model_errors, field)
+	if #errors > 0 then
+		for _, error in pairs(errors) do
+			return [[<div style="%s">%s</div>]] % { style, error }
+		end
+	else
+		return ""
+	end
+end
+
+function TextField(name, field, model, options)
+	options = options or {}
+	local value = options.novalue == true and "" or model.data[field]
+	local required = options.required == true and "required" or ""
+
+	return [[
+	<label class="font-bold" for="firstname">%s</label>
+	<input type="text" name="%s" value="%s" %s />%s
+	]] % { name, field, value or "", required, DisplayErrorFor(model.errors, field, options.error_style) }
+end

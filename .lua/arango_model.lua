@@ -6,7 +6,7 @@ function ArangoModel.new(data)
   self.filters = {}
   self.bindvars = {}
   self.sort = "doc._id ASC"
-  self.data = data
+  self.data = data or {}
   self.var_index = 0
   self.global_callbacks = {
     before_create = { "run_before_create_callback" },
@@ -198,7 +198,7 @@ function ArangoModel:validates_each(data)
         local default_error = I18n:t("models.errors.presence")
         if v == true then v = { message = default_error } end
         if v.message == nil then v.message = default_error end
-        if value == nil then
+        if value == nil or value == "" then
           self.errors = table.append(self.errors, {{ field = field, message = v.message }})
         end
       end
@@ -397,7 +397,7 @@ end
 -- collection
 
 function ArangoModel:create(data)
-  assert(self.data == nil, "create not allowed here")
+  assert(self.data._id == nil, "create not allowed here")
   local callbacks = table.append(self.global_callbacks.before_create, self.callbacks.before_create)
   for _, methodName in pairs(callbacks) do data = self[methodName](data) end
 
@@ -407,6 +407,8 @@ function ArangoModel:create(data)
     self.data = Adb.primary:CreateDocument(self.COLLECTION, data, "returnNew=true")["new"]
     callbacks = table.append(self.global_callbacks.after_create, self.callbacks.after_create)
     for _, methodName in pairs(callbacks) do self[methodName](self)  end
+  else
+    self.data = data
   end
   return self
 end

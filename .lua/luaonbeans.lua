@@ -105,18 +105,18 @@ end
 
 ---Helper method ContentFor
 ---@param tag string name of the content
----@param fn function the function to be executed
+---@param block function the function to be executed
 ---@return nil
 function ContentFor(tag, block)
-  Blocks[tag] = Blocks[tag] or {}
-  table.insert(Blocks[tag], block())
+	Blocks[tag] = Blocks[tag] or {}
+	table.insert(Blocks[tag], block())
 end
 
 ---Helper method YieldContent
 ---@param tag string name of the content
 ---@return string content
 function YieldContent(tag)
-  return table.concat(Blocks[tag], "\n")
+	return table.concat(Blocks[tag] or {}, "\n")
 end
 
 local function assignRoute(method, name, options, value)

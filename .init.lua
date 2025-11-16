@@ -68,6 +68,7 @@ end
 
 -- OnHttpRequest hook
 function OnHttpRequest()
+	Blocks = {}
 	-- local redis = require "db.redis"
 	-- Redis = redis.connect()
 

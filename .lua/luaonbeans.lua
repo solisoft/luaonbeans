@@ -5,7 +5,6 @@ Crate = {}
 PGRest = {}
 Rest = {}
 Surreal = {}
-
 Blocks = {}
 
 function LoadViewsRecursively(path)
@@ -58,18 +57,18 @@ function Page(view, layout, bindVarsView, bindVarsLayout)
 		end
 	end
 
+	compiled_view = Views["app/views/" .. view .. ".etlua"]
+	if variant ~= "" then
+		compiled_view = Views["app/views/" .. view .. "+" .. variant .. ".etlua"] or compiled_view
+	end
+	view = compiled_view(bindVarsView or {})
+
 	compiled_layout = Views["app/views/layouts/" .. layout .. "/index.html.etlua"]
 	if variant ~= "" then
 		compiled_layout = Views["app/views/layouts/" .. layout .. "/index.html+" .. variant .. ".etlua"]
 			or compiled_layout
 	end
 	layout = compiled_layout(bindVarsLayout or {})
-
-	compiled_view = Views["app/views/" .. view .. ".etlua"]
-	if variant ~= "" then
-		compiled_view = Views["app/views/" .. view .. "+" .. variant .. ".etlua"] or compiled_view
-	end
-	view = compiled_view(bindVarsView or {})
 
 	local content
 	if view:find("%%") then
@@ -246,9 +245,10 @@ local function tableSplat(input_list)
 end
 
 function DefineRoute(path, method)
-	if method == "PATCH" then
-		method = "PUT"
-	end
+	if method == "PATCH" then	method = "PUT" end
+
+	if method == "POST" and Params._method ~= nil then method = Params._method end
+
 	local recognized_route = Routes[method]
 	local route_found = false
 	local final_route = false
@@ -257,7 +257,7 @@ function DefineRoute(path, method)
 
 	Splat = {}
 	if path == "/" then
-		recognized_route = recognized_route[""]
+		recognized_route = recognized_route[""] or recognized_route["@"]
 	else
 		for _, value in pairs(string.split(path, "/")) do
 			if final_route == false then
@@ -266,16 +266,16 @@ function DefineRoute(path, method)
 						final_route = true
 					end
 					recognized_route = recognized_route[value] or recognized_route[value .. "*"]
-					if recognized_route[""] then
-						last_route_found = recognized_route[""]
+					if recognized_route[""] or recognized_route["@"] then
+						last_route_found = recognized_route[""] or recognized_route["@"]
 					end
 					route_found = true
 				else
 					route_found = false
 					if recognized_route[":var"] then
 						recognized_route = recognized_route[":var"]
-						if recognized_route[""] then
-							last_route_found = recognized_route[""]
+						if recognized_route[""] or recognized_route["@"] then
+							last_route_found = recognized_route[""] or recognized_route["@"]
 						end
 						local parser = Re.compile(recognized_route[":regex"])
 						local matcher = { parser:search(value) }
@@ -293,7 +293,7 @@ function DefineRoute(path, method)
 		end
 
 		if type(recognized_route) == "table" and route_found then
-			recognized_route = recognized_route[""]
+			recognized_route = recognized_route[""] or recognized_route["@"]
 		else
 			if route_found == false then
 				recognized_route = nil
@@ -376,11 +376,12 @@ function GetBodyParams()
 	end
 
 	Params = table.merge(Params, body_Params)
+	Params = table.merge(Params, DecodeJson(GetBody()) or {})
 	return body_Params
 end
 
-function RedirectTo(path, status)
-	status = status or 301
+function RedirectTo(path)
+	status = status or 302
 	SetStatus(status)
 	SetHeader("Location", path)
 end
@@ -477,7 +478,7 @@ function LoadPublicAssetsRecursively(path)
 	dir:close()
 end
 
-RunCommand = function(command)
+function RunCommand(command)
 	if type(command) == "string" then
 		command = string.split(command)
 	end
@@ -552,7 +553,7 @@ function RefreshPageForDevMode()
 	end
 end
 
--- View form errors
+-- View Helpers
 local function ExtractModelError(inputTable, allowedField)
 	local messages = {}
 
@@ -582,9 +583,20 @@ function TextField(name, field, model, options)
 	options = options or {}
 	local value = options.novalue == true and "" or model.data[field]
 	local required = options.required == true and "required" or ""
+	local type = options.password == true and "password" or "text"
 
 	return [[
 	<label class="font-bold" for="firstname">%s</label>
-	<input type="text" name="%s" value="%s" %s />%s
-	]] % { name, field, value or "", required, DisplayErrorFor(model.errors, field, options.error_style) }
+	<input type="%s" name="%s" value="%s" %s class="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-600 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400" />%s
+	]] % { name, type, field, value or "", required, DisplayErrorFor(model.errors, field, options.error_style) }
 end
+
+function PasswordField(name, field, model, options)
+	return TextField(name, field, model, table.merge(options, { password = true }))
+end
+
+function CheckboxField(field, model, options)
+	options = options or {}
+	return '%s<input type="checkbox" name="%s" %s>' % { DisplayErrorFor(model.errors, field, options.error_style), field, model.data[field] and "checked" or "" }
+end
+-- / View Helpers

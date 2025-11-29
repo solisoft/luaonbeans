@@ -1,5 +1,5 @@
 Routes = { ["GET"] = {
-    [""] = { ["@"] = "welcome#index" },
+    [""] = "welcome#index",
     ["pdf"] = { ["@"] = "welcome#pdf" },
     ["chart"] = { ["@"] = "welcome#chart" },
     ["redis-incr"] = { ["@"] = "welcome#redis_incr" }

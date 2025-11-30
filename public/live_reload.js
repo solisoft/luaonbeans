@@ -4,7 +4,7 @@
  * when using the beans CLI development server.
  */
 
-(function() {
+(function () {
     'use strict';
 
     // Configuration
@@ -29,7 +29,9 @@
             z-index: 9999;
             transition: background-color 0.3s ease;
         `;
-        document.body.appendChild(indicator);
+        if (document.body !== null) {
+            document.body.appendChild(indicator);
+        }
         return indicator;
     }
 
@@ -44,8 +46,13 @@
     // Reload stylesheets to force CSS refresh
     function reloadStylesheets() {
         document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-            const newHref = link.href.replace(/\?.*$/, '') + '?v=' + Date.now();
-            link.href = newHref;
+            try {
+                const url = new URL(link.href);
+                url.searchParams.set('v', Date.now());
+                link.href = url.toString();
+            } catch (e) {
+                console.error('Failed to reload stylesheet:', link.href, e);
+            }
         });
     }
 
@@ -62,11 +69,11 @@
                 Window.lob_ws = new WebSocket(WS_URL);
             }
 
-            Window.lob_ws.onopen = function() {
+            Window.lob_ws.onopen = function () {
                 updateStatus(true);
             };
 
-            Window.lob_ws.onmessage = async function(event) {
+            Window.lob_ws.onmessage = async function (event) {
                 try {
                     const data = JSON.parse(event.data);
                     if (data.type === 'file_changed') {
@@ -103,7 +110,9 @@
                                         document.body.appendChild(newScript);
                                     });
                                 }
-                            }, 100);
+                                // Run any script here
+                                try { hljs.highlightAll(); } catch (e) { console.log(e); }
+                            }, 1);
                         }
                     }
                 } catch (e) {
@@ -111,12 +120,12 @@
                 }
             };
 
-            Window.lob_ws.onclose = function() {
+            Window.lob_ws.onclose = function () {
                 updateStatus(false);
                 scheduleReconnect();
             };
 
-            Window.lob_ws.onerror = function(error) {
+            Window.lob_ws.onerror = function (error) {
                 updateStatus(false);
                 scheduleReconnect();
             };

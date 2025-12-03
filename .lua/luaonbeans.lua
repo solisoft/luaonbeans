@@ -140,10 +140,9 @@ local function assignRoute(method, name, options, value)
 		for i = 1, #path do
 			local v = path[i]
 			if v:sub(1, 1) == ":" then
-				current[":var"] = {
-					[":name"] = v:sub(2),
-					[":regex"] = options[v] or "([0-9a-zA-Z_\\-]+)",
-				}
+				current[":var"] = current[":var"] or {}
+				current[":var"][":name"] = v:sub(2)
+				current[":var"][":regex"] = options[v] or "([0-9a-zA-Z_\\-]+)"
 				if i == #path then
 					current[":var"][""] = value
 				end

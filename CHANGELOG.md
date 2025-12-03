@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.18.0](https://github.com/solisoft/luaonbeans/compare/v0.17.0...v0.18.0) (2025-12-03)
+
+
+### Features
+
+* add arc2bezier to pdfgenerator ([0af46ee](https://github.com/solisoft/luaonbeans/commit/0af46ee6ebd0c4d687301a4feeda6c79729d58a6))
+* add cache for hexToRGB ([602704f](https://github.com/solisoft/luaonbeans/commit/602704f1e7a0105b25bea4433e0f2fd9d260954d))
+* add styles & cap to lines ([bfed6a6](https://github.com/solisoft/luaonbeans/commit/bfed6a67a5181182bcaaa1196ef33f76a4924cc6))
+* add styles & cap to lines ([5033137](https://github.com/solisoft/luaonbeans/commit/503313730d3535ad8dd54a4e802ba79f3cc9c6af))
+* add styles & cap to lines ([cc9e8ab](https://github.com/solisoft/luaonbeans/commit/cc9e8abf51883b6a2cc49e56a3b22a0f71432ca4))
+* auto calculate image width & heigth ([b4b326a](https://github.com/solisoft/luaonbeans/commit/b4b326a26941f85f45c5b77e1ebdd1e5f70d19d5))
+* ContentFor & YieldContent ([406f561](https://github.com/solisoft/luaonbeans/commit/406f561c02ba81633c44cc806e6791e08befda6d))
+* handle multilines in table cells ([30cdef3](https://github.com/solisoft/luaonbeans/commit/30cdef3041173e611ed78b45d8ee24007052d045))
+* improve core ([3cd423f](https://github.com/solisoft/luaonbeans/commit/3cd423f53bf2ba5b76b10df4c8c6ecb0882b037f))
+* improve live_reload ([fd773eb](https://github.com/solisoft/luaonbeans/commit/fd773eb2aec16f0734bc131976dc34ba562c02fd))
+* improve PDF generator speed ([28ebded](https://github.com/solisoft/luaonbeans/commit/28ebded3a7135e7a7fdacd9487b88477e492164b))
+* improve performances for PDF generartion ([0c5e74d](https://github.com/solisoft/luaonbeans/commit/0c5e74d75110b408e9d0d3faddbb26c16d95305c))
+* improve text width calculation ([b17b2f5](https://github.com/solisoft/luaonbeans/commit/b17b2f52229406ca9e9227f6e57404256aefc0f3))
+* live reload ([12e1ddf](https://github.com/solisoft/luaonbeans/commit/12e1ddfaa287a33cec51253c1a9526a2f50a2cd9))
+* onError : returns the right status ([86d9a86](https://github.com/solisoft/luaonbeans/commit/86d9a8673a2a409b217220c3d9dc657c9095f5f5))
+* PDFGenerator : add option.color for drawLine method ([374333d](https://github.com/solisoft/luaonbeans/commit/374333d8baa0c7ad7814770ad50eecfc940feec2))
+* PDFGenerator : add option.color for drawLine method ([113b877](https://github.com/solisoft/luaonbeans/commit/113b877bf2f2dec7c74381f9942be56d075212c1))
+* PDFGenerator : allow empty header rows ([12e5889](https://github.com/solisoft/luaonbeans/commit/12e5889090d6680e885b2db47a011a84916b719f))
+* PDFGenerator : allow fontWeght options + multilines in cells ([70a070e](https://github.com/solisoft/luaonbeans/commit/70a070e972b639042fd862951d7b0dc9412475f1))
+* revert bad indentation in spec ([6b19d41](https://github.com/solisoft/luaonbeans/commit/6b19d4182b75ca7ee6732b615d9eae5d7b48c614))
+* simplify cron files ([c0bac84](https://github.com/solisoft/luaonbeans/commit/c0bac8410bbaa14750b8ece300db6666f77f305a))
+* table can emebed list of text and images ([3f442ec](https://github.com/solisoft/luaonbeans/commit/3f442ec5c808d18f5dd87746ac2e4dc30e7299cb))
+
+
+### Bug Fixes
+
+* "fix" specs :) ([e834747](https://github.com/solisoft/luaonbeans/commit/e8347471289ad4cbcd586d1c5e13dea4a9549962))
+* 404 error page + remove useless code in PDF Generator ([96b5cc7](https://github.com/solisoft/luaonbeans/commit/96b5cc7a42f5a7320689f3d1c84741b629aa21e9))
+* assignRoute ([6b86ce0](https://github.com/solisoft/luaonbeans/commit/6b86ce03182d9f095b7c2c2e309d5c2a02bea604))
+* Blocks must be emptied on each requests ([6459323](https://github.com/solisoft/luaonbeans/commit/64593230eb57ef8a89d10075ac87158ef927c423))
+* handle empty headers ([5912ea6](https://github.com/solisoft/luaonbeans/commit/5912ea69613b7444e94eb050958c770af94823e3))
+* less warnings in code ([f6a3dbb](https://github.com/solisoft/luaonbeans/commit/f6a3dbb5749f34bd7ad464a2b97c74b61724812e))
+* optimize get_jpeg_dimensions method ([0f07dae](https://github.com/solisoft/luaonbeans/commit/0f07dae04086f6abd765e08b33b3287828714805))
+* PDF Generator double table header when first line do not have enough room ([d82784d](https://github.com/solisoft/luaonbeans/commit/d82784da55166ffb72a911eb7cb48d9ea6108223))
+* remove unused code ([d18c3d1](https://github.com/solisoft/luaonbeans/commit/d18c3d155aa500cbd027e4132bdcde63fd77605f))
+* restore vertical alignement ([b9d536a](https://github.com/solisoft/luaonbeans/commit/b9d536a9931f6fa520641bba402ac9c8365c72a9))
+* Routes definition ([a48c29a](https://github.com/solisoft/luaonbeans/commit/a48c29ac018faa47e1fd7f091ece8a91cbd36713))
+* small improvement on PDF Generate method ([be02ce3](https://github.com/solisoft/luaonbeans/commit/be02ce332560cf631c0e11a5c43221874b5078d0))
+* transform tabs in spaces ([0b86079](https://github.com/solisoft/luaonbeans/commit/0b8607934a54e265873359fdcb61cb4d9e51790a))
+* YieldContent issue when no data ([8cdb31e](https://github.com/solisoft/luaonbeans/commit/8cdb31ed3f62ad9053b736e80a6caf3edaf310fc))
+
 ## [0.17.0](https://github.com/solisoft/luaonbeans/compare/v0.16.0...v0.17.0) (2025-09-07)
 
 
